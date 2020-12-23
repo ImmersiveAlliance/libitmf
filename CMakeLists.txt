@@ -3,19 +3,23 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-# Uses C++11
 project(bmllib VERSION 1.0)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+# Uses C++11
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Setting variables
 set(bmllib_root "${CMAKE_CURRENT_SOURCE_DIR}")
 set(bmllib_src_root "${bmllib_root}/src/bmllib")
 set(bmllib_build "${CMAKE_BINARY_DIR}")
 
+# Subdirectories
 add_subdirectory("${bmllib_src_root}/core")
+add_subdirectory("${bmllib_src_root}/tests")
 
+# TEMP WHILE LEARNING
 add_executable(Main main.cpp)
 
 target_link_libraries(Main PUBLIC
@@ -33,6 +37,34 @@ install(FILES "${bmllib_build}/bmltypes.h"
 			  "${bmllib_build}/bmlbitutils.h"
 		DESTINATION include)
 
-enable_testing()
-include(AddGoogleTest)
-add_executable(bmlbitutiltstest "${bmllib_src_root}/core/bmlbitutilstest.cc")
+# Download and unpack googletest at configure time https://github.com/google/googletest/tree/master/googletest
+configure_file(CMakeLists.txt.in bmllib/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
+
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+                 ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+                 EXCLUDE_FROM_ALL)
+
+# The gtest/gtest_main targets carry header search path
+# dependencies automatically when using CMake 2.8.11 or
+# later. Otherwise we have to add them here ourselves.
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+  include_directories("${gtest_SOURCE_DIR}/include")
+endif()
