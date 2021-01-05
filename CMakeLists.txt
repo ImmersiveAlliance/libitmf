@@ -15,6 +15,18 @@ set(bmllib_root "${CMAKE_CURRENT_SOURCE_DIR}")
 set(bmllib_src_root "${bmllib_root}/src/bmllib")
 set(bmllib_build "${CMAKE_BINARY_DIR}")
 
+# Boost
+set(Boost_USE_STATIC_LIBS ON) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_ADDITIONAL_VERSIONS "1.73")
+find_package(Boost REQUIRED)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+else()
+  message(STATUS "Boost NOT Found !")
+endif(Boost_FOUND)
+
 # Subdirectories
 add_subdirectory("${bmllib_src_root}/core")
 add_subdirectory("${bmllib_src_root}/tests")
