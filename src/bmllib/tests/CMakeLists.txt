@@ -6,5 +6,3 @@ macro(bmllib_add_test TESTNAME COMMANDNAME)
     target_link_libraries(${TESTNAME} gtest gmock gtest_main)
     add_test(NAME ${TESTNAME} COMMAND ${COMMANDNAME})
 endmacro()
-
-bmllib_add_test(leftShiftTest lst bmlbitutilstests.cc)
