@@ -20,10 +20,10 @@ jobs:
 
         - name: "Install Boost"
           run: |
-          ${boost_root} = "${env:BOOST_ROOT_1_72_0}"
-          echo "BOOST_ROOT=${boost_root}" >> ${env:GITHUB_ENV}
-          echo "BOOST_INCLUDEDIR=${boost_root}\include" >> ${env:GITHUB_ENV}
-          echo "BOOST_LIBRARYDIR=${boost_root}\lib" >> ${env:GITHUB_ENV}
+            ${boost_root} = "${env:BOOST_ROOT_1_72_0}"
+            echo "BOOST_ROOT=${boost_root}" >> ${env:GITHUB_ENV}
+            echo "BOOST_INCLUDEDIR=${boost_root}\include" >> ${env:GITHUB_ENV}
+            echo "BOOST_LIBRARYDIR=${boost_root}\lib" >> ${env:GITHUB_ENV}
 
         - name: "Running CMAKE"
           run: |
