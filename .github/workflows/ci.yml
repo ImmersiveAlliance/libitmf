@@ -7,6 +7,7 @@ on:
     pull_request:
         paths-ignore:
             - '**.md'
+            - '**.yml'
 
 jobs:
     # Windows
@@ -21,6 +22,7 @@ jobs:
             set BOOST_ROOT=%BOOST_ROOT_1_72_0%
             $powershell
             $env:BOOST_ROOT=$env:BOOST_ROOT_1_72_0
+            echo %BOOST_ROOT%
 
         - name: "Running CMAKE"
           run: |
