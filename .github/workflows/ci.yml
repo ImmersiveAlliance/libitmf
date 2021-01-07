@@ -30,13 +30,14 @@ jobs:
             cd ${{ github.workspace }}
             mkdir build
             cd build
-            set BOOST_ROOT=%BOOST_ROOT_1_72_0%
             cmake ..
 
         - name: "Building with CMAKE"
           run: |
+            cd build
             cmake --build .
 
         - name: "Run tests"
           run: |
+            cd build
             ctest
