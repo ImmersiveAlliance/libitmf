@@ -16,6 +16,12 @@ jobs:
         steps:
         - uses: actions/checkout@v2
 
+        - name: "Set BOOST_ROOT"
+          run: |
+            set BOOST_ROOT=%BOOST_ROOT_1_72_0%
+            $powershell
+            $env:BOOST_ROOT=$env:BOOST_ROOT_1_72_0
+
         - name: "Running CMAKE"
           run: |
             cd ${{ github.workspace }}
