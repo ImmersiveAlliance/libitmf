@@ -15,15 +15,15 @@ jobs:
         runs-on: windows-2019
         steps:
         - uses: actions/checkout@v2
-        - name: Running CMAKE
+        - name: "Running CMAKE"
          run: |
             cd ${{ github.workspace }}
             mkdir build
             cd build
             cmake ..
-        - name: Building with CMAKE
+        - name: "Building with CMAKE"
          run: |
             cmake --build .
-        - name: Run tests
+        - name: "Run tests"
         run: |
             ctest
