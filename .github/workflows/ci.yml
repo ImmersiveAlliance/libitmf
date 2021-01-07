@@ -1,0 +1,32 @@
+name: CI
+
+on:
+	push:
+		paths-ignore:
+			- '**.md'
+	pull_request:
+		paths-ignore:
+			- '**.md'
+
+jobs:
+	windows-vs-2019:
+		name: "Windows VS 2019"
+		runs-on: windows-2019
+		steps:
+		- name: Checkout
+		  uses: actions/checkout@v2
+
+		- name: Running CMAKE
+		run: |
+			cd ${{ github.workspace }}
+			mkdir build
+			cd build
+			cmake ..
+
+		- name: Building with CMAKE
+		run: |
+			cmake --build .
+		
+		- name: Run tests
+		run: |
+			ctest
