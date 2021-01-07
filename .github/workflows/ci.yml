@@ -19,6 +19,7 @@ jobs:
 
         - name: "Set BOOST_ROOT"
           run: |
+            cmd \c
             set BOOST_ROOT=%BOOST_ROOT_1_72_0%
             $powershell
             $env:BOOST_ROOT=$env:BOOST_ROOT_1_72_0
