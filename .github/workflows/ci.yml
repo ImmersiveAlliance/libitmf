@@ -17,14 +17,14 @@ jobs:
         - uses: actions/checkout@v2
 
         - name: "Running CMAKE"
-         run: |
+        run: |
             cd ${{ github.workspace }}
             mkdir build
             cd build
             cmake ..
 
         - name: "Building with CMAKE"
-         run: |
+        run: |
             cmake --build .
 
         - name: "Run tests"
