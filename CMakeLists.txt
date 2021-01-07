@@ -24,7 +24,7 @@ find_package(Boost REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 else()
-  message(STATUS "Boost NOT Found !")
+  message(STATUS "Boost NOT Found ! ${BOOST_ROOT}")
 endif(Boost_FOUND)
 
 # Subdirectories
