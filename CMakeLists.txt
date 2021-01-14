@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project(bmllib VERSION 1.0)
+project(itmflib VERSION 1.0)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # Uses C++11
@@ -11,9 +11,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Setting variables
-set(bmllib_root "${CMAKE_CURRENT_SOURCE_DIR}")
-set(bmllib_src_root "${bmllib_root}/src/bmllib")
-set(bmllib_build "${CMAKE_BINARY_DIR}")
+set(itmflib_root "${CMAKE_CURRENT_SOURCE_DIR}")
+set(itmflib_src_root "${itmflib_root}/src/itmflib")
+set(itmflib_build "${CMAKE_BINARY_DIR}")
 
 # Boost
 set(Boost_USE_STATIC_LIBS ON) 
@@ -29,7 +29,7 @@ else()
 endif(Boost_FOUND)
 
 # Subdirectories
-add_subdirectory("${bmllib_src_root}/core")
+add_subdirectory("${itmflib_src_root}/core")
 
 # TEMP WHILE LEARNING
 add_executable(Main main.cpp)
@@ -40,13 +40,13 @@ target_link_libraries(Main PUBLIC
 						)
 
 target_include_directories(Main PUBLIC
-						"${bmllib_build}"
-						"${bmllib_src_root}/core"
+						"${itmflib_build}"
+						"${itmflib_src_root}/core"
 						)
 
 install(TARGETS Main DESTINATION bin)
-install(FILES "${bmllib_build}/bmltypes.h"
-			  "${bmllib_build}/bmlbitutils.h"
+install(FILES "${itmflib_build}/bmltypes.h"
+			  "${itmflib_build}/bmlbitutils.h"
 		DESTINATION include)
 
 # Download and unpack googletest at configure time https://github.com/google/googletest/tree/master/googletest
@@ -83,4 +83,4 @@ endif()
 include(GoogleTest)
 
 enable_testing()
-add_subdirectory("${bmllib_src_root}/tests")
+add_subdirectory("${itmflib_src_root}/tests")

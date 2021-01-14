@@ -1,4 +1,4 @@
-macro(bmllib_add_test FILENAME SRC)
+macro(itmflib_add_test FILENAME SRC)
     # create an exectuable in which the tests will be stored
     add_executable(${FILENAME} ${SRC})
     # link the Google test infrastructure, mocking library, and a default main fuction to
@@ -7,4 +7,4 @@ macro(bmllib_add_test FILENAME SRC)
     gtest_discover_tests(${FILENAME})
 endmacro()
 
-bmllib_add_test(bmlbitutilstests bmlbitutilstests.cc)
+itmflib_add_test(bmlbitutilstests bmlbitutilstests.cc)

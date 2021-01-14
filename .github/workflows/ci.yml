@@ -41,3 +41,26 @@ jobs:
           run: |
             cd build
             ctest
+    
+    ubuntu-18.04-gnu:
+        name: "Ubuntu 18.04 GNU"
+        runs-on: ubuntu-18.04
+        steps:
+        - uses: actions/checkout@v2
+
+        - name: "Running CMAKE"
+          run: |
+            cd ${{ github.workspace }}
+            mkdir build
+            cd build
+            cmake ..
+
+        - name: "Building with CMAKE"
+          run: |
+            cd build
+            cmake --build .
+
+        - name: "Run tests"
+          run: |
+            cd build
+            ctest
