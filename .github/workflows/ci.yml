@@ -12,11 +12,10 @@ on:
 
 jobs:
     build:
-        name: ${{ matrix.name }}
         runs-on: ${{ matrix.os }}
         strategy:
+          fail-fast: false
           matrix:
-              name : ["Windows Latest VS 2019", "Ubuntu Latest GNU", "MacOS Latest Clang"]
               os: [windows-latest, ubuntu-latest, macos-latest]
         steps:
         - uses: actions/checkout@v2

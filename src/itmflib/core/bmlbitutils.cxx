@@ -16,7 +16,7 @@ namespace itmflib {
 
 		return bits / 8;
 	}
-
+	/*
 	BMLBitVector::BMLBitVector(int32_t num, Encoding E) {
 		int total_bytes = countBytes(num);
 		// Endianess?
@@ -48,5 +48,5 @@ namespace itmflib {
 	BMLBitVector& BMLBitVector::operator^(BMLBitVector& b) {
 		return BMLBitVector();
 	}
-
+	*/
 }
