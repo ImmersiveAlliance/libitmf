@@ -5,7 +5,7 @@
 #include <fstream>
 #include "bmlbitutils.h"
 
-namespace bmllib {
+namespace itmflib {
 	
 template <typename T>
 class BMLtype {

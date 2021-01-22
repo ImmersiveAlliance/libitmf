@@ -1,7 +1,7 @@
 #include <iostream>
-#include "src/bmllib/core/bmltypes.h"
+#include "src/itmflib/core/bmltypes.h"
 
-using namespace bmllib;
+using namespace itmflib;
 
 int main() {
 	std::cout << "hello cmake" << std::endl;
