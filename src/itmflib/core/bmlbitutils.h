@@ -11,7 +11,7 @@
 Implementation thoughts:
 
 *  Do we want to encode the bits signaling number of bytes before encoding?
-*  Is vector<unsigned char> best representation?
+*  Is vector<uint8_t> best representation?
 *  Should the Encoding (VSIE, VUIE) be specified?
 *  BML Reader Class?
 
@@ -25,8 +25,8 @@ namespace itmflib {
 	};
 	/* This will have things like bit manip for bml bit sets*/
 	// Helper functions
-	unsigned int countBits(int number); // counts how many bits an int will occupy (excluding sign bit)
-	unsigned int countBytes(int number);
+	int countBits(int number); // counts how many bits an int will occupy (excluding sign bit)
+	int countBytes(int number);
 
 	// Cases where the BMLBitVector will be used per spec:
 	/*
@@ -43,7 +43,7 @@ namespace itmflib {
 		BMLBitVector(int32_t num, Encoding E = VUIE);
 		BMLBitVector(int64_t num, Encoding E = VUIE);
 		// ifstream input constructor - logic for parsing mess in one place
-		BMLBitVector(std::vector<unsigned char> v, Encoding E = VUIE) : bitvector(v) { } // Mostly used for testing purposes
+		BMLBitVector(std::vector<uint8_t> v, Encoding E = VUIE) : bitvector(v) { } // Mostly used for testing purposes
 
 		// Operators
 		BMLBitVector& operator|(BMLBitVector& b);
@@ -53,7 +53,7 @@ namespace itmflib {
 		BMLBitVector operator>>(int amount);
 
 		// Getters/Setters
-		std::vector<unsigned char> getBitVector() const { return bitvector; }
+		std::vector<uint8_t> getBitVector() const { return bitvector; }
 
 		// Conversions
 		int32_t to_int32();  // int conversion
@@ -63,7 +63,7 @@ namespace itmflib {
 		bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)
 
 	private:
-		std::vector<unsigned char> bitvector;
+		std::vector<uint8_t> bitvector;
 	};
 
 	inline bool operator==(const BMLBitVector& b1, const BMLBitVector& b2) {

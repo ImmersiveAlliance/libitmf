@@ -32,12 +32,12 @@ namespace itmflib {
 
 	TEST(ConstuctorTest, VUIEInt32SpecTest3) {
 		BMLBitVector a((int32_t)537);
-		EXPECT_EQ(a, BMLBitVector(std::vector<unsigned char>({ 0x82, 0x19 }))); // 0x02, 0x19
+		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0x82, 0x19 }))); // 0x02, 0x19
 	}
 	
 	TEST(ConstuctorTest, VUIEInt32SpecTest4) {
 		BMLBitVector a((int32_t)100000);
-		EXPECT_EQ(a, BMLBitVector(std::vector<unsigned char>({ 0xC1, 0x86, 0xA0 }))); // 0x01, 0x86, 0xA0
+		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xC1, 0x86, 0xA0 }))); // 0x01, 0x86, 0xA0
 	}
 
 	TEST(ConstuctorTest, VSIEInt32SpecTest1) {
@@ -47,17 +47,17 @@ namespace itmflib {
 
 	TEST(ConstuctorTest, VSIEInt32SpecTest2) {
 		BMLBitVector a((int32_t)-64, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<unsigned char>({ 0xA0, 0x40 }), Encoding::VSIE)); // 0x20, 0x40
+		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xA0, 0x40 }), Encoding::VSIE)); // 0x20, 0x40
 	}
 
 	TEST(ConstuctorTest, VSIEInt32SpecTest3) {
 		BMLBitVector a((int32_t)537, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<unsigned char>({ 0x82, 0x19 }), Encoding::VSIE)); // 0x02, 0x19
+		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0x82, 0x19 }), Encoding::VSIE)); // 0x02, 0x19
 	}
 
 	TEST(ConstuctorTest, VSIEInt32SpecTest4) {
 		BMLBitVector a((int32_t)-100000, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<unsigned char>({ 0xD1, 0x86, 0xA0 }), Encoding::VSIE)); // 0x11, 0x86, 0xA0
+		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xD1, 0x86, 0xA0 }), Encoding::VSIE)); // 0x11, 0x86, 0xA0
 	}
 
 	// Shift tests
