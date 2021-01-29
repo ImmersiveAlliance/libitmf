@@ -25,8 +25,8 @@ namespace itmflib {
 	};
 	/* This will have things like bit manip for bml bit sets*/
 	// Helper functions
-	int countBits(int number); // counts how many bits an int will occupy (excluding sign bit)
-	int countBytes(int number);
+	unsigned int countBits(int number); // counts how many bits an int will occupy (excluding sign bit)
+	unsigned int countBytes(int number);
 
 	// Cases where the BMLBitVector will be used per spec:
 	/*

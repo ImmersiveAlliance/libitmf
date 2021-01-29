@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(itmflib_root "${CMAKE_CURRENT_SOURCE_DIR}")
 set(itmflib_src_root "${itmflib_root}/src/itmflib")
 set(itmflib_build "${CMAKE_BINARY_DIR}")
-
+#[[
 # Boost
 set(Boost_USE_STATIC_LIBS ON) 
 set(Boost_USE_MULTITHREADED ON)  
@@ -27,7 +27,7 @@ if(Boost_FOUND)
 else()
   message(STATUS "Boost NOT Found ! ${BOOST_ROOT}")
 endif(Boost_FOUND)
-
+]]
 include_directories("${itmflib_src_root}/core")
 enable_testing()
 
