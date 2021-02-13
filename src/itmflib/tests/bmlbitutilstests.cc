@@ -20,138 +20,165 @@ namespace itmflib {
 	}
 
 	// Constructor tests
-	TEST(ConstuctorTest, VUIEInt32SpecTest1) {
-		BMLBitVector a((int32_t)63);
-		EXPECT_EQ(a, BMLBitVector({ 0x3F }));
+	TEST(ConstructorTest, VUIEInt32SpecTest1) {
+		BMLBitVector a(63);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({0, 0, 1, 1, 1, 1, 1, 1})); // 0x3f
 	}
 
-	TEST(ConstuctorTest, VUIEInt32SpecTest2) {
-		BMLBitVector a((int32_t)64);
-		EXPECT_EQ(a, BMLBitVector({ 0x40 }));
+	TEST(ConstructorTest, VUIEInt32SpecTest2) {
+		BMLBitVector a(64);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({0, 1, 0, 0, 0, 0, 0, 0})); // 0x40
 	}
 
-	TEST(ConstuctorTest, VUIEInt32SpecTest3) {
-		BMLBitVector a((int32_t)537);
-		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0x82, 0x19 }))); // 0x02, 0x19
+	TEST(ConstructorTest, VUIEInt32SpecTest3) {
+		BMLBitVector a(537);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1})); // 0x82, 0x19
 	}
 	
-	TEST(ConstuctorTest, VUIEInt32SpecTest4) {
-		BMLBitVector a((int32_t)100000);
-		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xC1, 0x86, 0xA0 }))); // 0x01, 0x86, 0xA0
+	TEST(ConstructorTest, VUIEInt32SpecTest4) {
+		BMLBitVector a(100000);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0})); // 0xC1, 0x86, 0xA0
 	}
 
-	TEST(ConstuctorTest, VSIEInt32SpecTest1) {
-		BMLBitVector a((int32_t)63, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector({ 0x3F }));
+	TEST(ConstructorTest, VSIEInt32SpecTest1) {
+		BMLBitVector a(63, Encoding::VSIE);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({0, 0, 1, 1, 1, 1, 1, 1 })); // 0x3f
+		EXPECT_EQ(a.getIsNegative(), false);
 	}
 
-	TEST(ConstuctorTest, VSIEInt32SpecTest2) {
-		BMLBitVector a((int32_t)-64, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xA0, 0x40 }), Encoding::VSIE)); // 0x20, 0x40
+	TEST(ConstructorTest, VSIEInt32SpecTest2) {
+		BMLBitVector a(-64, Encoding::VSIE);
+		EXPECT_EQ(a, BMLBitVector(std::vector<bool>({0, 1, 0, 0, 0, 0, 0, 0 }), Encoding::VSIE)); // 0x20, 0x40
+		EXPECT_EQ(a.getIsNegative(), true);
 	}
 
-	TEST(ConstuctorTest, VSIEInt32SpecTest3) {
+	TEST(ConstructorTest, VSIEInt32SpecTest3) {
 		BMLBitVector a((int32_t)537, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0x82, 0x19 }), Encoding::VSIE)); // 0x02, 0x19
+		EXPECT_EQ(a, BMLBitVector(std::vector<bool>({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1}), Encoding::VSIE)); // 0x02, 0x19
+		EXPECT_EQ(a.getIsNegative(), false);
 	}
 
-	TEST(ConstuctorTest, VSIEInt32SpecTest4) {
+	TEST(ConstructorTest, VSIEInt32SpecTest4) {
 		BMLBitVector a((int32_t)-100000, Encoding::VSIE);
-		EXPECT_EQ(a, BMLBitVector(std::vector<uint8_t>({ 0xD1, 0x86, 0xA0 }), Encoding::VSIE)); // 0x11, 0x86, 0xA0
+		EXPECT_EQ(a, BMLBitVector(std::vector<bool>({0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0}), Encoding::VSIE)); // 0x11, 0x86, 0xA0
+		EXPECT_EQ(a.getIsNegative(), true);
+	}
+
+	TEST(ConstructorTest, ComplexTest) {
+		BMLBitVector a(2231902501);
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({ 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0 , 1  }));
 	}
 
 	// Shift tests
 	TEST(LeftShiftTest, HandlesSingleByteMSB0) {
-		BMLBitVector arr((int32_t)32);
+		BMLBitVector arr(32);
 		arr = arr << 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)256));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(0).getBitVector());
 	}
 
 	TEST(LeftShiftTest, HandlesSingleByteMSB1) {
-		BMLBitVector arr((int32_t)72);
+		BMLBitVector arr(72);
 		arr = arr << 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)1088));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(64).getBitVector());
 	}
 
 	TEST(LeftShiftTest, HandlesMultipleBytes1) {
-		BMLBitVector arr((int32_t)12619800);
+		BMLBitVector arr(12619800);
 		arr = arr << 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)100958400));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(295104).getBitVector());
 	}
 
 	TEST(LeftShiftTest, HandlesMultipleBytes2) {
-		BMLBitVector arr((int32_t)12619800);
+		BMLBitVector arr(16312969);
 		arr = arr << 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)100958400));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(13063240).getBitVector());
 	}
 
 	TEST(RightShiftTest, HandlesSingleByteMSB0) {
-		BMLBitVector arr((int32_t)72);
+		BMLBitVector arr(72);
 		arr = arr >> 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)9));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(9).getBitVector());
 	}
 
 	TEST(RightShiftTest, HandlesSingleByteMSB1) {
-		BMLBitVector arr((int32_t)137);
+		BMLBitVector arr(137);
 		arr = arr >> 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)241));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(241).getBitVector());
 	}
 
 	TEST(RightShiftTest, HandlesMultipleBytes1) {
-		BMLBitVector arr((int32_t)12619800);
-		arr = arr << 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)100958400));
+		BMLBitVector arr(12619800);
+		arr = arr >> 3;
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(16257539).getBitVector());
 	}
 
 	TEST(RightShiftTest, HandlesMultipleBytes2) {
-		BMLBitVector arr((int32_t)2231902501);
+		BMLBitVector arr(2231902501);
 		arr = arr >> 3;
-		EXPECT_EQ(arr, BMLBitVector((int32_t)100958400));
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(4037084196).getBitVector());
 	}
 
 	TEST(XorTest, SameLength) {
-		BMLBitVector arr1;
-		BMLBitVector arr2;
-		BMLBitVector result;
-		result = arr1 ^ arr2;
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 ^ arr2;
+		EXPECT_EQ(result.getBitVector(), BMLBitVector(170).getBitVector());
 	}
 
 	TEST(XorTest, DifferentLengths1) {
-
+		BMLBitVector arr1(511);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 ^ arr2;
+		EXPECT_EQ(result.getBitVector(), std::vector<bool>({0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0 }));
 	}
 
 	TEST(XorTest, DifferentLengths2) {
-
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(25941);
+		BMLBitVector result = arr1 ^ arr2;
+		EXPECT_EQ(result.getBitVector(), std::vector<bool>({ 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0 }));
 	}
 
 	TEST(OrTest, SameLength) {
-		BMLBitVector arr1;
-		BMLBitVector arr2;
-		BMLBitVector result;
-		result = arr1 ^ arr2;
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 | arr2;
+		EXPECT_EQ(result.getBitVector(), BMLBitVector(255).getBitVector());
 	}
 
 	TEST(OrTest, DifferentLengths1) {
-
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(1365);
+		BMLBitVector result = arr1 | arr2;
+		EXPECT_EQ(result.getBitVector(), BMLBitVector(1535).getBitVector());
 	}
 
 	TEST(OrTest, DifferentLengths2) {
-
+		BMLBitVector arr1(511);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 | arr2;
+		EXPECT_EQ(result.getBitVector(), BMLBitVector(511).getBitVector());
 	}
 
 	TEST(AndTest, SameLength) {
-		BMLBitVector arr1;
-		BMLBitVector arr2;
-		BMLBitVector result;
-		result = arr1 & arr2;
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 & arr2;
+		EXPECT_EQ(result.getBitVector(), BMLBitVector(85).getBitVector());
 	}
 
 	TEST(AndTest, DifferentLengths1) {
-
+		BMLBitVector arr1(255);
+		BMLBitVector arr2(1365);
+		BMLBitVector result = arr1 & arr2;
+		EXPECT_EQ(result.getBitVector(), std::vector<bool>({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1 }));
 	}
 
 	TEST(AndTest, DifferentLengths2) {
-
+		BMLBitVector arr1(511);
+		BMLBitVector arr2(85);
+		BMLBitVector result = arr1 & arr2;
+		EXPECT_EQ(result.getBitVector(), std::vector<bool>({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1 }));
 	}
-	*/
+	
 }

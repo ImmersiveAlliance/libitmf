@@ -4,8 +4,10 @@
 #include <vector>
 #include <string>
 #include <math.h>
+#include <iostream>
 //#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 
+#define BML_BYTE_SIZE 8
 
 /*
 Implementation thoughts:
@@ -38,22 +40,24 @@ namespace itmflib {
 	class BMLBitVector { 
 	public:
 		// Constructors - will convert to bitvector based on encoding method (default is VUIE)
-		BMLBitVector() { }
+		BMLBitVector() : encoding(Encoding::VUIE), is_negative(false), bitvector(std::vector<bool>{}) { }
 		BMLBitVector(std::string bits, Encoding E = VUIE);
-		BMLBitVector(int32_t num, Encoding E = VUIE);
-		BMLBitVector(int64_t num, Encoding E = VUIE);
+		BMLBitVector(int num, Encoding E = VUIE);
 		// ifstream input constructor - logic for parsing mess in one place
-		BMLBitVector(std::vector<uint8_t> v, Encoding E = VUIE) : bitvector(v) { } // Mostly used for testing purposes
+		BMLBitVector(std::vector<bool> v, Encoding E = VUIE) : bitvector(v), encoding(E) { } // Mostly used for testing purposes
+		BMLBitVector(int32_t id, int8_t type); // for tags
 
 		// Operators
-		BMLBitVector& operator|(BMLBitVector& b);
-		BMLBitVector& operator&(BMLBitVector& b);
-		BMLBitVector& operator^(BMLBitVector& b);
+		BMLBitVector operator|(BMLBitVector& rhs);
+		BMLBitVector operator&(BMLBitVector& rhs);
+		BMLBitVector operator^(BMLBitVector& rhs);
 		BMLBitVector operator<<(int amount);
 		BMLBitVector operator>>(int amount);
 
 		// Getters/Setters
-		std::vector<uint8_t> getBitVector() const { return bitvector; }
+		std::vector<bool> getBitVector() const { return bitvector; }
+		bool getIsNegative() const { return is_negative; }
+		int getBitVectorSize() const { return bitvector.size(); }
 
 		// Conversions
 		int32_t to_int32();  // int conversion
@@ -61,9 +65,12 @@ namespace itmflib {
 
 		// Helper functions
 		bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)
-
+		void resize(int length); // Resizes by adding more significant bits equal to 0
+		void compareAndExtendBitVector(BMLBitVector* rhs);
 	private:
-		std::vector<uint8_t> bitvector;
+		std::vector<bool> bitvector;
+		Encoding encoding;
+		bool is_negative;
 	};
 
 	inline bool operator==(const BMLBitVector& b1, const BMLBitVector& b2) {

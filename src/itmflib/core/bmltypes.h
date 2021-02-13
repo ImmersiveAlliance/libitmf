@@ -26,7 +26,7 @@ typedef BMLtype<int64_t> BMLlong;
 typedef BMLtype<float> BMLsingle;
 typedef BMLtype<double> BMLdouble;
 
-class BMLstring : public BMLtype<std::string> {
+class BMLstring : public BMLtype<std::wstring> {
 public:
 	int32_t length;
 };
