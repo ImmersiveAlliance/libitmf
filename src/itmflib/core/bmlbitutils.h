@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <math.h>
-#include <iostream>
+#include <algorithm>
 //#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 
 #define BML_BYTE_SIZE 8
