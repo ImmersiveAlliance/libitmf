@@ -9,16 +9,6 @@
 
 #define BML_BYTE_SIZE 8
 
-/*
-Implementation thoughts:
-
-*  Do we want to encode the bits signaling number of bytes before encoding?
-*  Is vector<uint8_t> best representation?
-*  Should the Encoding (VSIE, VUIE) be specified?
-*  BML Reader Class?
-
-*/
-
 namespace itmflib {
 	enum Encoding
 	{
@@ -37,15 +27,14 @@ namespace itmflib {
 	> Decoding/encoding int32 and int64 with VSIE
 	> Encoding length for string and blob
 	*/
-	class BMLBitVector { 
+	class BMLBitVector {
 	public:
 		// Constructors - will convert to bitvector based on encoding method (default is VUIE)
 		BMLBitVector() : encoding(Encoding::VUIE), is_negative(false), bitvector(std::vector<bool>{}) { }
 		BMLBitVector(std::string bits, Encoding E = VUIE);
-		BMLBitVector(int num, Encoding E = VUIE);
+		BMLBitVector(int64_t num, Encoding E = VUIE);
 		// ifstream input constructor - logic for parsing mess in one place
 		BMLBitVector(std::vector<bool> v, Encoding E = VUIE) : bitvector(v), encoding(E) { } // Mostly used for testing purposes
-		BMLBitVector(int32_t id, int8_t type); // for tags
 
 		// Operators
 		BMLBitVector operator|(BMLBitVector& rhs);
@@ -59,14 +48,19 @@ namespace itmflib {
 		bool getIsNegative() const { return is_negative; }
 		int getBitVectorSize() const { return bitvector.size(); }
 
-		// Conversions
-		int32_t to_int32();  // int conversion
-		int64_t to_int64();  // long conversions
+		// Conversions - Encode/decode
+		uint32_t to_uint32();  // unsigned int conversion (agnostic to whether or not the bitvector is encoded)
+		uint64_t to_uint64();  // unsigned long conversion (agnostic to whether or not the bitvector is encoded)
+		int32_t to_int32();  // int conversion (agnostic to whether or not the bitvector is encoded)
+		int64_t to_int64();  // long conversions (agnostic to whether or not the bitvector is encoded)
+		void prepareForEncoding(); // adds the number of significant 1 bits that signals subsequent bytes
+		void encodeTag(int32_t id, int8_t type);
 
 		// Helper functions
-		bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)
+		//bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)
 		void resize(int length); // Resizes by adding more significant bits equal to 0
 		void compareAndExtendBitVector(BMLBitVector* rhs);
+
 	private:
 		std::vector<bool> bitvector;
 		Encoding encoding;
