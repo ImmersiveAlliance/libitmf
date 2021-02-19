@@ -6,6 +6,7 @@
 #include <math.h>
 #include <algorithm>
 #include <sstream>
+#include <iterator>
 //#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 
 #define BML_BYTE_SIZE 8

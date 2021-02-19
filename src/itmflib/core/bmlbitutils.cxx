@@ -281,6 +281,7 @@ namespace itmflib {
 	}
 
 	void BMLBitVector::encodeTag(uint32_t id, uint8_t type) {
+		// TODO - eliminate code reuse?
 		uint32_t quot = id;
 		while (quot != 0) {
 			bitvector.insert(bitvector.begin(), quot % 2);
@@ -293,6 +294,7 @@ namespace itmflib {
 			bitvector.insert(bitvector.begin(), filler_bits, 0);
 
 		(*this) = (*this) << 3;
-		(*this) = (*this) | BMLBitVector(type);
+		BMLBitVector t(type);
+		(*this) = (*this) | t;
 	}
 }
