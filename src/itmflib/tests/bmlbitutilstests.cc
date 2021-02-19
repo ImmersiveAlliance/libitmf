@@ -295,28 +295,64 @@ namespace itmflib {
 	}
 
 	TEST(ConversionTest, VSIEPositiveInt32Test1) {
-
+		BMLBitVector b(253, VSIE);
+		int32_t i = b.to_int32();
+		EXPECT_EQ(i, 253);
 	}
 
 	TEST(ConversionTest, VSIEPositiveInt32Test2) {
-
+		BMLBitVector b(100000, VSIE);
+		int32_t i = b.to_int32();
+		EXPECT_EQ(i, 100000);
 	}
 
 	TEST(ConversionTest, VSIENegativeInt32Test1) {
-
+		BMLBitVector b(-253, VSIE);
+		int32_t i = b.to_int32();
+		EXPECT_EQ(i, -253);
 	}
 
 	TEST(ConversionTest, VSIENegativeInt32Test2) {
+		BMLBitVector b(-100000, VSIE);
+		int32_t i = b.to_int32();
+		EXPECT_EQ(i, -100000);
+	}
 
+	TEST(ConversionTest, VSIEPositiveInt64Test1) {
+		BMLBitVector b(117473493101343);
+		int64_t i = b.to_int64();
+		EXPECT_EQ(i, 117473493101343);
+	}
+
+	TEST(ConversionTest, VSIEPositiveInt64Test2) {
+		BMLBitVector b(15184315101500);
+		int64_t i = b.to_int64();
+		EXPECT_EQ(i, 15184315101500);
+	}
+
+	TEST(ConversionTest, VSIENegativeInt64Test1) {
+		BMLBitVector b(-15184315101500);
+		int64_t i = b.to_int64();
+		EXPECT_EQ(i, -15184315101500);
+	}
+
+	TEST(ConversionTest, VSIENegativeInt64Test2) {
+		BMLBitVector b(-117473493101343);
+		int64_t i = b.to_int64();
+		EXPECT_EQ(i, -117473493101343);
 	}
 
 	/* ENCODING TAGS TEST */
 
 	TEST(EncodingTagsTest, SingleByteTag1) {
-
+		BMLBitVector b;
+		b.encodeTag(3, 6);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 0, 0, 1, 1, 1, 1, 0 }));
 	}
 
 	TEST(EncodingTagsTest, SingleByteTag2) {
-
+		BMLBitVector b;
+		b.encodeTag(30, 2);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 1, 1, 0, 0, 1, 0 }));
 	}
 }

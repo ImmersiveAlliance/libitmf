@@ -5,6 +5,7 @@
 #include <string>
 #include <math.h>
 #include <algorithm>
+#include <sstream>
 //#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 
 #define BML_BYTE_SIZE 8
@@ -54,7 +55,7 @@ namespace itmflib {
 		int32_t to_int32();  // int conversion (agnostic to whether or not the bitvector is encoded)
 		int64_t to_int64();  // long conversions (agnostic to whether or not the bitvector is encoded)
 		void prepareForEncoding(); // adds the number of significant 1 bits that signals subsequent bytes
-		void encodeTag(int32_t id, int8_t type);
+		void encodeTag(uint32_t id, uint8_t type);
 
 		// Helper functions
 		//bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)

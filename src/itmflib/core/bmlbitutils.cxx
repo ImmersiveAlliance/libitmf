@@ -186,7 +186,113 @@ namespace itmflib {
 				break;
 			}
 		}
+	}
 
-		// Bit vectors the size of 7 bytes and VSIE have to be extended to 9 bytes per spec
+	uint32_t BMLBitVector::to_uint32() {
+		int num_bytes = bitvector.size() / 8;
+
+		std::ostringstream oss;
+		uint32_t r = 0;
+		if (!bitvector.empty()) {
+			if (num_bytes > 4) {
+				int beginning_index = bitvector.size() - 31;
+				try {
+					std::copy(bitvector.begin() + beginning_index, bitvector.end(), std::ostream_iterator<bool>(oss));
+				}
+				catch (const std::invalid_argument&) {} // TBD
+				catch (const std::out_of_range&) {}
+			}
+			else {
+				try{
+					std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+				}
+				catch (const std::invalid_argument&) {} // TBD
+				catch (const std::out_of_range&) {}
+			}
+			r = std::stoul(oss.str(), 0, 2);
+		}
+
+		return r;
+	}
+
+	uint64_t BMLBitVector::to_uint64() {
+		std::ostringstream oss;
+		uint64_t r = 0;
+		if (!bitvector.empty()) {
+			try {
+				std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+			}
+			catch (const std::invalid_argument&) {} // TBD
+			catch (const std::out_of_range&) {}
+
+			r = std::stoull(oss.str(), 0, 2);
+		}
+
+		return r;
+	}
+
+	int32_t BMLBitVector::to_int32() {
+		int num_bytes = bitvector.size() / 8;
+
+		std::ostringstream oss;
+		int32_t r = 0;
+		if (!bitvector.empty()) {
+			if (num_bytes > 4) {
+				int beginning_index = bitvector.size() - 31;
+				try {
+					std::copy(bitvector.begin() + beginning_index, bitvector.end(), std::ostream_iterator<bool>(oss));
+				}
+				catch (const std::invalid_argument&) {} // TBD
+				catch (const std::out_of_range&) {}
+			}
+			else {
+				try {
+					std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+				}
+				catch (const std::invalid_argument&) {} // TBD
+				catch (const std::out_of_range&) {}
+			}
+			
+			r = std::stol(oss.str(), 0, 2);
+			if (is_negative)
+				return r * -1;
+		}
+
+		return r;
+	}
+
+	int64_t BMLBitVector::to_int64() {
+		std::ostringstream oss;
+		int64_t r = 0;
+		if (!bitvector.empty()) {
+			try {
+				std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+			}
+			catch (const std::invalid_argument&) {} // TBD
+			catch (const std::out_of_range&) {}
+
+			r = std::stoull(oss.str(), 0, 2);
+		}
+
+		if (is_negative)
+			r * -1;
+
+		return r;
+	}
+
+	void BMLBitVector::encodeTag(uint32_t id, uint8_t type) {
+		uint32_t quot = id;
+		while (quot != 0) {
+			bitvector.insert(bitvector.begin(), quot % 2);
+			quot /= 2;
+		}
+
+		// Fill the rest of the byte with 0s
+		int filler_bits = BML_BYTE_SIZE - (bitvector.size() % BML_BYTE_SIZE);
+		if (filler_bits != BML_BYTE_SIZE)
+			bitvector.insert(bitvector.begin(), filler_bits, 0);
+
+		(*this) = (*this) << 3;
+		(*this) = (*this) | BMLBitVector(type);
 	}
 }
