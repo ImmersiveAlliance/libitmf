@@ -1,5 +1,7 @@
 #include "bmlbitutils.h"
 
+// TODO - function comments
+
 namespace itmflib {
 	unsigned int countBits(int num) {
 		if (num < 0)
@@ -17,12 +19,19 @@ namespace itmflib {
 		return bits / 8;
 	}
 
+	/*
+		Takes in an integer and creates the Bit Vector with the byte length indicator
+		bits per the specification.
+		NOTE: All functions using and manipulating the bit vector must first remove
+		these byte length indicator bits, complete the function, then add back those
+		byte indicator bits, extending if needed
+		@input 
+		@return
+	*/
 	BMLBitVector::BMLBitVector(int64_t num, Encoding E) : encoding(E) {
 		bool is_neg = num < 0;
-		// The following sets metadata to prevent having to store the bit vector as VUIE/VSIE
-		// so they can be used when encoding happens
-		// Design choice made to ignore the number sig '1' bits until encoding for ease in left/right
-		// shifts and binary operations
+		
+		// TODO - replace this with the sign bit and remove is_negative
 		if (encoding == Encoding::VSIE) {
 			if (is_neg) {
 				num *= -1;
@@ -47,15 +56,113 @@ namespace itmflib {
 			quot /= 2;
 		}
 
-		// Fill the rest of the byte with 0s
-		int filler_bits = BML_BYTE_SIZE - (bitvector.size() % BML_BYTE_SIZE);
-		if (filler_bits != BML_BYTE_SIZE)
-			bitvector.insert(bitvector.begin(), filler_bits, 0);
+		// Encode the byte length indicator bits
+		int remainder = bitvector.size() % BML_BYTE_SIZE;
+		int num_bytes = bitvector.size() / BML_BYTE_SIZE;
+		if (remainder != 0) // when dividing by 8, it will take the floor of value so need to increment to reflect true num bytes
+			num_bytes++;
+
+		int num_byte_length_bits = 0;
+
+		if (num_bytes != 0)
+			num_byte_length_bits = num_bytes - 1;
+
+		// Switch based on encoding (implementation is not very elegant)
+		switch(encoding) {
+			case(VSIE):
+			{
+				if (remainder != 0) {
+					// The first byte is not full, maybe enough bits to encode length
+					int num_empty_bits = BML_BYTE_SIZE - remainder;
+					if (num_empty_bits >= (num_byte_length_bits + 2)) {
+						// enough bits
+						int num_filler_bits = num_empty_bits - num_byte_length_bits - 2; // bits that just need to be filled w 0
+						bitvector.insert(bitvector.begin(), num_filler_bits, 0);
+						bitvector.insert(bitvector.begin(), is_neg);
+
+						if (num_bytes > 1) {
+							bitvector.insert(bitvector.begin(), 0);
+							bitvector.insert(bitvector.begin(), num_byte_length_bits, 1);
+						}
+						else
+							bitvector.insert(bitvector.begin(), 0);
+
+						break;
+					}
+					else {
+						// not enought bits in first byte
+						bitvector.insert(bitvector.begin(), num_empty_bits, 0);
+					}
+				}
+
+				// Not enough space in the first byte to encode length, so extend it
+				num_bytes++; // includes the byte that is going to be added
+
+				// Vectors of 7 bytes have to be expanded to 8 bytes per spec
+				if (num_bytes == 8) {
+					bitvector.insert(bitvector.begin(), BML_BYTE_SIZE, 0);
+					num_bytes++;
+				}
+
+				num_byte_length_bits = num_bytes - 1; // reset
+
+				if (num_byte_length_bits == 8)
+					num_byte_length_bits--; // per spec, 9 byte length have 7 indicator bits plus sign bit
+				std::vector<bool> extra_byte;
+
+				extra_byte.insert(extra_byte.begin(), num_byte_length_bits, 1);
+				if (num_bytes == 9)
+					extra_byte.insert(extra_byte.end(), is_neg);
+				else {
+					extra_byte.insert(extra_byte.end(), 0);
+					extra_byte.insert(extra_byte.end(), is_neg);
+					extra_byte.insert(extra_byte.end(), BML_BYTE_SIZE - extra_byte.size(), 0);
+				}
+
+				bitvector.insert(bitvector.begin(), extra_byte.begin(), extra_byte.end());
+
+				break;
+			}
+			case(VUIE):
+			{
+				if (remainder != 0) {
+					// might be enough bits to encode length in first byte
+					int num_empty_bits = BML_BYTE_SIZE - remainder;
+					if (num_empty_bits >= num_bytes) {
+						int filler_bits = num_empty_bits - num_byte_length_bits;
+						bitvector.insert(bitvector.begin(), filler_bits, 0);
+						bitvector.insert(bitvector.begin(), num_byte_length_bits, 1);
+
+						break;
+					}
+					else {
+						bitvector.insert(bitvector.begin(), num_empty_bits, 0);
+					}
+				}
+				
+				// no space so add extra byte
+				num_bytes++;
+				num_byte_length_bits++;
+				std::vector<bool> extra_byte;
+				int filler_bits = BML_BYTE_SIZE - num_byte_length_bits;
+				extra_byte.insert(extra_byte.begin(), filler_bits, 0);
+				extra_byte.insert(extra_byte.begin(), num_byte_length_bits, 1);
+				bitvector.insert(bitvector.begin(), extra_byte.begin(), extra_byte.end());
+				
+
+				break;
+			}
+			default:
+				break;
+		}
 	}
 
 	BMLBitVector BMLBitVector::operator<<(int amount) {
 		std::vector<bool> result = this->getBitVector();
-		std::rotate(result.begin(), result.begin() + amount, result.end());
+
+		// for VSIE the number of indicator bits (including sign bit)
+		auto begin = result.begin() + getFirstNonLengthBitIndex();
+		std::rotate(begin, begin + amount, result.end());
 		for (std::reverse_iterator<std::vector<bool>::iterator> r = result.rbegin(); r < result.rbegin() + amount; r++) {
 			*r = 0;
 		}
@@ -66,10 +173,15 @@ namespace itmflib {
 	BMLBitVector BMLBitVector::operator>>(int amount) {
 		std::vector<bool> result = this->getBitVector();
 
-		bool msb = result[0];
-		std::rotate(result.begin(), result.begin() + result.size() - amount, result.end());
-		for (std::vector<bool>::iterator r = result.begin(); r < result.begin() + amount; r++) {
-			*r = msb;
+		// TODO - change MSB to the value after byte size indicator bits (and sign bit if VSIE)
+		// rotate beginning with the first non-byte size indicator bit
+		int first_non_length_bit_index = getFirstNonLengthBitIndex();
+		bool msb = result[first_non_length_bit_index];
+		auto rend = result.rend() - first_non_length_bit_index;
+		std::rotate(result.rbegin(), result.rbegin() + amount, rend);
+		auto begin = result.begin() + first_non_length_bit_index;
+		for (auto r = begin; r < begin + amount; r++) {
+			*r = 0; // need to discuss this
 		}
 
 		return BMLBitVector(result);
@@ -79,8 +191,11 @@ namespace itmflib {
 		std::vector<bool> result;
 
 		compareAndExtendBitVector(&rhs);
+		int beginning_index = getFirstNonLengthBitIndex();
+		for (int i = 0; i < beginning_index; i++)
+			result.push_back(bitvector[i]);
 
-		for (int i = 0; i < rhs.getBitVectorSize(); i++)
+		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
 			result.insert(result.end(), bitvector.at(i) && rhs.getBitVector().at(i));
 
 		return BMLBitVector(result);
@@ -91,9 +206,13 @@ namespace itmflib {
 
 		compareAndExtendBitVector(&rhs);
 
-		for (int i = 0; i < rhs.getBitVectorSize(); i++)
-			result.insert(result.end(), bitvector.at(i) || rhs.getBitVector().at(i));
+		int beginning_index = getFirstNonLengthBitIndex();
+		for (int i = 0; i < beginning_index; i++)
+			result.push_back(bitvector[i]);
 
+		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
+			result.insert(result.end(), bitvector.at(i) || rhs.getBitVector().at(i));
+		
 		return BMLBitVector(result);
 	}
 
@@ -101,91 +220,72 @@ namespace itmflib {
 		std::vector<bool> result;
 
 		compareAndExtendBitVector(&rhs);
+		// The vectors will be the same size now
+		// copy over the length bits
+		int beginning_index = getFirstNonLengthBitIndex();
+		for (int i = 0; i < beginning_index; i++)
+			result.push_back(bitvector[i]);
 
-		for (int i = 0; i < rhs.getBitVectorSize(); i++)
+		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
 			result.insert(result.end(), bitvector.at(i) ^ rhs.getBitVector().at(i));
 
 		return BMLBitVector(result);
 	}
 
-	void BMLBitVector::resize(int length) {
-		bitvector.insert(bitvector.begin(), length - bitvector.size(), 0);
+	void BMLBitVector::extend(int length) {
+		if (length % 8 != 0 || length <= bitvector.size())
+			throw "Length must be a multiple of 8 or greater than the bit vector's current size!";
+
+		int old_length_bit_index = getFirstNonLengthBitIndex();
+		std::vector<bool> extension;
+		for (int i = 0; i < old_length_bit_index; i++) {
+			extension.push_back(bitvector[i]); // this didn't work with copy weirdly
+		}
+		
+		for (int i = 0; i < old_length_bit_index; i++) {
+			bitvector[i] = 0;
+		}
+
+		int bit_size_difference = length - bitvector.size();
+		int byte_size_difference = bit_size_difference / BML_BYTE_SIZE;
+		extension.insert(extension.begin(), byte_size_difference, 1);
+
+		bitvector.insert(bitvector.begin(), bit_size_difference - extension.size(), 0);
+		bitvector.insert(bitvector.begin(), extension.begin(), extension.end());
 	}
 
 	void BMLBitVector::compareAndExtendBitVector(BMLBitVector* rhs) {
 		if (getBitVectorSize() < rhs->getBitVectorSize())
-			resize(rhs->getBitVectorSize());
+			extend(rhs->getBitVectorSize());
 		else if (getBitVectorSize() > rhs->getBitVectorSize())
-			rhs->resize(getBitVectorSize());
+			rhs->extend(getBitVectorSize());
 	}
 
-	void BMLBitVector::prepareForEncoding() {
-		// Check number of bytes
-		int num_sig_1_bits = (bitvector.size() / 8) - 1; // bitvector should always be a multiple of 8
+	bool BMLBitVector::shrink() {
+		// Edge case with vector size = 8 return false
+		if (bitvector.size() == 8)
+			return false;
 
-		// See if there is space to put it in existing vector
-		auto it = std::find(bitvector.begin(), bitvector.end(), true);
+		// Get first byte
+		std::vector<bool> length_bits(bitvector.begin(), bitvector.begin() + getFirstNonLengthBitIndex());
+		
+		auto it = std::find(bitvector.begin() + getFirstNonLengthBitIndex(), bitvector.end(), true);
 		if (it != bitvector.end()) {
 			int index = it - bitvector.begin();
 
-			switch (encoding)
-			{
-			case VUIE:
-				if (index >= num_sig_1_bits + 1) { // including 0
-					for (int i = 0; i < num_sig_1_bits; i++) {
-						bitvector[i] = 1;
-					}
-				}
-				// Extend vector as needed
-				else {
-					num_sig_1_bits++;
-					std::vector<bool> extra_byte;
-					extra_byte.insert(extra_byte.begin(), 8 - num_sig_1_bits, 0);
-					extra_byte.insert(extra_byte.begin(), num_sig_1_bits, 1);
-					bitvector.insert(bitvector.begin(), extra_byte.begin(), extra_byte.end());
-				}
+			if (index < BML_BYTE_SIZE) // means first byte 
+				return false;
 
-				break;
-			case VSIE:
-				if (index >= num_sig_1_bits + 2) { // including 0 and sign bit
-					for (int i = 0; i < num_sig_1_bits; i++) {
-						bitvector[i] = 1;
-					}
-
-					bitvector[num_sig_1_bits + 1] = is_negative;
-				}
-				// Extend vector as needed
-				else {
-					std::vector<bool> extra_byte;
-
-					// Vectors size of 7 bytes need to be extended to 9 bytes per spec
-					if (num_sig_1_bits == 6) {
-						bitvector.insert(bitvector.begin(), 8, 0);
-						num_sig_1_bits++;
-					}
-					num_sig_1_bits++; // since we are extending the vector, need to take into account new byte
-
-					int num_padding_bits = 8 - num_sig_1_bits - 2;
-
-					if (num_padding_bits > 0)
-						extra_byte.insert(extra_byte.begin(), num_padding_bits, 0);
-
-					extra_byte.insert(extra_byte.begin(), is_negative);
-					if (num_sig_1_bits != 8) {
-						extra_byte.insert(extra_byte.begin(), 0);
-					}
-					else { // 64 subsequent bits
-						num_sig_1_bits--; // 7 num_sig_1_bits indicate 64 bits rather than 8 per spec
-					}
-					extra_byte.insert(extra_byte.begin(), num_sig_1_bits, 1);
-					bitvector.insert(bitvector.begin(), extra_byte.begin(), extra_byte.end());
-				}
-
-				break;
-			default:
-				break;
-			}
+			it = std::find(bitvector.begin() + BML_BYTE_SIZE, bitvector.end(), true);
 		}
+		else {
+			// this means it is just an empty vector
+			bitvector = { 0,0,0,0,0,0,0,0 };
+
+			return true;
+		}
+		
+		return false;
 	}
 
 	uint32_t BMLBitVector::to_uint32() {
@@ -204,7 +304,7 @@ namespace itmflib {
 			}
 			else {
 				try{
-					std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+					std::copy(bitvector.begin() + getFirstNonLengthBitIndex(), bitvector.end(), std::ostream_iterator<bool>(oss));
 				}
 				catch (const std::invalid_argument&) {} // TBD
 				catch (const std::out_of_range&) {}
@@ -218,9 +318,10 @@ namespace itmflib {
 	uint64_t BMLBitVector::to_uint64() {
 		std::ostringstream oss;
 		uint64_t r = 0;
+		int index = getFirstNonLengthBitIndex();
 		if (!bitvector.empty()) {
 			try {
-				std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+				std::copy(bitvector.begin() + index, bitvector.end(), std::ostream_iterator<bool>(oss));
 			}
 			catch (const std::invalid_argument&) {} // TBD
 			catch (const std::out_of_range&) {}
@@ -247,7 +348,7 @@ namespace itmflib {
 			}
 			else {
 				try {
-					std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+					std::copy(bitvector.begin() + getFirstNonLengthBitIndex(), bitvector.end(), std::ostream_iterator<bool>(oss));
 				}
 				catch (const std::invalid_argument&) {} // TBD
 				catch (const std::out_of_range&) {}
@@ -266,7 +367,7 @@ namespace itmflib {
 		int64_t r = 0;
 		if (!bitvector.empty()) {
 			try {
-				std::copy(bitvector.begin(), bitvector.end(), std::ostream_iterator<bool>(oss));
+				std::copy(bitvector.begin() + getFirstNonLengthBitIndex(), bitvector.end(), std::ostream_iterator<bool>(oss));
 			}
 			catch (const std::invalid_argument&) {} // TBD
 			catch (const std::out_of_range&) {}
@@ -280,6 +381,25 @@ namespace itmflib {
 		return r;
 	}
 
+	int BMLBitVector::getFirstNonLengthBitIndex() {
+		int num_bytes = bitvector.size() / 8;
+
+		if (num_bytes == 9)
+			return num_bytes - 1;
+
+		switch (encoding) {
+		case(VSIE):
+			return num_bytes + 1;
+
+		case(VUIE):
+			return num_bytes;
+		}
+	}
+
+	/*
+	// TODO - figure out a better interface for encoding tags - does a tag need to be its own class? static?
+	// static or in another class/namespace?
+	// return BMLBitVector
 	void BMLBitVector::encodeTag(uint32_t id, uint8_t type) {
 		// TODO - eliminate code reuse?
 		uint32_t quot = id;
@@ -297,4 +417,5 @@ namespace itmflib {
 		BMLBitVector t(type);
 		(*this) = (*this) | t;
 	}
+	*/
 }
