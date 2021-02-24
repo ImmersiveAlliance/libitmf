@@ -2,23 +2,7 @@
 #include "../core/bmlbitutils.h"
 
 namespace itmflib {
-
-	TEST(CountBitsTest, SimpleIntTest) {
-		int num = 65;
-		int num2 = -65;
-
-		EXPECT_EQ(countBits(num), 7);
-		EXPECT_EQ(countBits(num2), 7);
-	}
-
-	TEST(CountBytesTest, SimpleIntTest) {
-		int num = 65;
-		int num2 = -65;
-
-		EXPECT_EQ(countBytes(num), 1);
-		EXPECT_EQ(countBytes(num2), 1);
-	}
-
+	/* TESTS FOR BMLBITVECTOR */
 	// Constructor tests
 	TEST(ConstructorTest, VUIEInt32SpecTest1) {
 		BMLBitVector a(63);
@@ -101,7 +85,7 @@ namespace itmflib {
 
 	/* BIT OPERATION TESTS */
 
-	// Shift tests
+	// Left shift tests
 	TEST(LeftShiftTest, HandlesSingleByteMSB0) {
 		BMLBitVector arr(32);
 		arr = arr << 3;
@@ -126,6 +110,7 @@ namespace itmflib {
 		EXPECT_EQ(arr.getBitVector(), BMLBitVector(130503752).getBitVector());
 	}
 
+	// Right shift tests
 	TEST(RightShiftTest, HandlesSingleByteMSB0) {
 		BMLBitVector arr(72);
 		arr = arr >> 3;
@@ -150,6 +135,7 @@ namespace itmflib {
 		EXPECT_EQ(arr.getBitVector(), BMLBitVector(27329572).getBitVector());
 	}
 
+	// Xor tests
 	TEST(XorTest, SameLength) {
 		BMLBitVector arr1(127);
 		BMLBitVector arr2(85);
@@ -171,6 +157,7 @@ namespace itmflib {
 		EXPECT_EQ(result.getBitVector(), BMLBitVector(26026).getBitVector());
 	}
 
+	// Or tests
 	TEST(OrTest, SameLength) {
 		BMLBitVector arr1(127);
 		BMLBitVector arr2(85);
@@ -192,6 +179,7 @@ namespace itmflib {
 		EXPECT_EQ(result.getBitVector(), BMLBitVector(511).getBitVector());
 	}
 
+	// And tests
 	TEST(AndTest, SameLength) {
 		BMLBitVector arr1(127);
 		BMLBitVector arr2(85);
@@ -214,6 +202,7 @@ namespace itmflib {
 	}
 
 	/* CONVERSION TESTS */
+
 	TEST(ConversionTest, VUIEInt32Test1) {
 		BMLBitVector b(43807);
 		uint32_t i = b.to_uint32();
@@ -293,7 +282,7 @@ namespace itmflib {
 	}
 
 	/* SHRINK TESTS */
-	/*
+	
 	TEST(ShrinkTest, ShrinkableVector1) {
 		BMLBitVector b(std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
 		bool success = b.shrink();
@@ -311,9 +300,81 @@ namespace itmflib {
 	TEST(ShrinkTest, UnshrinkableVector1) {
 		BMLBitVector b(std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
 		bool success = b.shrink();
-		EXPECT_EQ(success, true);
-		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
+		EXPECT_EQ(success, false);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
 	}
-	*/
+	
 	/* EXTEND TESTS */
+
+	TEST(ExtendTest, ExtendVectorSingleByte1) {
+		BMLBitVector b(34);
+		b.extend(2);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendTest, ExtendVectorSingleByte2) {
+		BMLBitVector b(255);
+		b.extend(3);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 }));
+
+	}
+
+	TEST(ExtendTest, ExtendVectorMultiByte1) {
+		BMLBitVector b(34);
+		b.extend(4);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendTest, ExtendVectorMultiByte2) {
+		BMLBitVector b(255);
+		b.extend(6);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 }));
+	}
+
+	TEST(ExtendTest, ExtendVSIESingleByte) {
+		BMLBitVector b(-34, VSIE);
+		b.extend(2);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendTest, ExtendVSIEMutliByte) {
+		BMLBitVector b(-34, VSIE);
+		b.extend(5);
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendTest, AssertionTest) {
+		BMLBitVector b(34);
+		EXPECT_ANY_THROW(b.extend(1));
+	}
+
+	/* EXTEND AND SHRINK TEST */
+
+	TEST(ExtendAndShrinkTest, VUIEExtendAndShrinkSingleByte) {
+		BMLBitVector b(34);
+		b.extend(2);
+		b.shrink();
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendAndShrinkTest, VUIEExtendAndShrinkMultiByte) {
+		BMLBitVector b(34);
+		b.extend(4);
+		b.shrink();
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 0, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendAndShrinkTest, VSIEExtendAndShrinkSingleByte) {
+		BMLBitVector b(-34, VSIE);
+		b.extend(2);
+		b.shrink();
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 1, 1, 0, 0, 0, 1, 0 }));
+	}
+
+	TEST(ExtendAndShrinkTest, VSIEExtendAndShrinkMultiByte) {
+		BMLBitVector b(-34, VSIE);
+		b.extend(4);
+		b.shrink();
+		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 1, 1, 0, 0, 0, 1, 0 }));
+	}
 }

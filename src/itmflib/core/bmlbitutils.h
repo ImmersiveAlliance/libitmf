@@ -17,14 +17,6 @@ namespace itmflib {
 		VUIE,
 		VSIE
 	};
-	/* This will have things like bit manip for bml bit sets*/
-	// Helper functions
-	unsigned int countBits(int number); // counts how many bits an int will occupy (excluding sign bit)
-	unsigned int countBytes(int number);
-
-	// NOTES:
-	// one function that changes behavior of other functions - leading to complicated, unforeseen bugs
-	// prevent it from happening by mistake
 
 	// Cases where the BMLBitVector will be used per spec:
 	/*
@@ -54,21 +46,17 @@ namespace itmflib {
 		int getBitVectorSize() const { return bitvector.size(); }
 
 		// Conversions - Encode/decode
-		uint32_t to_uint32();  // unsigned int conversion (agnostic to whether or not the bitvector is encoded)
-		uint64_t to_uint64();  // unsigned long conversion (agnostic to whether or not the bitvector is encoded)
-		int32_t to_int32();  // int conversion (agnostic to whether or not the bitvector is encoded)
-		int64_t to_int64();  // long conversions (agnostic to whether or not the bitvector is encoded)
+		uint32_t to_uint32();  // unsigned int conversion
+		uint64_t to_uint64();  // unsigned long conversion 
+		int32_t to_int32();  // int conversion 
+		int64_t to_int64();  // long conversions
 
-		// TODO - determine better functionality/interface for these functions
-		void prepareForEncoding(); // adds the number of significant 1 bits that signals subsequent bytes
-		void encodeTag(uint32_t id, uint8_t type); // Better as output parameter? TBD
-
-		// Function to shrink the vector if possible, for example one byte is all 0s.
+		/*// TODO - determine better functionality/interface for this function
+		void encodeTag(uint32_t id, uint8_t type); // Better as output parameter? TBD*/
 
 		// Helper functions
-		//bool is_valid(); // Checks to see if the encoding is valid (i.e. correct number of MSBs for length)
-		void extend(int length); // Resizes by adding more significant bits equal to 0
-		bool shrink(); // return 1 if shrink was successful, 0 if not
+		void extend(int byte_length); // Resizes by adding more significant bits equal to 0
+		bool shrink(); // Shrinks the vector returning if successful
 
 	private:
 		std::vector<bool> bitvector;
@@ -77,6 +65,7 @@ namespace itmflib {
 
 		int getFirstNonLengthBitIndex(); // Returns the index which is the first non-length bit
 		void compareAndExtendBitVector(BMLBitVector* rhs); // Used in ^, |, &
+		void encodeByteLengthIndicatorBits(std::vector<bool>* bits, bool sign_bit); // Used for bitvectors that are missing the byte length bits (used in shrinking and constructor)
 	};
 
 	inline bool operator==(const BMLBitVector& b1, const BMLBitVector& b2) {
