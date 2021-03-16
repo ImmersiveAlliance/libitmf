@@ -37,7 +37,7 @@ macro(itmflib_add_test FILENAME TEST_SRC)
     # link the Google test infrastructure, mocking library, and a default main fuction to
     # the test executable.  Remove g_test_main if writing your own main function.
     gtest_discover_tests(${FILENAME})
-    target_link_libraries(${FILENAME} PUBLIC bmllib gtest gmock gtest_main)
+    target_link_libraries(${FILENAME} PUBLIC itmflibcore gtest gmock gtest_main)
 endmacro()
 
 itmflib_add_test(bmlbitutilstests bmlbitutilstests.cc)

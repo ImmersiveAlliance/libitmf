@@ -1,0 +1,3 @@
+add_executable(ITMFEncoder itmfencoder.cxx)
+target_link_libraries(ITMFEncoder PUBLIC itmflibcore)
+set_target_properties(ITMFEncoder PROPERTIES COMPILE_DEFINITIONS BUILDER_STATIC_DEFINE)

@@ -43,22 +43,36 @@ namespace itmflib {
 	}
 
 	/**
-		Left shift operator on the bit vector. The left shift begins after the byte length indicator bits
+		Arithmetic left shift operator on the bit vector. The left shift begins after the byte length indicator bits
 		to the end of the bit vector. 
 		@params
 			int amount: the amount to left shift. (TODO - exception if the amount is greater than length)
 		@return
 			A new BMLBitVector with the left shifted bit vector.
+
+		TODO - assertion that amount is adequate to shift
 	*/
 	BMLBitVector BMLBitVector::operator<<(int amount) {
 		std::vector<bool> result = this->getBitVector();
-
 		// for VSIE the number of indicator bits (including sign bit)
 		auto begin = result.begin() + getFirstNonLengthBitIndex();
+		std::vector<bool> lost_info(begin, begin + amount);
+
 		std::rotate(begin, begin + amount, result.end());
 		for (std::reverse_iterator<std::vector<bool>::iterator> r = result.rbegin(); r < result.rbegin() + amount; r++) {
 			*r = 0;
 		}
+
+		// erase length bits
+		result.erase(result.begin(), begin);
+
+		// insert any lost information
+		if (lost_info != std::vector<bool>(amount, 0)) {
+			result.insert(result.begin(), lost_info.begin(), lost_info.end());
+		}
+
+		// re-encode
+		encodeByteLengthIndicatorBits(&result, is_negative);
 
 		return BMLBitVector(result);
 	}
@@ -70,6 +84,7 @@ namespace itmflib {
 			int amount: the amount to right shift (TODO - assertion if this is larger than the bit vector size)
 		@return
 			A new BMLBitVector with the right shifted bit vector.
+		TODO - revisit to comply with arithmetic right shift
 	*/
 	BMLBitVector BMLBitVector::operator>>(int amount) {
 		std::vector<bool> result = this->getBitVector();
@@ -211,6 +226,7 @@ namespace itmflib {
 		Replaces bitvector if it is found to be smaller.
 		@return
 			Boolean indicating if the shrink was successful or not.
+		TODO - Iron out bugs
 	*/
 	bool BMLBitVector::shrink() {
 		// Edge case with vector size = 8 return false
@@ -383,6 +399,32 @@ namespace itmflib {
 			r * -1;
 
 		return r;
+	}
+
+	/**
+	
+	*/
+	std::vector<char> BMLBitVector::to_charvector() {
+		std::vector<char> ret;
+		for (unsigned int it = 0; it < getBitVectorSize(); it += BML_BYTE_SIZE) {
+			int leng = it + 8;
+			std::vector<bool> chunk(bitvector.begin() + it, bitvector.begin() + leng);
+			
+			std::ostringstream oss;
+			int i = 0;
+			if (!chunk.empty()) {
+				try {
+					std::copy(chunk.begin(), chunk.end(), std::ostream_iterator<bool>(oss));
+					i = std::stoi(oss.str(), 0, 2);
+				}
+				catch (const std::invalid_argument&) { std::cerr << "Invalid argument\n"; }
+				catch (const std::out_of_range&) { std::cerr << "Out of range\n"; }
+			}
+			char r = i;
+			ret.push_back(r);
+		}
+
+		return ret;
 	}
 
 	/**

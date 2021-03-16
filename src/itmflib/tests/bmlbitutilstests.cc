@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../core/bmlbitutils.h"
+#include "bmlbitutils.h"
 
 namespace itmflib {
 	/* TESTS FOR BMLBITVECTOR */
@@ -89,13 +89,13 @@ namespace itmflib {
 	TEST(LeftShiftTest, HandlesSingleByteMSB0) {
 		BMLBitVector arr(32);
 		arr = arr << 3;
-		EXPECT_EQ(arr.getBitVector(), BMLBitVector(0).getBitVector());
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(256).getBitVector());
 	}
 
 	TEST(LeftShiftTest, HandlesSingleByteMSB1) {
 		BMLBitVector arr(72);
 		arr = arr << 3;
-		EXPECT_EQ(arr.getBitVector(), BMLBitVector(64).getBitVector());
+		EXPECT_EQ(arr.getBitVector(), BMLBitVector(576).getBitVector());
 	}
 
 	TEST(LeftShiftTest, HandlesMultipleBytes1) {

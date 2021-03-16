@@ -2,11 +2,23 @@ set(bmllib_SRCS
 	bmltypes.h
 	bmltypes.cxx
 	bmlbitutils.h
-	bmlbitutils.cxx)
+	bmlbitutils.cxx
+	)
 
-add_library(bmllib ${bmllib_SRCS})
+set(itmflib_SRCS
+	itmfunits.h
+	itmfunits.cxx
+	itmfenums.h
+	itmffile.h
+	itmffile.cxx
+	)
 
-target_include_directories(bmllib PUBLIC
+include_directories("${itmflib_src_root}/core")
+
+add_library(itmflibcore STATIC ${itmflib_SRCS} ${bmllib_SRCS} defines.h)
+
+target_include_directories(itmflibcore PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}	
 )
+
 message(${CMAKE_CURRENT_SOURCE_DIR})

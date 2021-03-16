@@ -1,6 +1,7 @@
 #ifndef BMLLIB_CORE_BML_BIT_UTILS_H_
 #define BMLLIB_CORE_BML_BIT_UTILS_H_
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <math.h>
@@ -50,6 +51,7 @@ namespace itmflib {
 		uint64_t to_uint64();  // unsigned long conversion 
 		int32_t to_int32();  // int conversion 
 		int64_t to_int64();  // long conversions
+		std::vector<char> to_charvector(); // to char vector for writing
 
 		/*// TODO - determine better functionality/interface for this function
 		void encodeTag(uint32_t id, uint8_t type); // Better as output parameter? TBD*/
@@ -71,6 +73,7 @@ namespace itmflib {
 	inline bool operator==(const BMLBitVector& b1, const BMLBitVector& b2) {
 		return b1.getBitVector() == b2.getBitVector();
 	}
+
 }
 
 #endif // BMLLIB_CORE_BML_BIT_UTILS_H_
