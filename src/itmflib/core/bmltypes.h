@@ -134,11 +134,11 @@ public:
 	size_t save(std::ofstream& outfile);
 };
 
-class BMLobject : public BMLtype {
+class BMLobject {
 private:
 	int id;
 public:
-	BMLobject(int i) : BMLtype(i, 0) { }
+	BMLobject(int i) : id(i) { }
 
 	std::vector<char> encodeOpenTag();
 	size_t writeOpenTag(std::ofstream& outfile);
