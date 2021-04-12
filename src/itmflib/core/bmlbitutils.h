@@ -30,7 +30,7 @@ namespace itmflib {
 	public:
 		// Constructors - will convert to bitvector based on encoding method (default is VUIE)
 		BMLBitVector() : encoding(Encoding::VUIE), is_negative(false), bitvector(std::vector<bool>{}) { }
-		BMLBitVector(std::string bits, Encoding E = VUIE);
+		BMLBitVector(unsigned char& v, Encoding E = VUIE);
 		BMLBitVector(int64_t num, Encoding E = VUIE);
 		BMLBitVector(std::vector<bool> v, Encoding E = VUIE) : bitvector(v), encoding(E) { } // Mostly used for testing purposes
 
@@ -68,6 +68,7 @@ namespace itmflib {
 		int getFirstNonLengthBitIndex(); // Returns the index which is the first non-length bit
 		void compareAndExtendBitVector(BMLBitVector* rhs); // Used in ^, |, &
 		void encodeByteLengthIndicatorBits(std::vector<bool>* bits, bool sign_bit); // Used for bitvectors that are missing the byte length bits (used in shrinking and constructor)
+		size_t decodeByteLength(char* byte);
 	};
 
 	inline bool operator==(const BMLBitVector& b1, const BMLBitVector& b2) {

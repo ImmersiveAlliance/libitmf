@@ -1,8 +1,8 @@
 #ifndef ITMF_FILE_H_
-#define ITMF_FILE_H
+#define ITMF_FILE_H_
 
-#include <itmfunits.h>
-#include <bmltypes.h>
+#include "itmfunits.h"
+#include "bmltypes.h"
 
 /*
 #if defined(_WIN32)
@@ -62,6 +62,8 @@ namespace itmflib {
 		static ITMFFILE CreateStreamsAtStartFile();
 		static ITMFFILE CreateStreamsAtEndFile();
 		static ITMFFILE CreateFileFromConfig(ITMFCONFIGURATION configuration);
+		static ITMFFILE ReadFile(std::string filepath);
+		static ITMFFILE ReadFileFromMemory(void* mem);
 		
 		void addProperty(std::string key, std::string value);
 		void addProperty(std::string key, int64_t value);
@@ -71,7 +73,15 @@ namespace itmflib {
 
 		std::vector<std::string> getFilelist() const { return filelist; }
 
+		// Reading functions
+		void read(std::string filepath);
+		void readFileFromMemory();
+
+		// Writing functions
 		void write(std::string location, std::string filename); // write file to disk
+
+		// create file buffer?
+		void writeFileToMemory();
 	};
 
 }

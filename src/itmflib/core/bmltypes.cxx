@@ -9,7 +9,8 @@ namespace itmflib {
 	std::vector<char> encodeTag(int id, int type_id) {
 		BMLBitVector tag(id);
 		tag = tag << 3;
-		tag = tag | (BMLBitVector(type_id));
+		BMLBitVector typeBitVector(type_id);
+		tag = tag | typeBitVector;
 		return tag.to_charvector();
 	}
 
@@ -86,6 +87,13 @@ namespace itmflib {
 		encoded_value.insert(encoded_value.end(), value.begin(), value.end());
 		
 		return encoded_value;
+	}
+
+	void BMLstring::load(std::ifstream& infile) {
+		char firstByte; // read first byte to determine number of sub. bytes
+		infile.read(&firstByte, 1);
+		BMLBitVector tag(firstByte);
+		// left of here
 	}
 
 // blob

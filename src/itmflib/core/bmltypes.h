@@ -1,11 +1,10 @@
 #ifndef BML_TYPES_H_
 #define BML_TYPES_H_
 
-#include <defines.h>
 #include <vector>
 #include <fstream>
-#include <boost/variant/static_visitor.hpp>
-#include <bmlbitutils.h>
+#include "boost/variant/static_visitor.hpp"
+#include "bmlbitutils.h"
 
 namespace itmflib {
 	std::vector<char> encodeTag(int id, int type_id);
@@ -13,7 +12,7 @@ namespace itmflib {
 class BMLtype {
 public:
 	BMLtype() { }
-	BMLtype(int i) : id(i) { }
+	BMLtype(int i, int type) : id(i), type_id(type) { }
 
 	int id;
 	int type_id;
@@ -46,9 +45,7 @@ public:
 class BMLint : public BMLtype {
 	int32_t value;
 public:
-	BMLint(int i, int32_t v) : BMLtype(i), value(v) {
-		type_id = 2;
-	}
+	BMLint(int i, int32_t v) : BMLtype(i, 2), value(v) { }
 
 	int32_t getValue() const { return value; }
 
@@ -64,9 +61,7 @@ public:
 class BMLlong : public BMLtype {
 	int64_t value;
 public:
-	BMLlong(int i, int64_t v) : BMLtype(i), value(v) {
-		type_id = 3;
-	}
+	BMLlong(int i, int64_t v) : BMLtype(i, 3), value(v) { }
 
 	int64_t getValue() const { return value; }
 	
@@ -82,9 +77,7 @@ public:
 class BMLsingle : public BMLtype {
 	float value;
 public:
-	BMLsingle(int i, float v) : BMLtype(i), value(v) {
-		type_id = 4;
-	}
+	BMLsingle(int i, float v) : BMLtype(i, 4), value(v) { }
 
 	float getValue() const { return value; }
 
@@ -94,9 +87,7 @@ public:
 class BMLdouble : public BMLtype {
 	double value;
 public:
-	BMLdouble(int i, double v) : BMLtype(i), value(v) {
-		type_id = 5;
-	}
+	BMLdouble(int i, double v) : BMLtype(i, 5), value(v) {	}
 	
 	double getValue() const { return value; }
 
@@ -107,10 +98,11 @@ class BMLstring : public BMLtype {
 private:
 	std::string value;
 public:
-	BMLstring(int i, std::string v) : BMLtype(i), value(v) { 
-		type_id = 6;
+	BMLstring(int i, std::string v) : BMLtype(i, 6), value(v) {
 		length = v.size();
 	}
+
+	BMLstring() : BMLtype(0, 6), value(""), length(0) { }
 
 	int32_t length;
 
@@ -126,7 +118,7 @@ public:
 class BMLblob : public BMLtype {
 	char* value;
 public:
-	BMLblob(int i, int32_t l, char* v) : BMLtype(i), value(v), length(l) {
+	BMLblob(int i, int32_t l, char* v) : BMLtype(i, 7), value(v), length(l) {
 		type_id = 7;
 	}
 
@@ -142,11 +134,11 @@ public:
 	size_t save(std::ofstream& outfile);
 };
 
-class BMLobject {
+class BMLobject : public BMLtype {
 private:
 	int id;
 public:
-	BMLobject(int i) : id(i) { }
+	BMLobject(int i) : BMLtype(i, 0) { }
 
 	std::vector<char> encodeOpenTag();
 	size_t writeOpenTag(std::ofstream& outfile);
@@ -178,22 +170,29 @@ public:
 	}
 };
 
-class check_file_stream_header : public boost::static_visitor<bool> {
+class check_file_stream_header : public boost::static_visitor<> {
+	bool& ret;
 public:
-	bool operator()(BMLint& i) const {
+	check_file_stream_header(bool& r) : ret(r) { }
+
+	void operator()(BMLint& i) const {
 		if (i.getValue() == 0) {
-			return true;
+			ret = true;
+
+			return;
 		}
 
-		return false;
+		ret = false;
 	}
 
-	bool operator()(BMLstring& s) const {
+	void operator()(BMLstring& s) const {
 		if (s.getValue() == "file") {
-			return true;
+			ret = true;
+
+			return;
 		}
 
-		return false;
+		ret = false;
 	}
 };
 

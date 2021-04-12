@@ -58,6 +58,20 @@ namespace itmflib {
         return file;
     }
 
+    ITMFFILE ITMFFILE::ReadFile(std::string filepath) {
+        std::ifstream infile;
+        infile.open(filepath, std::ios::in | std::ios::binary);
+        
+        if (infile.is_open()) {
+            ITMF_HEADER header = ITMF_HEADER::ReadITMFHeader(infile);
+
+        }
+
+        infile.close();
+
+        return ITMFFILE::CreateStreamsAtEndFile();
+    }
+
     void ITMFFILE::addProperty(std::string key, std::string value) {
         if (!CHECK_BOOST_OPTIONAL(properties)) {
             properties = PROPERTIES({});
@@ -82,7 +96,10 @@ namespace itmflib {
     {
         for (auto it = streamheaders.begin(); it != streamheaders.end(); it++) {
             if (stream_type == ITMF_STREAM_TYPES::FILE_DATA) {
-                if (boost::apply_visitor(check_file_stream_header(), (*it).getType())) {
+                bool found = false;
+                boost::variant<BMLint, BMLstring> t = (*it).getType();
+                boost::apply_visitor(check_file_stream_header(found), t);
+                if (found) {
                     return &(*it);
                 }
             }

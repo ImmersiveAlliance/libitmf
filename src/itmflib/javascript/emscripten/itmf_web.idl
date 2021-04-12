@@ -1,0 +1,9 @@
+interface ITMFEncoder {
+	void InitStreamsAtStart();
+	void InitStreamsAtEnd();
+	void InitCustom();
+	void AddStringProperty(DOMString key, DOMString value);
+	void AddLongProperty(DOMString key, long value);
+	void AddFile(DOMString filepath);
+	void Write(DOMString location, DOMString filename);
+};

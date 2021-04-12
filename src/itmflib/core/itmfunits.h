@@ -1,10 +1,10 @@
 #ifndef ITMF_UNITS_H_
 #define ITMF_UNITS_H_
 
-#include <bmltypes.h>
-#include <itmfenums.h>
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
+#include "bmltypes.h"
+#include "itmfenums.h"
+#include "boost/optional.hpp"
+#include "boost/variant.hpp"
 
 namespace itmflib {
 
@@ -25,10 +25,12 @@ namespace itmflib {
 
 	public:
 		static ITMF_HEADER CreateITMFHeader(int32_t flags);
+		static ITMF_HEADER ReadITMFHeader(std::ifstream& infile);
 
 		void addFlag(ITMF_HEADER_FLAGS flag) { flags += static_cast<int32_t>(flag); }
 
 		size_t write(std::ofstream& outfile);
+
 	};
 
 	class PROPERTIES : public BMLobject {

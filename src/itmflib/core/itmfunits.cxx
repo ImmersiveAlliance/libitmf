@@ -6,6 +6,13 @@ namespace itmflib {
 		return ITMF_HEADER(BMLstring(1, "OX"), BMLint(2, 1), BMLint(3, flags));
 	}
 
+	ITMF_HEADER ITMF_HEADER::ReadITMFHeader(std::ifstream& infile) {
+		BMLstring o; 
+		o.load(infile);
+
+		return ITMF_HEADER(BMLstring(1, "OX"), BMLint(2, 1), BMLint(3, 1));
+	}
+
 	size_t ITMF_HEADER::write(std::ofstream& outfile)
 	{
 		size_t bytes_written = 0;

@@ -1,6 +1,7 @@
-#include <itmffile.h>
+#include "itmffile.h"
 
 int main() {
+	std::cout << "test" << std::endl;
 	itmflib::ITMFFILE file = itmflib::ITMFFILE::CreateStreamsAtStartFile();
 
 	file.addFile("F:\\art\\3D Models\\bunny.obj");

@@ -42,6 +42,13 @@ namespace itmflib {
 		encodeByteLengthIndicatorBits(&bitvector, is_neg);
 	}
 
+	BMLBitVector::BMLBitVector(unsigned char& v, Encoding E) : encoding(E) {
+		for (int i = 0; i < 8; i++) {
+			bool bit = (v >> i) & 1;
+			bitvector.push_back(bit);
+		}
+	}
+
 	/**
 		Arithmetic left shift operator on the bit vector. The left shift begins after the byte length indicator bits
 		to the end of the bit vector. 

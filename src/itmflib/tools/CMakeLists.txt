@@ -1,3 +1,7 @@
+# set(CMAKE_EXECUTABLE_SUFFIX ".html")
 add_executable(ITMFEncoder itmfencoder.cxx)
-target_link_libraries(ITMFEncoder PUBLIC itmflibcore)
+add_executable(ITMFDecoder itmfdecoder.cxx)
+target_link_libraries(ITMFEncoder PUBLIC itmfcore)
 set_target_properties(ITMFEncoder PROPERTIES COMPILE_DEFINITIONS BUILDER_STATIC_DEFINE)
+target_link_libraries(ITMFDecoder PUBLIC itmfcore)
+set_target_properties(ITMFDecoder PROPERTIES COMPILE_DEFINITIONS BUILDER_STATIC_DEFINE)
