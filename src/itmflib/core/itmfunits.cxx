@@ -30,6 +30,23 @@ namespace itmflib {
 		return bytes_written;
 	}
 
+	/*size_t ITMF_HEADER::writeToBuffer(std::vector<char>* buffer)
+	{
+		size_t bytes_written = 0;
+		bytes_written += ox.writeToBuffer(buffer);
+		bytes_written += version.writeToBuffer(buffer);
+		bytes_written += flags.writeToBuffer(buffer);
+
+		if (CHECK_BOOST_OPTIONAL(keygen_method))
+			boost::apply_visitor(buffer_save_visitor(buffer, bytes_written), keygen_method.get());
+		if (CHECK_BOOST_OPTIONAL(nrounds))
+			bytes_written += nrounds.get().writeToBuffer(buffer);
+		if (CHECK_BOOST_OPTIONAL(salt))
+			bytes_written += salt.get().writeToBuffer(buffer);
+
+		return bytes_written;
+	}*/
+
 	size_t PROPERTIES::write(std::ofstream& outfile)
 	{
 		size_t bytes_written = 0;
@@ -44,6 +61,20 @@ namespace itmflib {
 
 		return bytes_written;
 	}
+	
+	/*size_t PROPERTIES::writeToBuffer(std::vector<char>* buffer) {
+		size_t bytes_written = 0;
+		bytes_written += writeOpenTagToBuffer(buffer);
+
+		for (std::pair<BMLstring, boost::variant<BMLstring, BMLlong>>& prop : properties) {
+			bytes_written += prop.first.writeToBuffer(buffer);
+			boost::apply_visitor(buffer_save_visitor(buffer, bytes_written), prop.second);
+		}
+
+		bytes_written += writeCloseTagToBuffer(buffer);
+
+		return bytes_written;
+	}*/
 
 	size_t STREAM_HEADER::write(std::ofstream& outfile)
 	{

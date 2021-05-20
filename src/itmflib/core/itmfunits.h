@@ -30,7 +30,7 @@ namespace itmflib {
 		void addFlag(ITMF_HEADER_FLAGS flag) { flags += static_cast<int32_t>(flag); }
 
 		size_t write(std::ofstream& outfile);
-
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class PROPERTIES : public BMLobject {
@@ -41,6 +41,7 @@ namespace itmflib {
 		void addProperty(std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> property) { properties.push_back(property); }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class STREAM_HEADER : public BMLobject {
@@ -85,6 +86,7 @@ namespace itmflib {
 		boost::variant<BMLint, BMLstring> getType() const { return type; }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class INDEX : public BMLobject {
@@ -99,6 +101,7 @@ namespace itmflib {
 		void addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>> n) { nbytes.push_back(n); }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class STREAM_PROPERTIES {
@@ -125,6 +128,7 @@ namespace itmflib {
 		}
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class DIRECTORY : public BMLobject {
@@ -139,6 +143,7 @@ namespace itmflib {
 		void addStreamProperty(STREAM_PROPERTIES props) { stream_properties.push_back(props); }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class SIGNATURE : public BMLobject {
@@ -154,6 +159,7 @@ namespace itmflib {
 		void setSignature(BMLblob s) { signature = s; }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class CHUNK {
@@ -171,6 +177,7 @@ namespace itmflib {
 		void setData(BMLblob d) { data = d; }
 
 		size_t write(std::ofstream& outfile);
+		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
 	class ITMF_FOOTER {
@@ -183,6 +190,7 @@ namespace itmflib {
 		void setOffset(uint32_t offset) { offset_to_stream_end = offset; }
 
 		void write(std::ofstream& outfile);
+		//void writeToBuffer(std::vector<char>* buffer);
 	};
 
 }

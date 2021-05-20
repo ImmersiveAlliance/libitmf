@@ -55,6 +55,7 @@ namespace itmflib {
 		STREAM_HEADER* getStreamHeader(ITMF_STREAM_TYPES stream_type);
 		void writeFiles(std::ofstream& outfile);
 		void writeStreamsAtStart(std::ofstream& outfile);
+		//void writeStreamsAtStartToBuffer(std::vector<char>* buffer);
 		void writeStreamsAtEnd(std::ofstream& outfile);
 		
 		ITMFFILE(ITMF_HEADER h, ITMF_FOOTER f, ITMFCONFIGURATION conf) : header(h), footer(f), config(conf) { }
@@ -81,7 +82,7 @@ namespace itmflib {
 		void write(std::string location, std::string filename); // write file to disk
 
 		// create file buffer?
-		void writeFileToMemory();
+		//void writeFileToBuffer(std::vector<char>* file_buffer);
 	};
 
 }

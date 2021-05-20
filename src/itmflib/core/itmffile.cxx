@@ -216,6 +216,8 @@ namespace itmflib {
         //}
 
         // Stream Headers
+        // If stream headers is empty because of no files this causes issues
+        // same with other logical units below
         offset_to_stream += streamheaders[0].writeOpenTag(outfile);
         for (auto it = streamheaders.begin(); it != streamheaders.end(); it++) {
             offset_to_stream += (*it).write(outfile);
@@ -246,6 +248,17 @@ namespace itmflib {
         footer.setOffset(static_cast<uint32_t>(offset_to_stream));
         footer.write(outfile);
     }
+
+    //void itmflib::ITMFFILE::writeStreamsAtStartToBuffer(std::vector<char>* buffer)
+    //{
+    //    // Header
+    //    header.writeToBuffer(buffer);
+
+    //    // Properties
+    //    if (config.isPropertiesIncluded()) {
+    //        properties.get().writeToBuffer(buffer);
+    //    }
+    //}
 
     void ITMFFILE::writeStreamsAtEnd(std::ofstream& outfile) {
         header.write(outfile);
@@ -287,7 +300,7 @@ namespace itmflib {
 
     void ITMFFILE::write(std::string location, std::string filename) // needs to be updated for both encoding types
     {
-        std::string filepath = location + '\\' + filename;
+        std::string filepath = location + '/' + filename;
         std::ofstream outstream(filepath, std::ios::out | std::ios::binary);
         if (outstream.is_open()) {
             if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_START) {
@@ -300,4 +313,14 @@ namespace itmflib {
         
         outstream.close();
     }
+
+    //void ITMFFILE::writeFileToBuffer(std::vector<char>* file_buffer)
+    //{
+    //    if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_START) {
+    //        writeStreamsAtStartToBuffer(file_buffer);
+    //    }
+    //    /*else if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_END) {
+    //        writeStreamsAtEnd(outstream);
+    //    }*/
+    //}
 }

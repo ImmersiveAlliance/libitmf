@@ -33,8 +33,12 @@ else()
 endif(Boost_FOUND)
 # enable_testing()
 
+
+
 # Subdirectories
 # add_subdirectory("${itmflib_src_root}/tests")
 add_subdirectory("${itmflib_src_root}/core")
 add_subdirectory("${itmflib_src_root}/tools")
-
+if(EMSCRIPTEN)
+	add_subdirectory("${itmflib_src_root}/javascript/emscripten")
+endif()
