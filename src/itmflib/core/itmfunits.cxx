@@ -129,7 +129,7 @@ namespace itmflib {
 		return bytes_written;
 	}
 
-	size_t STREAM_PROPERTIES::write(std::ofstream& outfile)
+	size_t FILE_PROPERTIES::write(std::ofstream& outfile)
 	{
 		size_t bytes_written = 0;
 
@@ -161,7 +161,7 @@ namespace itmflib {
 		if (CHECK_BOOST_OPTIONAL(stream_index))
 			bytes_written += stream_index.get().save(outfile);
 
-		for (STREAM_PROPERTIES& prop : stream_properties) {
+		for (FILE_PROPERTIES& prop : file_properties) {
 			bytes_written += prop.write(outfile);
 		}
 

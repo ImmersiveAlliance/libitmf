@@ -68,6 +68,7 @@ namespace itmflib {
 		
 		void addProperty(std::string key, std::string value);
 		void addProperty(std::string key, int64_t value);
+		void addFiles(std::vector<std::string> filepaths);
 		void addFile(std::string filepath);
 		void addFile(std::string filename, char* buffer);
 		void readFile(std::string filename, char* buffer);
@@ -79,7 +80,7 @@ namespace itmflib {
 		void readFileFromMemory();
 
 		// Writing functions
-		void write(std::string location, std::string filename); // write file to disk
+		void write(std::string filename); // write file to disk
 
 		// create file buffer?
 		//void writeFileToBuffer(std::vector<char>* file_buffer);
