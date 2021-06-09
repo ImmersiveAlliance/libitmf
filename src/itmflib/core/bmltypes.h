@@ -8,16 +8,24 @@
 
 namespace itmflib {
 	std::vector<char> encodeTag(int id, int type_id);
-	
+	void decodeTag(std::ifstream& infile, int& id, int& type_id);
+	void peekTag(std::ifstream& infile, int& id, int& type_id);
+
+	unsigned char countLeadingOnes(unsigned char byte);
+
+	BMLBitVector readVUIE(std::ifstream& infile);
+	BMLBitVector readVSIE(std::ifstream& infile);
+
+
 class BMLtype {
 public:
-	BMLtype() { }
+	BMLtype() : id(), type_id() { }
 	BMLtype(int i, int type) : id(i), type_id(type) { }
 
 	int id;
 	int type_id;
 
-	void load(std::ifstream& infile);
+
 	virtual std::vector<char> encode() {
 		std::vector<char> encoded_vector;
 		// encode tag
@@ -33,6 +41,7 @@ public:
 	}
 
 	virtual std::vector<char> encodeValue() = 0;
+	virtual void parse(std::ifstream& infile) = 0;
 
 	virtual size_t save(std::ofstream& outfile) {
 		std::vector<char> to_write = encode();
@@ -42,10 +51,16 @@ public:
 	}
 };
 
+	// Returns true if the output BMLtype was filled, else returns false
+	// Only consumes bytes if the tag from the input stream is what was expected
+	bool ParseElement(std::ifstream& infile, int expected_id, BMLtype& output); 
+
 class BMLint : public BMLtype {
+	// TODO: Replace with BMLBitVector
 	int32_t value;
 public:
 	BMLint(int i, int32_t v) : BMLtype(i, 2), value(v) { }
+	BMLint() : BMLtype(0, 2), value() { }
 
 	int32_t getValue() const { return value; }
 
@@ -56,12 +71,15 @@ public:
 	}
 
 	std::vector<char> encodeValue();
+	void parse(std::ifstream& infile);
 };
 
 class BMLlong : public BMLtype {
+	// TODO: Replace with BMLBitVector
 	int64_t value;
 public:
 	BMLlong(int i, int64_t v) : BMLtype(i, 3), value(v) { }
+	BMLlong() : BMLtype(0, 3), value() { }
 
 	int64_t getValue() const { return value; }
 	
@@ -72,26 +90,31 @@ public:
 	}
 
 	std::vector<char> encodeValue();
+	void parse(std::ifstream& infile);
 };
 
 class BMLsingle : public BMLtype {
 	float value;
 public:
 	BMLsingle(int i, float v) : BMLtype(i, 4), value(v) { }
+	BMLsingle() : BMLtype(0, 4), value() { }
 
 	float getValue() const { return value; }
 
 	std::vector<char> encodeValue();
+	void parse(std::ifstream& infile);
 };
 
 class BMLdouble : public BMLtype {
 	double value;
 public:
 	BMLdouble(int i, double v) : BMLtype(i, 5), value(v) {	}
+	BMLdouble() : BMLtype(0, 5), value() { }
 	
 	double getValue() const { return value; }
 
 	std::vector<char> encodeValue();
+	void parse(std::ifstream& infile);
 };
 
 class BMLstring : public BMLtype {
@@ -104,38 +127,41 @@ public:
 
 	BMLstring() : BMLtype(0, 6), value(""), length(0) { }
 
-	int32_t length;
+	//int32_t length; // TODO
+	uint64_t length;
 
 	std::string getValue() const { return value; }
 
 	// Overloads
-	void load(std::ifstream& infile);
+	//void load(std::ifstream& infile);
 	std::vector<char> encode();
 	std::vector<char> encodeLength();
 	std::vector<char> encodeValue();
+	void parse(std::ifstream& infile);
 };
 
 class BMLblob : public BMLtype {
-	char* value;
+	std::shared_ptr<char> value;
 public:
-	BMLblob(int i, int32_t l, char* v) : BMLtype(i, 7), value(v), length(l) {
-		type_id = 7;
-	}
+	BMLblob() : length(0), value(), BMLtype(0, 7) { }
+	BMLblob(int id, uint64_t l, std::shared_ptr<char> v) : length(l), value(v), BMLtype(id, 7) { }
 
-	char* getValue() const { return value; }
+	//char* getValue() const { return value; }
+	std::shared_ptr<char> getValue() const { return value; }
 
-	int32_t length;
+	uint64_t length;
 
 	// Overloads
-	void load(std::ifstream& infile);
+	//void load(std::ifstream& infile);
 	std::vector<char> encode();
 	std::vector<char> encodeLength();
 	std::vector<char> encodeValue() { return std::vector<char>({}); }
+	void parse(std::ifstream& infile);
 	size_t save(std::ofstream& outfile);
 };
 
 class BMLobject {
-private:
+protected:
 	int id;
 public:
 	BMLobject(int i) : id(i) { }

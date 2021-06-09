@@ -6,8 +6,7 @@ namespace itmflib {
     logical units that are non-optional: ITMF Header, Stream, StreamHeader, Chunk,
     Directory, and Footer.
     */
-    ITMFFILE ITMFFILE::CreateStreamsAtStartFile()
-    {
+    ITMFFILE ITMFFILE::CreateStreamsAtStartFile() {
         ITMFCONFIGURATION config(ITMF_ENCODING_ORDER::STREAMS_AT_START, false, false,
             ITMF_SIGNATURE::NONE, ITMF_COMPRESSION::NONE);
 
@@ -48,7 +47,7 @@ namespace itmflib {
         ITMFFILE file = ITMFFILE(header, footer, configuration);
         if (configuration.isPropertiesIncluded()) {
             file.header.addFlag(ITMF_HEADER_FLAGS::PROPERTIES);
-            file.properties = PROPERTIES({});
+            file.properties = PROPERTIES();
         }
         if (configuration.isIndexIncluded()) {
             file.header.addFlag(ITMF_HEADER_FLAGS::INDEX);
@@ -62,19 +61,164 @@ namespace itmflib {
         std::ifstream infile;
         infile.open(filepath, std::ios::in | std::ios::binary);
         
+        ITMFFILE itmffile;
         if (infile.is_open()) {
-            ITMF_HEADER header = ITMF_HEADER::ReadITMFHeader(infile);
+            int current_id = 0;
+            int current_type = 0;
+
+            itmffile.header = ITMF_HEADER::ReadITMFHeader(infile);
+
+            // Set file config according to header flags
+			ITMF_ENCODING_ORDER eo = itmffile.header.hasFlag(ITMF_HEADER_FLAGS::STREAMS_AT_START) ? ITMF_ENCODING_ORDER::STREAMS_AT_START : ITMF_ENCODING_ORDER::STREAMS_AT_END;
+			bool has_properties = itmffile.header.hasFlag(ITMF_HEADER_FLAGS::PROPERTIES);
+			bool has_index = itmffile.header.hasFlag(ITMF_HEADER_FLAGS::INDEX);
+			// TODO: This must be updated with the correct logic once encryption and compression are implemented in itmflib.
+			ITMF_SIGNATURE signature = ITMF_SIGNATURE::NONE;
+			ITMF_COMPRESSION com = ITMF_COMPRESSION::NONE;
+			ITMFCONFIGURATION c(eo, has_properties, has_index, signature, com);
+			itmffile.config = c;
+
+            // Check for properties present before streams, regardless of StreamsAtEnd or StreamsAtStart
+            // For compatibility with earlier versions of OTOY's ORBX container, we
+            // check for the Properties unit encoded at this point in all cases. In
+            // If properties are present, read properties
+            peekTag(infile, current_id, current_type);
+            if (current_id == 12 && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::PROPERTIES)) {
+                // Advance past tag
+                infile.get();
+                PROPERTIES props;
+                props.parseProperties(infile);
+                itmffile.properties = props;
+            }
+
+
+            if (itmffile.header.hasFlag(ITMF_HEADER_FLAGS::STREAMS_AT_START)) {
+                // read streams
+                itmffile.stream = CHUNK::ReadChunks(infile);
+
+                // if present, read properties
+                peekTag(infile, current_id, current_type);
+                if (current_id == 12 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::PROPERTIES)) {
+                    // Advance past tag
+                    infile.get();
+
+                    PROPERTIES props;
+                    props.parseProperties(infile);
+                    itmffile.properties = props;
+                }
+
+                // read streamheaders
+                if (current_id == 15 && current_type == static_cast<int>(BML_TYPES::OBJECT)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.streamheaders = STREAM_HEADER::ReadStreamHeaders(infile);
+                }
+                else {
+                    // TODO: Error: No streamheaders
+                }
+                // if present, read index
+                peekTag(infile, current_id, current_type);
+                if (current_id == 14 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::INDEX)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.index = INDEX::ReadIndexes(infile);
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+
+                // if present, read directory
+                peekTag(infile, current_id, current_type);
+                if (current_id == 13 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::DIRECTORY)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.directory = DIRECTORY::ReadDirectories(infile);
+                    // Sync the filelist to match the directories we found
+                    itmffile.syncFilelist();
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+                // if present, read signature
+                peekTag(infile, current_id, current_type);
+                if (current_id == 16 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::SIGNED)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.signature->parseSignature(infile);
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+                // read footer
+                itmffile.footer.parseFooter(infile);
+
+            } else if (itmffile.header.hasFlag(ITMF_HEADER_FLAGS::STREAMS_AT_END)) {
+                // properties already read above
+                // read streamheaders
+                peekTag(infile, current_id, current_type);
+                if (current_id == 15 && current_type == static_cast<int>(BML_TYPES::OBJECT)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.streamheaders = STREAM_HEADER::ReadStreamHeaders(infile);
+                }
+                else {
+                    // TODO: Error: No streamheaders
+                }
+                // if present, read index
+                peekTag(infile, current_id, current_type);
+                if (current_id == 14 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::INDEX)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.index = INDEX::ReadIndexes(infile);
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+                // if present, read directory
+                peekTag(infile, current_id, current_type);
+                if (current_id == 13 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::DIRECTORY)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.directory = DIRECTORY::ReadDirectories(infile);
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+                // if present, read signature
+                peekTag(infile, current_id, current_type);
+                if (current_id == 16 && current_type == static_cast<int>(BML_TYPES::OBJECT) && itmffile.header.hasFlag(ITMF_HEADER_FLAGS::SIGNED)) {
+                    // Advance past tag
+                    infile.get();
+
+                    itmffile.signature->parseSignature(infile);
+                }
+                else {
+                    // TODO: Error: No indexes
+                }
+                // read streams
+                itmffile.stream = CHUNK::ReadChunks(infile);
+            }
+            else {
+                // TODO: Error: File should be either STREAMS_AT_START or STREAMS_AT_END
+            }
 
         }
 
         infile.close();
 
-        return ITMFFILE::CreateStreamsAtEndFile();
+        return itmffile;
     }
 
     void ITMFFILE::addProperty(std::string key, std::string value) {
         if (!CHECK_BOOST_OPTIONAL(properties)) {
-            properties = PROPERTIES({});
+            properties = PROPERTIES();
             config.setPropertiesIncluded(true);
             header.addFlag(ITMF_HEADER_FLAGS::PROPERTIES);
         }
@@ -84,7 +228,7 @@ namespace itmflib {
 
     void ITMFFILE::addProperty(std::string key, int64_t value) {
         if (!CHECK_BOOST_OPTIONAL(properties)) {
-            properties = PROPERTIES({});
+            properties = PROPERTIES();
             config.setPropertiesIncluded(true);
             header.addFlag(ITMF_HEADER_FLAGS::PROPERTIES);
         }
@@ -105,7 +249,7 @@ namespace itmflib {
             }
         }
 
-        return nullptr;
+        return nullptr; 
     }
 
     void ITMFFILE::addFile(std::string filepath)
@@ -136,7 +280,8 @@ namespace itmflib {
         DIRECTORY file_stream_directory;
         INDEX file_stream_index; // added to indexes if indexes are included
 
-        char* memblock = new char[MAX_CHUNK_SIZE];
+        //char* memblock = new char[MAX_CHUNK_SIZE];
+        std::shared_ptr<char> memblock(new char[MAX_CHUNK_SIZE], std::default_delete<char[]>());
         int64_t chunk_index = 0;
         int prev_chunk_size = 0;
 
@@ -168,7 +313,7 @@ namespace itmflib {
                 while (infile) {
                     int pos_delta = 0;
 
-                    infile.read(memblock, MAX_CHUNK_SIZE);
+                    infile.read(memblock.get(), MAX_CHUNK_SIZE);
                     size_t bytes_read = infile.gcount();
 
                     if (!bytes_read)
@@ -190,8 +335,6 @@ namespace itmflib {
 
             infile.close();
         }
-
-        delete[] memblock;
 
         if (config.isIndexIncluded()) {
             index->push_back(file_stream_index);
@@ -283,6 +426,14 @@ namespace itmflib {
 
         // Write files to chunks
         writeFiles(outfile);
+    }
+
+    // Set file list to consist of only each name found in the Directories
+    void ITMFFILE::syncFilelist() {
+        filelist.clear();
+        for (DIRECTORY& dir : directory)
+            for (STREAM_PROPERTIES& file : dir.getStreamProperties())
+                filelist.push_back(file.getName().getValue());
     }
 
     void ITMFFILE::write(std::string location, std::string filename) // needs to be updated for both encoding types

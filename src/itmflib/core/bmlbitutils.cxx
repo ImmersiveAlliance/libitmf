@@ -42,8 +42,8 @@ namespace itmflib {
 		encodeByteLengthIndicatorBits(&bitvector, is_neg);
 	}
 
-	BMLBitVector::BMLBitVector(unsigned char& v, Encoding E) : encoding(E) {
-		for (int i = 0; i < 8; i++) {
+	BMLBitVector::BMLBitVector(unsigned char& v, Encoding E) : encoding(E), is_negative(false) {
+		for (int i = 0; i < 8; ++i) {
 			bool bit = (v >> i) & 1;
 			bitvector.push_back(bit);
 		}
@@ -331,7 +331,7 @@ namespace itmflib {
 	uint64_t BMLBitVector::to_uint64() {
 		std::ostringstream oss;
 		uint64_t r = 0;
-		int index = getFirstNonLengthBitIndex();
+		int index = getFirstNonLengthBitIndex(); 
 		if (!bitvector.empty()) {
 			try {
 				std::copy(bitvector.begin() + index, bitvector.end(), std::ostream_iterator<bool>(oss));

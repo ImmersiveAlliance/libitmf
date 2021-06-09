@@ -13,6 +13,7 @@
 #define BML_BYTE_SIZE 8
 
 namespace itmflib {
+
 	enum Encoding
 	{
 		VUIE,
@@ -32,7 +33,11 @@ namespace itmflib {
 		BMLBitVector() : encoding(Encoding::VUIE), is_negative(false), bitvector(std::vector<bool>{}) { }
 		BMLBitVector(unsigned char& v, Encoding E = VUIE);
 		BMLBitVector(int64_t num, Encoding E = VUIE);
-		BMLBitVector(std::vector<bool> v, Encoding E = VUIE) : bitvector(v), encoding(E) { } // Mostly used for testing purposes
+		// Constructs a BMLBitVector from the input vector<bool> that does not contain length indicator bits
+		BMLBitVector(std::vector<bool> v, Encoding E = VUIE, bool is_negative = false) : bitvector(v), encoding(E), is_negative(is_negative) { 
+			encodeByteLengthIndicatorBits(&bitvector, is_negative); 
+			shrink(); 
+		}
 
 		// Operators
 		BMLBitVector operator|(BMLBitVector& rhs);

@@ -15,11 +15,6 @@
 */
 namespace itmflib {
 
-	typedef std::vector<STREAM_HEADER> STREAMHEADERS;
-	typedef std::vector<DIRECTORY> DIRECTORIES;
-	typedef std::vector<INDEX> INDEXES;
-	typedef std::vector<CHUNK> CHUNKS;
-
 	class ITMFCONFIGURATION {
 		ITMF_ENCODING_ORDER encoding_order;
 		bool properties_included;
@@ -27,7 +22,13 @@ namespace itmflib {
 		ITMF_SIGNATURE signature;
 		ITMF_COMPRESSION compression;
 	public:
-		ITMFCONFIGURATION(ITMF_ENCODING_ORDER e, bool p, bool i, ITMF_SIGNATURE s, ITMF_COMPRESSION c) : encoding_order(e), properties_included(p), index_included(i), signature(s), compression(c) { }
+		ITMFCONFIGURATION(
+			ITMF_ENCODING_ORDER e = ITMF_ENCODING_ORDER::STREAMS_AT_START, 
+			bool p = false, 
+			bool i = false, 
+			ITMF_SIGNATURE s = ITMF_SIGNATURE::NONE, 
+			ITMF_COMPRESSION c = ITMF_COMPRESSION::NONE
+		) : encoding_order(e), properties_included(p), index_included(i), signature(s), compression(c) { }
 
 		ITMF_ENCODING_ORDER getEncodingOrder() const { return encoding_order; }
 
@@ -56,8 +57,11 @@ namespace itmflib {
 		void writeFiles(std::ofstream& outfile);
 		void writeStreamsAtStart(std::ofstream& outfile);
 		void writeStreamsAtEnd(std::ofstream& outfile);
+		void syncFilelist();
 		
 		ITMFFILE(ITMF_HEADER h, ITMF_FOOTER f, ITMFCONFIGURATION conf) : header(h), footer(f), config(conf) { }
+		ITMFFILE() : header(ITMF_HEADER::CreateITMFHeader(0)), footer(), config() { }
+
 	public:
 		static ITMFFILE CreateStreamsAtStartFile();
 		static ITMFFILE CreateStreamsAtEndFile();
@@ -69,7 +73,6 @@ namespace itmflib {
 		void addProperty(std::string key, int64_t value);
 		void addFile(std::string filepath);
 		void addFile(std::string filename, char* buffer);
-		void readFile(std::string filename, char* buffer);
 
 		std::vector<std::string> getFilelist() const { return filelist; }
 

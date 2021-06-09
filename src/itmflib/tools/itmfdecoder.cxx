@@ -1,5 +1,5 @@
 #include "itmffile.h"
 
 int main() {
-	itmflib::ITMFFILE file = itmflib::ITMFFILE::ReadFile("F:\\Work\\OTOY\\Sample ITMF Files\\octanetest.itmf");
+	itmflib::ITMFFILE file = itmflib::ITMFFILE::ReadFile("C:\\Users\\austin\\cablelabs\\development\\test_data\\octanetest.itmf");
 }
