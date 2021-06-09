@@ -50,7 +50,7 @@ jobs:
             cd ${{ github.workspace }}
             mkdir build
             cd build
-            cmake ..
+            cmake ../ -DITMF_TESTS=ON
 
         - name: "Building with CMAKE"
           run: |
@@ -61,42 +61,3 @@ jobs:
           run: |
             cd build
             ctest
- 
-    # Windows
-    #windows-vs-2019:
-    #    name: "Windows VS 2019"
-    #    runs-on: windows-2019
-    #    steps:
-    #    - uses: actions/checkout@v2
-
-        #- name: "Install Boost"
-        #  run: |
-        #    ${boost_root} = "${env:BOOST_ROOT_1_72_0}"
-        #    echo "BOOST_ROOT=${boost_root}" >> ${env:GITHUB_ENV}
-        #    echo "BOOST_INCLUDEDIR=${boost_root}\include" >> ${env:GITHUB_ENV}
-        #    echo "BOOST_LIBRARYDIR=${boost_root}\lib" >> ${env:GITHUB_ENV}
-
-        
-    
-    #ubuntu-18.04-gnu:
-    #    name: "Ubuntu 18.04 GNU"
-    #    runs-on: ubuntu-latest
-    #    steps:
-    #    - uses: actions/checkout@v2
-    #
-    #    - name: "Running CMAKE"
-    #      run: |
-    #        cd ${{ github.workspace }}
-    #        mkdir build
-    #        cd build
-    #        cmake ..
-
-    #    - name: "Building with CMAKE"
-    #      run: |
-    #        cd build
-    #        cmake --build .
-    
-    #    - name: "Run tests"
-    #      run: |
-    #        cd build
-    #        ctest
