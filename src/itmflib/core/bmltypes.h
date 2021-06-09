@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <fstream>
+#include <cstring>
 #include "boost/variant/static_visitor.hpp"
 #include "bmlbitutils.h"
 
