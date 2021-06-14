@@ -342,6 +342,87 @@ namespace itmflib {
         directory.push_back(file_stream_directory);
     }
 
+    void ITMFFILE::extractAllFiles(std::string destination_path) {
+        for (std::string filename : this->filelist)
+            extractFile(filename, destination_path);
+    }
+    void ITMFFILE::extractFile(std::string filename, std::string destination_path) {
+        // Get file data into a buffer
+        boost::optional<STREAM_PROPERTIES> file_properties;
+        int stream_index = -1;
+        for (DIRECTORY& dir : this->directory) {
+            for (STREAM_PROPERTIES& file : dir.getStreamProperties()) {
+                if (file.getName().getValue() == filename) {
+                    file_properties = file;
+                    stream_index = dir.getStreamIndex();
+                    break;
+                }
+            }
+        }
+
+        if (CHECK_BOOST_OPTIONAL(file_properties)) {
+            int64_t chunk_index = file_properties->getChunkIndex();
+            int64_t offset = file_properties->getOffset();
+            int64_t nbytes = file_properties->getNumBytes();
+
+            std::vector<char> file_data;
+
+            // Locate first chunk
+            int64_t found_chunk_index = -1;
+            for (CHUNKS::iterator it = stream.begin(); it != stream.end(); ++it) {
+                if (it->getStreamIndex() == stream_index) {
+                    found_chunk_index++;
+
+                    if (found_chunk_index == chunk_index) {
+                        // We've found the first chunk of the file, so begin reading the file
+                        BMLblob data_blob = it->getData();
+                        std::shared_ptr<char> data = data_blob.getValue();
+
+                        uint64_t bytes_after_offset = data_blob.length - offset;
+                        if (bytes_after_offset > nbytes) {
+                            file_data.insert(file_data.end(), data.get(), data.get() + nbytes);
+                        }
+                        else {
+                            file_data.insert(file_data.end(), data.get(), data.get() + bytes_after_offset);
+                            // Continue reading bytes until finished
+                            uint64_t remaining_bytes = nbytes - bytes_after_offset;
+                            while (remaining_bytes > 0 && it != stream.end()) {
+                                ++it;
+                                if (it->getStreamIndex() == stream_index) {
+                                    data_blob = it->getData();
+                                    data = data_blob.getValue();
+                                    if (remaining_bytes > data_blob.length) {
+                                        file_data.insert(file_data.end(), data.get(), data.get() + data_blob.length);
+                                    }
+                                    else {
+                                        file_data.insert(file_data.end(), data.get(), data.get() + remaining_bytes);
+                                    }
+                                    remaining_bytes -= data_blob.length;
+                                }
+                            }
+                        }
+
+                        // Finished reading the file
+                        break;
+                    }
+                }
+            }
+
+            // Change filename to avoid '/' and '\'
+            std::string modified_filename = filename;
+            std::replace(modified_filename.begin(), modified_filename.end(), '\\', '_');
+            std::replace(modified_filename.begin(), modified_filename.end(), '/', '_');
+
+            // Write data to host filesystem
+            std::ofstream output_file(destination_path + '/' + modified_filename, std::ios::out | std::ios::binary);
+            output_file.write((char*)&file_data[0], file_data.size());
+            output_file.close();
+        }
+        else {
+            // TODO: Error: file not found inside of ITMFFILE directories
+        }
+    }
+
     void ITMFFILE::writeStreamsAtStart(std::ofstream& outfile) {
         header.write(outfile);
 

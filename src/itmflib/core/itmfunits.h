@@ -134,11 +134,20 @@ namespace itmflib {
 		boost::optional<BMLint> flags;
 		std::vector<std::pair<BMLstring, boost::variant<BMLstring, BMLlong>>> properties;
 
+		static const int64_t default_chunk_index = 0;
+		static const int64_t default_offset = 0;
+		static const int64_t default_nbytes = 0;
+		static const int32_t default_flags = 0;
+
 	public:
 		STREAM_PROPERTIES() : name(BMLstring(static_cast<int>(DIRECTORY_IDS::NAME), "file")) { }
 		STREAM_PROPERTIES(BMLstring n, std::vector<std::pair<BMLstring, boost::variant<BMLstring, BMLlong>>> props = {}) : name(n), properties(props) { }
 
 		BMLstring getName() { return name; }
+		int64_t getChunkIndex() { return chunk_index ? chunk_index->getValue() : default_chunk_index; }
+		int64_t getOffset() { return offset ? offset->getValue() : default_offset; }
+		int64_t getNumBytes() { return nbytes ? nbytes->getValue() : default_nbytes; }
+		int64_t getFlags() { return flags ? flags->getValue() : default_flags; }
 
 		void setChunkIndex(int64_t ci) { chunk_index = BMLlong(static_cast<int>(DIRECTORY_IDS::CHUNK_INDEX), ci); }
 		void setChunkIndex(BMLlong ci) { chunk_index = ci; }
@@ -160,6 +169,8 @@ namespace itmflib {
 		boost::optional<BMLint> stream_index;
 		std::vector<STREAM_PROPERTIES> stream_properties;
 
+		static const int32_t default_stream_index = 0;
+
 	public:
 		DIRECTORY() : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::DIRECTORY)) { }
 		DIRECTORY(std::vector<STREAM_PROPERTIES> sp) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::DIRECTORY)), stream_properties(sp) { }
@@ -170,6 +181,7 @@ namespace itmflib {
 		void addStreamProperty(STREAM_PROPERTIES props) { stream_properties.push_back(props); }
 
 		std::vector<STREAM_PROPERTIES> getStreamProperties() { return stream_properties; }
+		int getStreamIndex() { return stream_index ? stream_index->getValue() : default_stream_index; }
 
 		size_t write(std::ofstream& outfile);
 	};
@@ -197,11 +209,18 @@ namespace itmflib {
 		boost::optional<BMLlong> uncompressed_bytes;
 		BMLblob data;
 
+		static const int32_t default_stream_index = 0;
+		static const int32_t default_flags = 0;
+
 	public:
 		CHUNK(BMLblob d) : data(d) { }
 		CHUNK(BMLblob d, boost::optional<BMLint> si, boost::optional<BMLint> f, boost::optional<BMLlong> ub) : data(d), stream_index(si), flags(f), uncompressed_bytes(ub) { }
 
 		static CHUNKS ReadChunks(std::ifstream& infile);
+
+		int32_t getStreamIndex() { return stream_index ? stream_index->getValue() : default_stream_index; }
+		int32_t getFlags() { return flags ? flags->getValue() : default_flags; }
+		BMLblob getData() { return data; }
 		
 		void setStreamIndex(BMLint si) { stream_index = si; }
 		void setFlags(BMLint f) { flags = f; }

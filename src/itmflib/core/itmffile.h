@@ -75,6 +75,8 @@ namespace itmflib {
 		void addFile(std::string filename, char* buffer);
 
 		std::vector<std::string> getFilelist() const { return filelist; }
+		void extractAllFiles(std::string destination_path);
+		void extractFile(std::string filename, std::string destination_path);
 
 		// Reading functions
 		void read(std::string filepath);
