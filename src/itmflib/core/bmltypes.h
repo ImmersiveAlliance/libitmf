@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <cstring>
+#include <memory>
 #include "boost/variant/static_visitor.hpp"
 #include "bmlbitutils.h"
 

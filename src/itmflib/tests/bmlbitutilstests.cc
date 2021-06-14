@@ -32,19 +32,19 @@ namespace itmflib {
 
 	TEST(ConstructorTest, VSIEInt32SpecTest2) {
 		BMLBitVector a(-64, Encoding::VSIE);
-		EXPECT_EQ(a.getBitVector(), BMLBitVector(std::vector<bool>({ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 }), Encoding::VSIE).getBitVector()); // 0x20, 0x40
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({ 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 })); // 0x20, 0x40
 		EXPECT_EQ(a.getIsNegative(), true);
 	}
 
 	TEST(ConstructorTest, VSIEInt32SpecTest3) {
 		BMLBitVector a(537, Encoding::VSIE);
-		EXPECT_EQ(a.getBitVector(), BMLBitVector(std::vector<bool>({ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1 }), Encoding::VSIE).getBitVector()); // 0x02, 0x19
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({ 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1 })); // 0x02, 0x19
 		EXPECT_EQ(a.getIsNegative(), false);
 	}
 
 	TEST(ConstructorTest, VSIEInt32SpecTest4) {
 		BMLBitVector a(-100000, Encoding::VSIE);
-		EXPECT_EQ(a.getBitVector(), BMLBitVector(std::vector<bool>({ 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0 }), Encoding::VSIE).getBitVector()); // 0x11, 0x86, 0xA0
+		EXPECT_EQ(a.getBitVector(), std::vector<bool>({ 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0 })); // 0x11, 0x86, 0xA0
 		EXPECT_EQ(a.getIsNegative(), true);
 	}
 

@@ -21,7 +21,8 @@ namespace itmflib {
 		BMLBitVector type_as_vector;
 		BMLBitVector tag = readVUIE(infile);
 		id = tag.to_int32() >> 3;
-		type_as_vector = tag & BMLBitVector(0b111, itmflib::VUIE);
+		BMLBitVector type_mask(0b111, Encoding::VUIE);
+		type_as_vector = tag & type_mask;
 		type_id = type_as_vector.to_int32();
 	}
 
