@@ -222,8 +222,8 @@ namespace itmflib {
             config.setPropertiesIncluded(true);
             header.addFlag(ITMF_HEADER_FLAGS::PROPERTIES);
         }
-        std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> prop(BMLstring(11, key), BMLstring(12, value));
-        properties->addProperty(prop);
+        //std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> prop(BMLstring(11, key), BMLstring(12, value));
+        properties->addProperty(key, value);
     }
 
     void ITMFFILE::addProperty(std::string key, int64_t value) {
@@ -232,8 +232,8 @@ namespace itmflib {
             config.setPropertiesIncluded(true);
             header.addFlag(ITMF_HEADER_FLAGS::PROPERTIES);
         }
-        std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> prop(BMLstring(11, key), BMLlong(12, value));
-        properties->addProperty(prop);
+        //std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> prop(BMLstring(11, key), BMLlong(12, value));
+        properties->addProperty(key, value);
     }
 
     STREAM_HEADER* ITMFFILE::getStreamHeader(ITMF_STREAM_TYPES stream_type)
@@ -256,23 +256,35 @@ namespace itmflib {
     {
         filelist.push_back(filepath);
         std::ifstream infile(filepath, std::ios::in | std::ios::binary);
-        infile.seekg(0, std::ios::end);
-        std::streampos size = infile.tellg();
-        int64_t num_chunks_needed = (size / MAX_CHUNK_SIZE) + 1;
+        if (infile.is_open()) {
+            infile.seekg(0, std::ios::end);
+            std::streampos size = infile.tellg();
+            int64_t num_chunks_needed = (size / MAX_CHUNK_SIZE) + 1;
 
-        if (streamheaders.empty()) {
-            STREAM_HEADER streamheader("file");
-            streamheader.setNumBytes((int64_t)size);
-            streamheader.setNumChunks(num_chunks_needed);
-            streamheaders.push_back(streamheader);
+            if (streamheaders.empty()) {
+                STREAM_HEADER streamheader("file");
+                streamheader.setNumBytes((int64_t)size);
+                streamheader.setNumChunks(num_chunks_needed);
+                streamheaders.push_back(streamheader);
+            }
+            else {
+                STREAM_HEADER* streamheader = getStreamHeader(ITMF_STREAM_TYPES::FILE_DATA);
+                streamheader->addNumBytes((int64_t)size);
+                streamheader->addNumChunks(num_chunks_needed);
+            }
         }
         else {
-            STREAM_HEADER* streamheader = getStreamHeader(ITMF_STREAM_TYPES::FILE_DATA);
-            streamheader->addNumBytes((int64_t)size);
-            streamheader->addNumChunks(num_chunks_needed);
+            std::cout << "Error: File doesn't exist!" << std::endl;
         }
 
         infile.close();
+    }
+
+    void itmflib::ITMFFILE::addFiles(std::vector<std::string> filepaths)
+    {
+        for (auto it = filepaths.begin(); it != filepaths.end(); it++) {
+            addFile(*it);
+        }
     }
 
     void ITMFFILE::writeFiles(std::ofstream& outfile)
@@ -297,7 +309,7 @@ namespace itmflib {
                 std::cout << (end - begin) << std::endl;
 
                 // create stream properties (one per file)
-                STREAM_PROPERTIES file_properties;
+                FILE_PROPERTIES file_properties;
                 file_properties.setChunkIndex(chunk_index);
                 file_properties.setNumBytes(int64_t(end - begin));
                 std::size_t found = (*it).find_last_of("/\\");
@@ -308,7 +320,7 @@ namespace itmflib {
                     file_properties.setName("assets/" + file);
 
                 // add stream property to directory
-                file_stream_directory.addStreamProperty(file_properties);
+                file_stream_directory.addFileProperty(file_properties);
                 
                 while (infile) {
                     int pos_delta = 0;
@@ -319,7 +331,7 @@ namespace itmflib {
                     if (!bytes_read)
                         break;
 
-                    BMLblob datablob(7, bytes_read, memblock);
+                    BMLblob datablob(static_cast<int>(CHUNK_IDS::DATA), bytes_read, memblock);
                     CHUNK c(datablob);
 
                     c.write(outfile);
@@ -327,7 +339,8 @@ namespace itmflib {
 
                     /*pos_delta += bytes_read;
                     pos_delta += 4;*/
-                    file_stream_index.addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>>(BMLlong(6, prev_chunk_size), BMLlong(10, static_cast<int32_t>(bytes_read))));
+                    //file_stream_index.addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>>(BMLlong(6, prev_chunk_size), BMLlong(10, static_cast<int32_t>(bytes_read))));
+                    file_stream_index.setPosDeltaNumBytes(prev_chunk_size, bytes_read);
                     prev_chunk_size = bytes_read;
                     prev_chunk_size += 4;
                 }
@@ -348,10 +361,10 @@ namespace itmflib {
     }
     void ITMFFILE::extractFile(std::string filename, std::string destination_path) {
         // Get file data into a buffer
-        boost::optional<STREAM_PROPERTIES> file_properties;
+        boost::optional<FILE_PROPERTIES> file_properties;
         int stream_index = -1;
         for (DIRECTORY& dir : this->directory) {
-            for (STREAM_PROPERTIES& file : dir.getStreamProperties()) {
+            for (FILE_PROPERTIES& file : dir.getFileProperties()) {
                 if (file.getName().getValue() == filename) {
                     file_properties = file;
                     stream_index = dir.getStreamIndex();
@@ -431,7 +444,36 @@ namespace itmflib {
             properties.get().write(outfile);
         }
         // Write files to chunks
-        writeFiles(outfile);
+        if (!filelist.empty())
+            writeFiles(outfile);
+        else {
+            // write an empty chunk
+            
+            BMLblob emptyChunk(static_cast<int>(CHUNK_IDS::DATA), 0, nullptr);
+            CHUNK c(emptyChunk);
+            c.write(outfile);
+            // create stream header indicating 0 length and add
+            STREAM_HEADER streamheader("file");
+            streamheader.setNumBytes(1);
+            streamheader.setNumChunks(1);
+            streamheaders.push_back(streamheader);
+            // create index (optional) indicating 0 length and index
+            if (config.isIndexIncluded()) {
+                INDEX empty_index;
+                //empty_index.addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>>(BMLlong(6, 0), BMLlong(10, static_cast<int32_t>(1))));
+                empty_index.setPosDeltaNumBytes(0, boost::optional<int64_t>(1));
+
+                index->push_back(empty_index);
+            }
+            // create directory with empty file name
+            DIRECTORY file_directory;
+            FILE_PROPERTIES file_props;
+            file_props.setChunkIndex(0);
+            file_props.setNumBytes(1);
+            file_props.setName("");
+            file_directory.addFileProperty(file_props);
+            directory.push_back(file_directory);
+        }
 
         size_t offset_to_stream = 0;
         //// Properties
@@ -440,6 +482,9 @@ namespace itmflib {
         //}
 
         // Stream Headers
+        // If stream headers is empty because of no files this causes issues
+        // same with other logical units below
+        // TODO ?
         offset_to_stream += streamheaders[0].writeOpenTag(outfile);
         for (auto it = streamheaders.begin(); it != streamheaders.end(); it++) {
             offset_to_stream += (*it).write(outfile);
@@ -471,6 +516,17 @@ namespace itmflib {
         footer.write(outfile);
     }
 
+    //void itmflib::ITMFFILE::writeStreamsAtStartToBuffer(std::vector<char>* buffer)
+    //{
+    //    // Header
+    //    header.writeToBuffer(buffer);
+
+    //    // Properties
+    //    if (config.isPropertiesIncluded()) {
+    //        properties.get().writeToBuffer(buffer);
+    //    }
+    //}
+
     void ITMFFILE::writeStreamsAtEnd(std::ofstream& outfile) {
         header.write(outfile);
 
@@ -479,6 +535,30 @@ namespace itmflib {
             properties.get().write(outfile);
         }
 
+        // No files
+        if (filelist.empty()) {
+            // create stream header indicating 0 length and add
+            STREAM_HEADER streamheader("file");
+            streamheader.setNumBytes(1);
+            streamheader.setNumChunks(1);
+            streamheaders.push_back(streamheader);
+            // create index (optional) indicating 0 length and index
+            if (config.isIndexIncluded()) {
+                INDEX empty_index;
+                //empty_index.addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>>(BMLlong(6, 0), BMLlong(10, static_cast<int32_t>(1))));
+                empty_index.setPosDeltaNumBytes(0, boost::optional<int64_t>(1));
+                index->push_back(empty_index);
+            }
+            // create directory with empty file name
+            DIRECTORY file_directory;
+            FILE_PROPERTIES file_props;
+            file_props.setChunkIndex(0);
+            file_props.setNumBytes(1);
+            file_props.setName("");
+            file_directory.addFileProperty(file_props);
+            directory.push_back(file_directory);
+        }
+        
         // Stream Headers
         streamheaders[0].writeOpenTag(outfile);
         for (auto it = streamheaders.begin(); it != streamheaders.end(); it++) {
@@ -504,23 +584,30 @@ namespace itmflib {
             (*it).write(outfile);
         }
         directory[0].writeCloseTag(outfile);
+        
 
         // Write files to chunks
-        writeFiles(outfile);
+        if(!filelist.empty())
+            writeFiles(outfile);
+        else {
+            // Write empty chunk
+            BMLblob emptyChunk(static_cast<int>(CHUNK_IDS::DATA), 0, nullptr);
+            CHUNK c(emptyChunk);
+            c.write(outfile);
+        }
     }
 
     // Set file list to consist of only each name found in the Directories
     void ITMFFILE::syncFilelist() {
         filelist.clear();
         for (DIRECTORY& dir : directory)
-            for (STREAM_PROPERTIES& file : dir.getStreamProperties())
+            for (FILE_PROPERTIES& file : dir.getFileProperties())
                 filelist.push_back(file.getName().getValue());
     }
 
-    void ITMFFILE::write(std::string location, std::string filename) // needs to be updated for both encoding types
+    void ITMFFILE::write(std::string filename) // needs to be updated for both encoding types
     {
-        std::string filepath = location + '\\' + filename;
-        std::ofstream outstream(filepath, std::ios::out | std::ios::binary);
+        std::ofstream outstream(filename, std::ios::out | std::ios::binary);
         if (outstream.is_open()) {
             if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_START) {
                 writeStreamsAtStart(outstream);
@@ -532,4 +619,14 @@ namespace itmflib {
         
         outstream.close();
     }
+
+    //void ITMFFILE::writeFileToBuffer(std::vector<char>* file_buffer)
+    //{
+    //    if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_START) {
+    //        writeStreamsAtStartToBuffer(file_buffer);
+    //    }
+    //    /*else if (config.getEncodingOrder() == ITMF_ENCODING_ORDER::STREAMS_AT_END) {
+    //        writeStreamsAtEnd(outstream);
+    //    }*/
+    //}
 }

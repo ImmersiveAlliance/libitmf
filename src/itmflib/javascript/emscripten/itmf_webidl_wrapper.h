@@ -15,16 +15,30 @@ to the ITMFILE.
 This will also need to be expanded for the scene graph in future versions.
 */
 
-template <typename T>
-class ITMFVector {
-	T GetValue(int index) const;
+typedef itmflib::ITMF_ENCODING_ORDER ITMFEncodingOrder;
+typedef itmflib::ITMF_SIGNATURE ITMFSignature;
+typedef itmflib::ITMF_COMPRESSION ITMFCompression;
 
+class ITMFByteBuffer {
+public:
+	ITMFByteBuffer();
+	void SetValues(const char* bytes, int count);
+	int8_t GetValue(int index) const;
+	size_t Size() { return vector_.size(); }
 
 private:
-	std::vector<T> vector_;
+	std::vector<int8_t> vector_;
 };
 
-class ITMFCONFIGURATION {
+class ITMFConfiguration {
+public:
+	ITMFConfiguration(ITMFEncodingOrder encodingOrder,
+		bool includeProperties,
+		bool includeIndex,
+		ITMFSignature signature,
+		ITMFCompression compression);
+
+	itmflib::ITMFCONFIGURATION getConfiguration() { return config_; }
 
 private:
 	itmflib::ITMFCONFIGURATION config_;
@@ -42,19 +56,21 @@ private:
 class ITMFEncoder {
 
 public:
-	//ITMFEncoder();
+	ITMFEncoder();
 
 	void InitStreamsAtStart();
 	void InitStreamsAtEnd();
-	//void InitCustom(); // what do function params look like?
+	void InitCustom(ITMFConfiguration* configuration); 
 
 	void AddStringProperty(char* key, char* value);
 	void AddLongProperty(char* key, long value);
 
-	void AddFile(char* filepath);
-	//void AddFile(char* filename, char* buffer);
+	//void AddFile(char* filepath);
+	bool AddFile(char* filename, const char* buffer, unsigned long long size);
 
 	void Write(char* location, char* filename);
+
+	void WriteToBuffer(ITMFByteBuffer* buffer);
 
 private:
 	itmflib::ITMFFILE file_;

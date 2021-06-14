@@ -31,10 +31,17 @@ if(Boost_FOUND)
 else()
   message(STATUS "Boost NOT Found ! ${BOOST_ROOT}")
 endif(Boost_FOUND)
-# enable_testing()
+
+if(ITMF_TESTS)
+	enable_testing()
+	add_subdirectory("${itmflib_src_root}/tests")
+endif(ITMF_TESTS)
 
 # Subdirectories
-# add_subdirectory("${itmflib_src_root}/tests")
+
+
 add_subdirectory("${itmflib_src_root}/core")
 add_subdirectory("${itmflib_src_root}/tools")
-
+if(EMSCRIPTEN)
+	add_subdirectory("${itmflib_src_root}/javascript/emscripten")
+endif()

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <fstream>
+#include <cstring>
 #include "boost/variant/static_visitor.hpp"
 #include "bmlbitutils.h"
 
@@ -47,6 +48,13 @@ public:
 		std::vector<char> to_write = encode();
 		std::copy(to_write.begin(), to_write.end(), std::ostream_iterator<char>(outfile));
 	
+		return to_write.size();
+	}
+
+	virtual size_t writeToBuffer(std::vector<char>* buffer) {
+		std::vector<char> to_write = encode();
+		buffer->insert(buffer->end(), to_write.begin(), to_write.end());
+
 		return to_write.size();
 	}
 };
@@ -168,8 +176,10 @@ public:
 
 	std::vector<char> encodeOpenTag();
 	size_t writeOpenTag(std::ofstream& outfile);
+	//size_t writeOpenTagToBuffer(std::vector<char>* buffer);
 	std::vector<char> encodeCloseTag();
 	size_t writeCloseTag(std::ofstream& outfile);
+	//size_t writeCloseTagToBuffer(std::vector<char>* buffer);
 };
 
 // Visitor class for boost::variant usage
@@ -193,6 +203,29 @@ public:
 
 	void operator()(BMLblob& b) const {
 		bytes_written += b.save(save_file);
+	}
+};
+
+class buffer_save_visitor : public boost::static_visitor<> {
+	std::vector<char>* buffer;
+	size_t& bytes_written;
+public:
+	buffer_save_visitor(std::vector<char>* buf, size_t& bytes) : buffer(buf), bytes_written(bytes) { }
+
+	void operator()(BMLstring& s) const {
+		bytes_written += s.writeToBuffer(buffer);
+	}
+
+	void operator()(BMLlong& l) const {
+		bytes_written += l.writeToBuffer(buffer);
+	}
+
+	void operator()(BMLint& i) const {
+		bytes_written += i.writeToBuffer(buffer);
+	}
+
+	void operator()(BMLblob& b) const {
+		bytes_written += b.writeToBuffer(buffer);
 	}
 };
 

@@ -170,7 +170,7 @@ namespace itmflib {
 // double
 	std::vector<char> BMLdouble::encodeValue() {
 		std::vector<char> encoded_value;
-		uint32_t bits = 0;
+		uint64_t bits = 0;
 		memcpy(&bits, &value, sizeof value);
 		encoded_value.push_back((bits) * 0xFF);
 		encoded_value.push_back((bits >> 8) * 0xFF);
@@ -259,8 +259,10 @@ namespace itmflib {
 		std::vector<char> to_write = encode();
 		std::copy(to_write.begin(), to_write.end(), std::ostream_iterator<char>(outfile));
 		size_t bytes_written = to_write.size();
-		outfile.write(value.get(), length);
-		bytes_written += length;
+		if (value != nullptr) {
+			outfile.write(value.get(), length);
+			bytes_written += length;
+		}
 
 		return bytes_written;
 	}
@@ -281,10 +283,20 @@ namespace itmflib {
 		return bytes_written;
 	}
 
+	/*size_t BMLobject::writeOpenTagToBuffer(std::vector<char>* buffer) {
+		size_t bytes_written = 0;
+		std::vector<char> opentag = encodeOpenTag();
+		buffer->insert(buffer->end(), opentag.begin(), opentag.end());
+		bytes_written += opentag.size();
+
+		return bytes_written;
+	}*/
+
 	std::vector<char> BMLobject::encodeCloseTag()
 	{
 		return encodeTag(id, 0);
 	}
+
 	size_t BMLobject::writeCloseTag(std::ofstream& outfile)
 	{
 		size_t bytes_written = 0;
@@ -294,4 +306,13 @@ namespace itmflib {
 
 		return bytes_written;
 	}
+
+	/*size_t BMLobject::writeCloseTagToBuffer(std::vector<char>* buffer) {
+		size_t bytes_written = 0;
+		std::vector<char> closetag = encodeCloseTag();
+		buffer->insert(buffer->end(), closetag.begin(), closetag.end());
+		bytes_written += closetag.size();
+
+		return bytes_written;
+	}*/
 }

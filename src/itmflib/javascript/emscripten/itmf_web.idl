@@ -1,9 +1,37 @@
+enum ITMFEncodingOrder {
+	"ITMFEncodingOrder::STREAMS_AT_START",
+	"ITMFEncodingOrder::STREAMS_AT_END"
+};
+
+enum ITMFSignature {
+	"ITMFSignature::NONE"
+};
+
+enum ITMFCompression {
+	"ITMFCompression::NONE"
+};
+
+interface ITMFByteBuffer {
+	void ITMFByteBuffer();
+	long GetValue(long index);
+	long Size();
+};
+
+interface ITMFConfiguration {
+	void ITMFConfiguration(ITMFEncodingOrder encodingOrder,
+		boolean includeProperties,
+		boolean includeIndex,
+		ITMFSignature signature,
+		ITMFCompression compression);
+};
+
 interface ITMFEncoder {
+	void ITMFEncoder();
 	void InitStreamsAtStart();
 	void InitStreamsAtEnd();
-	void InitCustom();
+	void InitCustom(ITMFConfiguration configuration);
 	void AddStringProperty(DOMString key, DOMString value);
 	void AddLongProperty(DOMString key, long value);
-	void AddFile(DOMString filepath);
+	boolean AddFile(DOMString filename, [Const] byte[] buffer, unsigned long long size);
 	void Write(DOMString location, DOMString filename);
 };
