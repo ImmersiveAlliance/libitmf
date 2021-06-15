@@ -1,13 +1,14 @@
 #include "itmf_webidl_wrapper.h"
 
-ITMFByteBuffer::ITMFByteBuffer() {}
+ITMFStringArray::ITMFStringArray() {}
 
-int8_t ITMFByteBuffer::GetValue(int index) const {
-	return vector_[index];
+const char* ITMFStringArray::GetValue(int index) const {
+	const char* value = vector_[index].c_str();
+	return value;
 }
 
-void ITMFByteBuffer::SetValues(const char* bytes, int count) {
-	vector_.assign(bytes, bytes + count);
+void ITMFStringArray::AddValue(std::string str) {
+	vector_.push_back(str);
 	return;
 }
 
@@ -58,12 +59,51 @@ bool ITMFEncoder::AddFile(char* filename, const char* buffer, unsigned long long
 
 		return true;
 	}
+	outfile.close();
 
 	return false;
 
 }
 
-void ITMFEncoder::Write(char* location, char* filename)
+void ITMFEncoder::Write(char* filename)
 {
-	file_.write(std::string(location), std::string(filename));
+	file_.write(std::string(filename));
+}
+
+ITMFDecoder::ITMFDecoder() : file_(itmflib::ITMFFILE::CreateStreamsAtStartFile()) {
+}
+
+void ITMFDecoder::ReadFile(const char* buffer, unsigned long long size) {
+	// Write the file to the virtual disk system
+	std::ofstream outitmffile;
+	outitmffile.open("temp.itmf", std::ios::out | std::ios::binary);
+	if (outitmffile.is_open()) {
+		outitmffile.write(buffer, size);
+	}
+	outitmffile.close();
+	file_ = itmflib::ITMFFILE::ReadFile("temp.itmf");
+}
+
+void ITMFDecoder::PrintFileList() {
+	std::vector<std::string> filelist = file_.getFilelist();
+	for (std::string filename : filelist) {
+		std::cout << filename << std::endl;
+	}
+}
+
+void ITMFDecoder::GetFileList(ITMFStringArray* strarray) {
+	std::vector<std::string> filelist = file_.getFilelist();
+	for (std::string filename : filelist) {
+		strarray->AddValue(filename);
+	}
+}
+
+void ITMFDecoder::ExtractFile(char* filename, char* destination)
+{
+	file_.extractFile(std::string(filename), std::string(destination));
+}
+
+void ITMFDecoder::ExtractAllFiles(char* destination)
+{
+	file_.extractAllFiles(std::string(destination));
 }

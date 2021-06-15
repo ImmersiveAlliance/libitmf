@@ -19,15 +19,15 @@ typedef itmflib::ITMF_ENCODING_ORDER ITMFEncodingOrder;
 typedef itmflib::ITMF_SIGNATURE ITMFSignature;
 typedef itmflib::ITMF_COMPRESSION ITMFCompression;
 
-class ITMFByteBuffer {
+class ITMFStringArray {
 public:
-	ITMFByteBuffer();
-	void SetValues(const char* bytes, int count);
-	int8_t GetValue(int index) const;
+	ITMFStringArray();
+	void AddValue(std::string str);
+	const char* GetValue(int index) const;
 	size_t Size() { return vector_.size(); }
 
 private:
-	std::vector<int8_t> vector_;
+	std::vector<std::string> vector_;
 };
 
 class ITMFConfiguration {
@@ -47,7 +47,13 @@ private:
 class ITMFDecoder {
 
 public:
-	//ITMFDecoder();
+	ITMFDecoder();
+
+	void ReadFile(const char* buffer, unsigned long long size);
+	void PrintFileList();
+	void GetFileList(ITMFStringArray* strarray);
+	void ExtractFile(char* filename, char* destination);
+	void ExtractAllFiles(char* destination);
 
 private:
 	itmflib::ITMFFILE file_;
@@ -68,9 +74,7 @@ public:
 	//void AddFile(char* filepath);
 	bool AddFile(char* filename, const char* buffer, unsigned long long size);
 
-	void Write(char* location, char* filename);
-
-	void WriteToBuffer(ITMFByteBuffer* buffer);
+	void Write(char* filename);
 
 private:
 	itmflib::ITMFFILE file_;

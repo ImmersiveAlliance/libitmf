@@ -11,9 +11,9 @@ enum ITMFCompression {
 	"ITMFCompression::NONE"
 };
 
-interface ITMFByteBuffer {
-	void ITMFByteBuffer();
-	long GetValue(long index);
+interface ITMFStringArray {
+	void ITMFStringArray();
+	[Const] DOMString GetValue(long index);
 	long Size();
 };
 
@@ -33,5 +33,14 @@ interface ITMFEncoder {
 	void AddStringProperty(DOMString key, DOMString value);
 	void AddLongProperty(DOMString key, long value);
 	boolean AddFile(DOMString filename, [Const] byte[] buffer, unsigned long long size);
-	void Write(DOMString location, DOMString filename);
+	void Write(DOMString filename);
+};
+
+interface ITMFDecoder {
+	void ITMFDecoder();
+	void ReadFile([Const] byte[] buffer, unsigned long long size);
+	void PrintFileList();
+	void GetFileList(ITMFStringArray strarray);
+	void ExtractFile(DOMString filename, DOMString destination);
+	void ExtractAllFiles(DOMString destination);
 };
