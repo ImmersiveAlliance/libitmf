@@ -39,6 +39,15 @@ namespace itmflib {
 			shrink(); 
 		}
 
+		// TODO: Reevaluate this if we decide not to rework BMLBitVector
+		static BMLBitVector BMLBitVectorFromEncodedBits(std::vector<bool> bits, bool is_neg, Encoding e) {
+			BMLBitVector bv;
+			bv.bitvector = bits;
+			bv.encoding = e;
+			bv.is_negative = is_neg;
+			return bv;
+		}
+
 		// Operators
 		BMLBitVector operator|(BMLBitVector& rhs);
 		BMLBitVector operator&(BMLBitVector& rhs);

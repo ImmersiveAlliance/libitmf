@@ -284,21 +284,33 @@ namespace itmflib {
 	/* SHRINK TESTS */
 	
 	TEST(ShrinkTest, ShrinkableVector1) {
-		BMLBitVector b(std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
+		BMLBitVector b = BMLBitVector::BMLBitVectorFromEncodedBits(
+			std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }), 
+			false, 
+			Encoding::VUIE
+		);
 		bool success = b.shrink();
 		EXPECT_EQ(success, true);
 		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
 	}
 
 	TEST(ShrinkTest, ShrinkableVector2) {
-		BMLBitVector b(std::vector<bool>({ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1 }));
+		BMLBitVector b = BMLBitVector::BMLBitVectorFromEncodedBits(
+			std::vector<bool>({ 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1 }), 
+			false, 
+			Encoding::VUIE
+		);
 		bool success = b.shrink();
 		EXPECT_EQ(success, true);
 		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 0, 0, 1, 1, 0, 1, 1, 1 }));
 	}
 
 	TEST(ShrinkTest, UnshrinkableVector1) {
-		BMLBitVector b(std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));
+		BMLBitVector b = BMLBitVector::BMLBitVectorFromEncodedBits(
+			std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }), 
+			false, 
+			Encoding::VUIE
+		);
 		bool success = b.shrink();
 		EXPECT_EQ(success, false);
 		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 }));

@@ -81,7 +81,7 @@ namespace itmflib {
 		// re-encode
 		encodeByteLengthIndicatorBits(&result, is_negative);
 
-		return BMLBitVector(result);
+		return BMLBitVectorFromEncodedBits(result, this->is_negative, this->encoding);
 	}
 
 	/**
@@ -107,7 +107,7 @@ namespace itmflib {
 			*r = 0; // need to discuss this
 		}
 
-		return BMLBitVector(result);
+		return BMLBitVectorFromEncodedBits(result, this->is_negative, this->encoding);
 	}
 
 	/**
@@ -131,7 +131,7 @@ namespace itmflib {
 		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
 			result.insert(result.end(), bitvector.at(i) && rhs.getBitVector().at(i));
 
-		return BMLBitVector(result);
+		return BMLBitVectorFromEncodedBits(result, this->is_negative, this->encoding);
 	}
 
 	/**
@@ -156,7 +156,7 @@ namespace itmflib {
 		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
 			result.insert(result.end(), bitvector.at(i) || rhs.getBitVector().at(i));
 		
-		return BMLBitVector(result);
+		return BMLBitVectorFromEncodedBits(result, this->is_negative, this->encoding);
 	}
 
 	/**
@@ -182,7 +182,7 @@ namespace itmflib {
 		for (int i = beginning_index; i < rhs.getBitVectorSize(); i++)
 			result.insert(result.end(), bitvector.at(i) ^ rhs.getBitVector().at(i));
 
-		return BMLBitVector(result);
+		return BMLBitVectorFromEncodedBits(result, this->is_negative, this->encoding);
 	}
 
 	/**
