@@ -6,7 +6,7 @@
 #include "boost/optional.hpp"
 #include "boost/variant.hpp"
 
-namespace itmflib {
+namespace itmf {
 
 #define CHECK_BOOST_OPTIONAL(x) (x != boost::none ? true : false)
 

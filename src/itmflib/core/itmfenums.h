@@ -1,7 +1,7 @@
 #ifndef ITMF_ENUMS_H_
 #define ITMF_ENUMS_H_
 
-namespace itmflib {
+namespace itmf {
 	enum class ITMF_ENCODING_ORDER { STREAMS_AT_START = 1, STREAMS_AT_END = 2 };
 	enum class ITMF_SIGNATURE { NONE = 0 };
 	enum class ITMF_COMPRESSION { NONE = 0 };

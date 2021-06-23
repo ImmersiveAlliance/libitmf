@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 	std::vector<std::pair<std::string, std::string>> properties;
 	bool include_index = false;
 	bool include_properties = false;
-	itmflib::ITMF_ENCODING_ORDER encoding_order = itmflib::ITMF_ENCODING_ORDER::STREAMS_AT_START;
+	itmf::ITMF_ENCODING_ORDER encoding_order = itmf::ITMF_ENCODING_ORDER::STREAMS_AT_START;
 
 	for (int i = 0; i < argc; i++) {
 		std::cout << argv[i] << std::endl;
@@ -63,10 +63,10 @@ int main(int argc, char **argv) {
 
 		if (!strcmp("-eo", argv[i])) {
 			if (!strcmp("start", argv[i + 1])) {
-				encoding_order = itmflib::ITMF_ENCODING_ORDER::STREAMS_AT_START;
+				encoding_order = itmf::ITMF_ENCODING_ORDER::STREAMS_AT_START;
 			}
 			else if (!strcmp("end", argv[i + 1])) {
-				encoding_order = itmflib::ITMF_ENCODING_ORDER::STREAMS_AT_END;
+				encoding_order = itmf::ITMF_ENCODING_ORDER::STREAMS_AT_END;
 			}
 			else {
 				std::cout << "Not a valid encoding order" << std::endl;
@@ -91,8 +91,8 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	itmflib::ITMFCONFIGURATION config(encoding_order, include_properties, include_index, itmflib::ITMF_SIGNATURE::NONE, itmflib::ITMF_COMPRESSION::NONE);
-	itmflib::ITMFFILE file = itmflib::ITMFFILE::CreateFileFromConfig(config);
+	itmf::ITMFCONFIGURATION config(encoding_order, include_properties, include_index, itmf::ITMF_SIGNATURE::NONE, itmf::ITMF_COMPRESSION::NONE);
+	itmf::ITMFFILE file = itmf::ITMFFILE::CreateFileFromConfig(config);
 	for (auto it = properties.begin(); it != properties.end(); it++) {
 		file.addProperty(it->first, it->second);
 	}

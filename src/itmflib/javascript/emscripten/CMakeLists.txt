@@ -16,12 +16,12 @@ SET(SRCS
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-ADD_EXECUTABLE(itmflib ${SRCS})
+ADD_EXECUTABLE(itmf ${SRCS})
 
-target_link_libraries(itmflib itmfcore)
+target_link_libraries(itmf itmfcore)
 
 INSTALL(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/itmflib.wasm
+	${CMAKE_CURRENT_BINARY_DIR}/itmf.wasm
 	DESTINATION dist
 	COMPONENT runtime
 )

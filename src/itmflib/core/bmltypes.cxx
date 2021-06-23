@@ -1,6 +1,6 @@
 #include <bmltypes.h>
 
-namespace itmflib {
+namespace itmf {
 
 	// interface
 

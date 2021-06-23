@@ -1,6 +1,6 @@
 #include <itmffile.h>
 
-namespace itmflib {
+namespace itmf {
     /**
     Creates a standard ITMF file with encoding order StreamsAtStart. Will include
     logical units that are non-optional: ITMF Header, Stream, StreamHeader, Chunk,
@@ -280,7 +280,7 @@ namespace itmflib {
         infile.close();
     }
 
-    void itmflib::ITMFFILE::addFiles(std::vector<std::string> filepaths)
+    void itmf::ITMFFILE::addFiles(std::vector<std::string> filepaths)
     {
         for (auto it = filepaths.begin(); it != filepaths.end(); it++) {
             addFile(*it);

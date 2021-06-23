@@ -8,7 +8,7 @@
 #include "boost/variant/static_visitor.hpp"
 #include "bmlbitutils.h"
 
-namespace itmflib {
+namespace itmf {
 	std::vector<char> encodeTag(int id, int type_id);
 	void decodeTag(std::ifstream& infile, int& id, int& type_id);
 	void peekTag(std::ifstream& infile, int& id, int& type_id);

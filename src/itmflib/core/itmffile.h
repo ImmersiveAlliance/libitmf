@@ -13,7 +13,7 @@
 #endif
 #endif
 */
-namespace itmflib {
+namespace itmf {
 
 	class ITMFCONFIGURATION {
 		ITMF_ENCODING_ORDER encoding_order;

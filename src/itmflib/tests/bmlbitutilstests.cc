@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "bmlbitutils.h"
 
-namespace itmflib {
+namespace itmf {
 	/* TESTS FOR BMLBITVECTOR */
 	// Constructor tests
 	TEST(ConstructorTest, VUIEInt32SpecTest1) {

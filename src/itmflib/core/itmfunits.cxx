@@ -1,6 +1,6 @@
 #include <itmfunits.h>
 
-namespace itmflib {
+namespace itmf {
 	ITMF_HEADER ITMF_HEADER::CreateITMFHeader(int32_t flags)
 	{
 		return ITMF_HEADER(BMLstring(1, "OX"), BMLint(2, 1), BMLint(3, flags));
