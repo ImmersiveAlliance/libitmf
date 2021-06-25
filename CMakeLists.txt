@@ -14,7 +14,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # Setting variables
 set(itmf_root "${CMAKE_CURRENT_SOURCE_DIR}")
-set(itmf_src_root "${itmf_root}/src/itmflib")
+set(itmf_src_root "${itmf_root}/src/libitmf")
 set(itmf_build "${CMAKE_BINARY_DIR}")
 
 # Boost
