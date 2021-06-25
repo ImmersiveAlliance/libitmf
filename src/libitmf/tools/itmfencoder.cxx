@@ -1,26 +1,7 @@
 #include "itmffile.h"
 
-// itmfencoder -i <input files> -o <output file>
-
-/*
--h
-	help
--i
-	input files
--o
-	output file name
--eo
-	encoding order
-	start - STREAMS_AT_START
-	end - STREAMS_AT_END
--p
-	key then value
--index
-	include index
-later: compression/encryption
-*/
-
 void PrintUsage() {
+	std::cout << "A command line application to encode files into an ITMF Container" << std::endl;
 	std::cout << "Usage: ITMFEncoder -i [input files] -o [output file] [options]" << std::endl;
 	std::cout << "\n";
 	std::cout << "Options:" << std::endl;
@@ -40,7 +21,6 @@ int main(int argc, char **argv) {
 	itmf::ITMF_ENCODING_ORDER encoding_order = itmf::ITMF_ENCODING_ORDER::STREAMS_AT_START;
 
 	for (int i = 0; i < argc; i++) {
-		std::cout << argv[i] << std::endl;
 		if (!strcmp("-h", argv[i])) {
 			PrintUsage();
 
@@ -50,14 +30,11 @@ int main(int argc, char **argv) {
 		if (!strcmp("-i", argv[i])) {
 			i++;
 			do {
-				std::cout << "Adding: " << argv[i] << std::endl;
 				filenames.push_back(argv[i++]);
 			} while(strcmp("-o", argv[i]));
 		}
 
 		if (!strcmp("-o", argv[i])) {
-			std::cout << "here?" << std::endl;
-			std::cout << "output filename: " << argv[i + 1] << std::endl;
 			outputfile = argv[++i];
 		}
 
