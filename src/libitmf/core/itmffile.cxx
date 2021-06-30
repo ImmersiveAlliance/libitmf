@@ -287,7 +287,7 @@ namespace itmf {
         }
     }
 
-    void ITMFFILE::writeFiles(std::ofstream& outfile)
+    void ITMFFILE::writeFiles(std::ostream& outfile)
     {
         DIRECTORY file_stream_directory;
         INDEX file_stream_index; // added to indexes if indexes are included
@@ -436,7 +436,7 @@ namespace itmf {
         }
     }
 
-    void ITMFFILE::writeStreamsAtStart(std::ofstream& outfile) {
+    void ITMFFILE::writeStreamsAtStart(std::ostream& outfile) {
         header.write(outfile);
 
         // Properties
@@ -527,7 +527,7 @@ namespace itmf {
     //    }
     //}
 
-    void ITMFFILE::writeStreamsAtEnd(std::ofstream& outfile) {
+    void ITMFFILE::writeStreamsAtEnd(std::ostream& outfile) {
         header.write(outfile);
 
         // Properties

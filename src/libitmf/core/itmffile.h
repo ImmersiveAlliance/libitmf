@@ -54,10 +54,10 @@ namespace itmf {
 		ITMFCONFIGURATION config;
 
 		STREAM_HEADER* getStreamHeader(ITMF_STREAM_TYPES stream_type);
-		void writeFiles(std::ofstream& outfile);
-		void writeStreamsAtStart(std::ofstream& outfile);
+		void writeFiles(std::ostream& outfile);
+		void writeStreamsAtStart(std::ostream& outfile);
 		//void writeStreamsAtStartToBuffer(std::vector<char>* buffer);
-		void writeStreamsAtEnd(std::ofstream& outfile);
+		void writeStreamsAtEnd(std::ostream& outfile);
 		void syncFilelist();
 		
 		ITMFFILE(ITMF_HEADER h, ITMF_FOOTER f, ITMFCONFIGURATION conf) : header(h), footer(f), config(conf) { }

@@ -6,7 +6,7 @@ namespace itmf {
 		return ITMF_HEADER(BMLstring(1, "OX"), BMLint(2, 1), BMLint(3, flags));
 	}
 
-	ITMF_HEADER ITMF_HEADER::ReadITMFHeader(std::ifstream& infile) {
+	ITMF_HEADER ITMF_HEADER::ReadITMFHeader(std::istream& infile) {
 		// Confirm OX
 		BMLstring ox;
 		if (ParseElement(infile, static_cast<int>(ITMF_HEADER_IDS::OX), ox)) {
@@ -47,7 +47,7 @@ namespace itmf {
 		return (flags.getValue() & static_cast<int32_t>(flag)) != 0;
 	}
 
-	size_t ITMF_HEADER::write(std::ofstream& outfile)
+	size_t ITMF_HEADER::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		bytes_written += ox.save(outfile);
@@ -64,7 +64,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	void PROPERTIES::parseProperties(std::ifstream& infile) {
+	void PROPERTIES::parseProperties(std::istream& infile) {
 		// Parse key-value pairs until we hit a close tag, then break the loop
 		// TODO: Bound check this loop
 		int current_id, current_type;
@@ -122,7 +122,7 @@ namespace itmf {
 		return bytes_written;
 	}*/
 
-	size_t PROPERTIES::write(std::ofstream& outfile)
+	size_t PROPERTIES::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		bytes_written += writeOpenTag(outfile);
@@ -137,7 +137,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	STREAMHEADERS STREAM_HEADER::ReadStreamHeaders(std::ifstream& infile)
+	STREAMHEADERS STREAM_HEADER::ReadStreamHeaders(std::istream& infile)
 	{
 		STREAMHEADERS streamheaders;
 
@@ -283,7 +283,7 @@ namespace itmf {
 		return bytes_written;
 	}*/
 
-	size_t STREAM_HEADER::write(std::ofstream& outfile)
+	size_t STREAM_HEADER::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		bytes_written += writeOpenTag(outfile);
@@ -316,7 +316,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	INDEXES INDEX::ReadIndexes(std::ifstream& infile)
+	INDEXES INDEX::ReadIndexes(std::istream& infile)
 	{
 		INDEXES indexes;
 
@@ -387,7 +387,7 @@ namespace itmf {
 		return indexes;
 	}
 
-	size_t INDEX::write(std::ofstream& outfile)
+	size_t INDEX::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		bytes_written += writeOpenTag(outfile);
@@ -407,7 +407,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	size_t FILE_PROPERTIES::write(std::ofstream& outfile)
+	size_t FILE_PROPERTIES::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 
@@ -430,7 +430,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	DIRECTORIES DIRECTORY::ReadDirectories(std::ifstream& infile)
+	DIRECTORIES DIRECTORY::ReadDirectories(std::istream& infile)
 	{
 		DIRECTORIES directories;
 
@@ -537,7 +537,7 @@ namespace itmf {
 		return directories;
 	}
 
-	size_t DIRECTORY::write(std::ofstream& outfile)
+	size_t DIRECTORY::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 
@@ -555,7 +555,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	void SIGNATURE::parseSignature(std::ifstream& infile)
+	void SIGNATURE::parseSignature(std::istream& infile)
 	{
 		BMLint alg_as_int;
 		BMLstring alg_as_string;
@@ -579,7 +579,7 @@ namespace itmf {
 		}
 	}
 
-	size_t SIGNATURE::write(std::ofstream& outfile)
+	size_t SIGNATURE::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 
@@ -595,7 +595,7 @@ namespace itmf {
 		return bytes_written;
 	}
 
-	CHUNKS CHUNK::ReadChunks(std::ifstream& infile)
+	CHUNKS CHUNK::ReadChunks(std::istream& infile)
 	{
 		CHUNKS stream;
 		int peeked_id, peeked_type;
@@ -649,7 +649,7 @@ namespace itmf {
 		return stream;
 	}
 
-	size_t CHUNK::write(std::ofstream& outfile)
+	size_t CHUNK::write(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 
@@ -672,7 +672,7 @@ namespace itmf {
 		return footer;
 	}
 
-	void ITMF_FOOTER::parseFooter(std::ifstream& infile)
+	void ITMF_FOOTER::parseFooter(std::istream& infile)
 	{
 		char bytes[4];
 		unsigned char* ubytes = reinterpret_cast<unsigned char*>(bytes);
@@ -685,7 +685,7 @@ namespace itmf {
 		}
 	}
 
-	void ITMF_FOOTER::write(std::ofstream& outfile)
+	void ITMF_FOOTER::write(std::ostream& outfile)
 	{
 		outfile.write((char*)&offset_to_stream_end, sizeof(offset_to_stream_end));
 		outfile.write((char*)&magic, sizeof(magic));
