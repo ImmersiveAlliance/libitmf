@@ -16,23 +16,23 @@ ITMFConfiguration::ITMFConfiguration(ITMFEncodingOrder encodingOrder, bool inclu
 	config_(encodingOrder, includeProperties, includeIndex, signature, compression)
 { }
 
-ITMFEncoder::ITMFEncoder() : file_(itmflib::ITMFFILE::CreateStreamsAtStartFile())
+ITMFEncoder::ITMFEncoder() : file_(itmf::ITMFFILE::CreateStreamsAtStartFile())
 { }
 
 void ITMFEncoder::InitStreamsAtStart()
 {
-	file_ = itmflib::ITMFFILE::CreateStreamsAtStartFile();
+	file_ = itmf::ITMFFILE::CreateStreamsAtStartFile();
 }
 
 void ITMFEncoder::InitStreamsAtEnd()
 {
-	file_ = itmflib::ITMFFILE::CreateStreamsAtEndFile();
+	file_ = itmf::ITMFFILE::CreateStreamsAtEndFile();
 }
 
 void ITMFEncoder::InitCustom(ITMFConfiguration* configuration)
 {
-	itmflib::ITMFCONFIGURATION config = configuration->getConfiguration();
-	file_ = itmflib::ITMFFILE::CreateFileFromConfig(config);
+	itmf::ITMFCONFIGURATION config = configuration->getConfiguration();
+	file_ = itmf::ITMFFILE::CreateFileFromConfig(config);
 }
 
 void ITMFEncoder::AddStringProperty(char* key, char* value)
@@ -70,7 +70,7 @@ void ITMFEncoder::Write(char* filename)
 	file_.write(std::string(filename));
 }
 
-ITMFDecoder::ITMFDecoder() : file_(itmflib::ITMFFILE::CreateStreamsAtStartFile()) {
+ITMFDecoder::ITMFDecoder() : file_(itmf::ITMFFILE::CreateStreamsAtStartFile()) {
 }
 
 void ITMFDecoder::ReadFile(const char* buffer, unsigned long long size) {
@@ -81,7 +81,7 @@ void ITMFDecoder::ReadFile(const char* buffer, unsigned long long size) {
 		outitmffile.write(buffer, size);
 	}
 	outitmffile.close();
-	file_ = itmflib::ITMFFILE::ReadFile("temp.itmf");
+	file_ = itmf::ITMFFILE::ReadFile("temp.itmf");
 }
 
 void ITMFDecoder::PrintFileList() {

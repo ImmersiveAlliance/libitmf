@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ITMF Decoder Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="itmf.js"></script>
+</head>
+<body>
+    <h1>ITMF JS/WASM Decoder Example</h1>
+    <input type="file" id="file-add">
+    <div id="filelist"></div>
+    <script>
+        /**
+         * This example takes an ITMF file and decodes it exposing the files contained within that can be downloaded. In order for this 
+         * to work, the html must be served from an http server with the itmf.wasm and itmf.js in the same directory of this file.
+         * */
+
+        // Get the button elements
+        const fileAdder = document.getElementById("file-add");
+        // Initialize the ITMF Module instance
+        ITMF().then(function (Module) {
+            // Create the ITMF Decoder
+            var ITMFDecoder = new Module.ITMFDecoder();
+
+            // Function to read the .itmf file
+            function readFile(event, file) {
+                var arrayBuffer = event.target.result;
+                // Create an Int8Array from the ArrayBuffer
+                var bytes = new Int8Array(arrayBuffer);
+
+                // Read the file with the Decoder
+                var result = ITMFDecoder.ReadFile(bytes, file.size);
+
+                // Prints the file list to console
+                ITMFDecoder.PrintFileList();
+                // Create an ITMFStringArray for the file list
+                var filelist = new Module.ITMFStringArray();
+                // Get the file list using the ITMFStringArray
+                ITMFDecoder.GetFileList(filelist);
+                // Get the size of the file list
+                var filelist_size = filelist.Size();
+                for (let i = 0; i < filelist_size; i++) {
+                    // Create text and button to download the file packed in the container
+                    var para = document.createElement("p");
+                    var node = document.createTextNode(filelist.GetValue(i));
+                    var button = document.createElement("button");
+                    button.innerHTML = "Download";
+                    // Function to handle the button click
+                    button.onclick = function () {
+                        // Extract the file from the container and write it to the root of the
+                        // in-memory file system
+                        ITMFDecoder.ExtractFile(filelist.GetValue(i), "./");
+
+                        // The decoder currently modifies file names that contain '/' to '_' during extraction
+                        var modified_filename = filelist.GetValue(i).replace("/", "_");
+                        // Get the file using FS from the in-memory file system
+                        var fileArray = Module.FS.readFile(modified_filename);
+
+                        // Create the blob and anchor link to download the file
+                        var blob = new Blob([fileArray], { type: "application/octet-stream" });
+                        
+                        var link = window.URL.createObjectURL(blob);
+                        
+                        var anchor = document.createElement("a");
+                        anchor.download = filelist.GetValue(i);
+                        anchor.href = link;
+                        anchor.click();
+                    };
+                    // Add the text and button to the filelist element
+                    para.appendChild(node);
+                    para.appendChild(button);
+                    const elem = document.getElementById("filelist");
+                    elem.appendChild(para);
+                }
+            }
+
+            // Event listener when the "browse" button is clicked
+            fileAdder.addEventListener('change', function (event) {
+                files = event.target.files;
+                for (let i = 0; i < files.length; i++) {
+                    // Create the file reader
+                    const reader = new FileReader();
+
+                    const file = files[i];
+
+                    // Function when the file is loaded from the FileReader
+                    reader.onload = (function (file) {
+                        return function (event) {
+                            readFile(event, file);
+                        };
+                    })(file);
+                    // Read the file as an ArrayBuffer
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        })
+    </script>
+
+</body>
+</html>

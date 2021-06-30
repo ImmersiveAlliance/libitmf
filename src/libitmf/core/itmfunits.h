@@ -6,7 +6,7 @@
 #include "boost/optional.hpp"
 #include "boost/variant.hpp"
 
-namespace itmflib {
+namespace itmf {
 
 #define CHECK_BOOST_OPTIONAL(x) (x != boost::none ? true : false)
 
@@ -40,12 +40,12 @@ namespace itmflib {
 	public:
 		static const int ITMF_CONTAINER_VERSION = 1;
 		static ITMF_HEADER CreateITMFHeader(int32_t flags);
-		static ITMF_HEADER ReadITMFHeader(std::ifstream& infile);
+		static ITMF_HEADER ReadITMFHeader(std::istream& infile);
 
 		void addFlag(ITMF_HEADER_FLAGS flag) { flags += static_cast<int32_t>(flag); }
 		bool hasFlag(ITMF_HEADER_FLAGS flag);
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -64,9 +64,9 @@ namespace itmflib {
 			std::pair<BMLstring, boost::variant<BMLstring, BMLlong>> prop(BMLstring(static_cast<int>(STREAM_HEADER_IDS::KEY), key), BMLlong(static_cast<int>(STREAM_HEADER_IDS::VALUE), value));
 			properties.push_back(prop);
 		}
-		void parseProperties(std::ifstream& infile);
+		void parseProperties(std::istream& infile);
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -88,7 +88,7 @@ namespace itmflib {
 		STREAM_HEADER(int32_t t, std::vector<std::pair<BMLstring, boost::variant<BMLstring, BMLlong>>> props = {}) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::STREAM_HEADERS)), type(BMLint(static_cast<int>(STREAM_HEADER_IDS::TYPE), t)), properties(props) { }
 		STREAM_HEADER(std::string t, std::vector<std::pair<BMLstring, boost::variant<BMLstring, BMLlong>>> props = {}) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::STREAM_HEADERS)), type(BMLstring(static_cast<int>(STREAM_HEADER_IDS::TYPE), t)), properties(props) { }
 
-		static STREAMHEADERS ReadStreamHeaders(std::ifstream& infile);
+		static STREAMHEADERS ReadStreamHeaders(std::istream& infile);
 
 		void setType(int32_t t) { type = BMLint(static_cast<int>(STREAM_HEADER_IDS::TYPE), t); }
 		void setType(std::string t) { type = BMLstring(static_cast<int>(STREAM_HEADER_IDS::TYPE), t); }
@@ -127,7 +127,7 @@ namespace itmflib {
 		// TODO: gets
 		boost::variant<BMLint, BMLstring> getType() const { return type; }
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -139,7 +139,7 @@ namespace itmflib {
 		INDEX() : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::INDEX)) { }
 		INDEX(std::vector<std::pair<BMLlong, boost::optional<BMLlong>>> nb) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::INDEX)), nbytes(nb) { }
 
-		static INDEXES ReadIndexes(std::ifstream& infile);
+		static INDEXES ReadIndexes(std::istream& infile);
 
 		void setStreamIndex(int32_t si) { stream_index = BMLint(static_cast<int>(INDEX_IDS::STREAM_INDEX), si); }
 		void addNumBytes(std::pair<BMLlong, boost::optional<BMLlong>> n) { nbytes.push_back(n); }
@@ -153,7 +153,7 @@ namespace itmflib {
 				nbytes.push_back(std::pair<BMLlong, boost::optional<BMLlong>>(BMLlong(static_cast<int>(INDEX_IDS::POS_DELTA), pos_delta), boost::none));
 			}
 		}
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -205,7 +205,7 @@ namespace itmflib {
 			properties.push_back(props);
 		}
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -219,7 +219,7 @@ namespace itmflib {
 		DIRECTORY() : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::DIRECTORY)) { }
 		DIRECTORY(std::vector<FILE_PROPERTIES> fp) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::DIRECTORY)), file_properties(fp) { }
 
-		static DIRECTORIES ReadDirectories(std::ifstream& infile);
+		static DIRECTORIES ReadDirectories(std::istream& infile);
 
 		void setStreamIndex(int32_t si) { stream_index = BMLint(static_cast<int>(DIRECTORY_IDS::STREAM_INDEX), si); }
 		void addFileProperty(FILE_PROPERTIES props) { file_properties.push_back(props); }
@@ -227,7 +227,7 @@ namespace itmflib {
 		std::vector<FILE_PROPERTIES> getFileProperties() { return file_properties; }
 		int getStreamIndex() { return stream_index ? stream_index->getValue() : default_stream_index; }
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -240,14 +240,14 @@ namespace itmflib {
 		SIGNATURE(boost::variant<BMLint, BMLstring> alg, BMLblob s) : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::SIGNATURE)), algorithm(alg), signature(s) { }
 		SIGNATURE() : BMLobject(static_cast<int>(LOGICAL_UNIT_IDS::SIGNATURE)), algorithm(), signature() { }
 
-		void parseSignature(std::ifstream& infile);
+		void parseSignature(std::istream& infile);
 		//void setAlgorithm(boost::variant<BMLint, BMLstring> alg) { algorithm = alg; }
 		void setAlgorithm(int32_t alg) { algorithm = BMLint(static_cast<int>(SIGNATURE_IDS::ALGORITHM), alg); }
 		void setAlgorithm(std::string alg) { algorithm = BMLstring(static_cast<int>(SIGNATURE_IDS::ALGORITHM), alg); }
 		void setCertificate(std::shared_ptr<char> c, uint64_t length) { certificate = BMLblob(static_cast<int>(SIGNATURE_IDS::CERTIFICATE), length, c); }
 		void setSignature(std::shared_ptr<char> s, uint64_t length) { signature = BMLblob(static_cast<int>(SIGNATURE_IDS::SIGNATURE), length, s); }
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -264,7 +264,7 @@ namespace itmflib {
 		CHUNK(BMLblob d) : data(d) { }
 		CHUNK(BMLblob d, boost::optional<BMLint> si, boost::optional<BMLint> f, boost::optional<BMLlong> ub) : data(d), stream_index(si), flags(f), uncompressed_bytes(ub) { }
 
-		static CHUNKS ReadChunks(std::ifstream& infile);
+		static CHUNKS ReadChunks(std::istream& infile);
 
 		int32_t getStreamIndex() { return stream_index ? stream_index->getValue() : default_stream_index; }
 		int32_t getFlags() { return flags ? flags->getValue() : default_flags; }
@@ -275,7 +275,7 @@ namespace itmflib {
 		void setUncompressBytes(int64_t ub) { uncompressed_bytes = BMLlong(static_cast<int>(CHUNK_IDS::UNCOMPRESSED_NBYTES), ub); }
 		void setData(std::shared_ptr<char> d, uint64_t length) { data = BMLblob(static_cast<int>(CHUNK_IDS::DATA), length, d); }
 
-		size_t write(std::ofstream& outfile);
+		size_t write(std::ostream& outfile);
 		//size_t writeToBuffer(std::vector<char>* buffer);
 	};
 
@@ -288,11 +288,11 @@ namespace itmflib {
 	public:
 		static ITMF_FOOTER CreateFooter(uint32_t offset);
 
-		void parseFooter(std::ifstream& infile);
+		void parseFooter(std::istream& infile);
 
 		void setOffset(uint32_t offset) { offset_to_stream_end = offset; }
 
-		void write(std::ofstream& outfile);
+		void write(std::ostream& outfile);
 		//void writeToBuffer(std::vector<char>* buffer);
 	};
 

@@ -1,6 +1,6 @@
 #include <bmltypes.h>
 
-namespace itmflib {
+namespace itmf {
 
 	// interface
 
@@ -17,7 +17,7 @@ namespace itmflib {
 
 	// TODO: Refactor id and type_id to be VUIE BMLBitVector and the type enum, respectively
 	// This function will need to be rewritten
-	void decodeTag(std::ifstream& infile, int& id, int& type_id) {
+	void decodeTag(std::istream& infile, int& id, int& type_id) {
 		BMLBitVector type_as_vector;
 		BMLBitVector tag = readVUIE(infile);
 		id = tag.to_int32() >> 3;
@@ -26,7 +26,7 @@ namespace itmflib {
 		type_id = type_as_vector.to_int32();
 	}
 
-	void peekTag(std::ifstream& infile, int& id, int& type_id) { 
+	void peekTag(std::istream& infile, int& id, int& type_id) { 
 		std::streampos startpos = infile.tellg();
 		decodeTag(infile, id, type_id); 
 		infile.seekg(startpos);
@@ -48,7 +48,7 @@ namespace itmflib {
 		return (num_bits) - (log_nb + 1);
 	}
 
-	BMLBitVector readVUIE(std::ifstream& infile) {
+	BMLBitVector readVUIE(std::istream& infile) {
 		char length_byte;
 		infile.read(&length_byte, 1);
 		unsigned char leading_ones = countLeadingOnes(length_byte);
@@ -72,7 +72,7 @@ namespace itmflib {
 		return BMLBitVector(bitvector, Encoding::VUIE, is_negative);
 	}
 
-	BMLBitVector readVSIE(std::ifstream& infile) {
+	BMLBitVector readVSIE(std::istream& infile) {
 		char length_byte;
 		infile.read(&length_byte, 1);
 		unsigned char leading_ones = countLeadingOnes(length_byte);
@@ -107,7 +107,7 @@ namespace itmflib {
 		return BMLBitVector(bitvector, Encoding::VSIE, is_negative);
 	}
 
-	bool ParseElement(std::ifstream& infile, int expected_id, BMLtype& output) {
+	bool ParseElement(std::istream& infile, int expected_id, BMLtype& output) {
 		int current_id, current_type;
         peekTag(infile, current_id, current_type);
         if (current_id == expected_id && current_type == output.type_id) {
@@ -132,7 +132,7 @@ namespace itmflib {
 		return b.to_charvector();
 	}
 
-	void BMLint::parse(std::ifstream& infile) {
+	void BMLint::parse(std::istream& infile) {
 		BMLBitVector parsed_value = readVSIE(infile);
 		this->value = parsed_value.to_int32();
 	}
@@ -144,7 +144,7 @@ namespace itmflib {
 		return b.to_charvector();
 	}
 
-	void BMLlong::parse(std::ifstream& infile) {
+	void BMLlong::parse(std::istream& infile) {
 		BMLBitVector parsed_value = readVSIE(infile);
 		this->value = parsed_value.to_int64();
 	}
@@ -162,7 +162,7 @@ namespace itmflib {
 		return encoded_value;
 	}
 
-	void BMLsingle::parse(std::ifstream& infile) {
+	void BMLsingle::parse(std::istream& infile) {
 		char bytes[4];
 		infile.read(bytes, 4);
 		this->value = *reinterpret_cast<float*>(bytes);
@@ -185,7 +185,7 @@ namespace itmflib {
 		return encoded_value;
 	}
 
-	void BMLdouble::parse(std::ifstream& infile) {
+	void BMLdouble::parse(std::istream& infile) {
 		char bytes[8];
 		infile.read(bytes, 8);
 		this->value = *reinterpret_cast<double*>(bytes);
@@ -222,7 +222,7 @@ namespace itmflib {
 		return encoded_value;
 	}
 
-	void BMLstring::parse(std::ifstream& infile) {
+	void BMLstring::parse(std::istream& infile) {
 		uint64_t str_length = readVUIE(infile).to_uint64();
 		std::string parsed_string(str_length, ' ');
 		infile.read(&parsed_string[0], str_length);
@@ -250,13 +250,13 @@ namespace itmflib {
 		return encoded_vector;
 	}
 
-	void BMLblob::parse(std::ifstream& infile) {
+	void BMLblob::parse(std::istream& infile) {
 		this->length = readVUIE(infile).to_uint64();
 		this->value.reset(new char[this->length], std::default_delete<char[]>());
 		infile.read(value.get(), this->length);
 	}
 
-	size_t BMLblob::save(std::ofstream& outfile) {
+	size_t BMLblob::save(std::ostream& outfile) {
 		std::vector<char> to_write = encode();
 		std::copy(to_write.begin(), to_write.end(), std::ostream_iterator<char>(outfile));
 		size_t bytes_written = to_write.size();
@@ -274,7 +274,7 @@ namespace itmflib {
 		return encodeTag(id, 1);
 	}
 
-	size_t BMLobject::writeOpenTag(std::ofstream& outfile)
+	size_t BMLobject::writeOpenTag(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		std::vector<char> opentag = encodeOpenTag();
@@ -298,7 +298,7 @@ namespace itmflib {
 		return encodeTag(id, 0);
 	}
 
-	size_t BMLobject::writeCloseTag(std::ofstream& outfile)
+	size_t BMLobject::writeCloseTag(std::ostream& outfile)
 	{
 		size_t bytes_written = 0;
 		std::vector<char> closetag = encodeCloseTag();

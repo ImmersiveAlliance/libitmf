@@ -12,7 +12,7 @@
 
 #define BML_BYTE_SIZE 8
 
-namespace itmflib {
+namespace itmf {
 
 	enum Encoding
 	{

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ITMF Encoder Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="itmf.js"></script>
+</head>
+<body>
+    
+    <h1>ITMF JS/WASM Encoder Example</h1>
+    <input type="file" id="file-add" multiple>
+    <input type="button" id="file-download" value="Download ITMF">
+    <script>
+        /**
+         * This example takes a file(s) and encodes them to an ITMF Container. In order for this to work, the html must be served from an http
+         * server with the itmf.wasm and itmf.js in the same directory of this file.
+         * */
+        let files = [];
+
+        // Get the button elements
+        const fileDownloader = document.getElementById("file-download");
+        const fileAdder = document.getElementById("file-add");
+        // Initialize the ITMF Module instance
+        ITMF().then(function (Module) {
+            // Load the encoder
+            var ITMFEncoder = new Module.ITMFEncoder();
+            // Create the configuration with streams at start, properties and index logical units, no compression or encryption
+            var configuration = new Module.ITMFConfiguration(Module.STREAMS_AT_START, true, true, Module.NONE, Module.NONE);
+            // Initalize the ITMFFILE with the configuration
+            ITMFEncoder.InitCustom(configuration);
+            // Adding string property
+            ITMFEncoder.AddStringProperty("octane_version", "10021301");
+            
+            // Function to add a file to the container
+            function addFile(event, file) {
+                var arrayBuffer = event.target.result;
+                var bytes = new Int8Array(arrayBuffer);
+
+                // Add the file to the container with the Int8Array bytes and size of the file
+                var result = ITMFEncoder.AddFile(file.name, bytes, file.size);
+            }
+
+            // Listener for when the "browse" file button is clicked
+            fileAdder.addEventListener('change', function(event) {
+                files = event.target.files;
+                for (let i = 0; i < files.length; i++) {
+                    // Create a new file reader
+                    const reader = new FileReader();
+
+                    const file = files[i];
+
+                    // Calls addFile once a file is loaded into file reader
+                    reader.onload = (function(file) {
+                        return function(event) {
+                            addFile(event, file);
+                        };
+                    })(file);
+                    // Read the file as an ArrayBuffer so we can get the Int8Array
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+
+            // Event listener for when "Download ITMF" is clicked
+            fileDownloader.addEventListener('click', function() {
+                for(let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    // ITMFEncoder.AddFile(file.)
+                }
+                // Write the ITMF file to the in-memory file system
+                ITMFEncoder.Write("./example.itmf");
+
+                // Use FS library to read the file in an array
+                var fileArray = Module.FS.readFile("/example.itmf");
+
+                // Create a blob and link for the download
+                var blob = new Blob([fileArray], { type: "application/octet-stream"});
+                var link = window.URL.createObjectURL(blob);
+
+                // Anchor for pop up to download the .itmf with a default name
+                var anchor = document.createElement("a");
+                anchor.download = "example.itmf";
+                anchor.href = link;
+                anchor.click();
+            });
+        })
+    </script>
+    
+</body>
+</html>

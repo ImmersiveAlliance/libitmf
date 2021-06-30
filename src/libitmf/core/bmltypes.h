@@ -8,15 +8,15 @@
 #include "boost/variant/static_visitor.hpp"
 #include "bmlbitutils.h"
 
-namespace itmflib {
+namespace itmf {
 	std::vector<char> encodeTag(int id, int type_id);
-	void decodeTag(std::ifstream& infile, int& id, int& type_id);
-	void peekTag(std::ifstream& infile, int& id, int& type_id);
+	void decodeTag(std::istream& infile, int& id, int& type_id);
+	void peekTag(std::istream& infile, int& id, int& type_id);
 
 	unsigned char countLeadingOnes(unsigned char byte);
 
-	BMLBitVector readVUIE(std::ifstream& infile);
-	BMLBitVector readVSIE(std::ifstream& infile);
+	BMLBitVector readVUIE(std::istream& infile);
+	BMLBitVector readVSIE(std::istream& infile);
 
 
 class BMLtype {
@@ -43,9 +43,9 @@ public:
 	}
 
 	virtual std::vector<char> encodeValue() = 0;
-	virtual void parse(std::ifstream& infile) = 0;
+	virtual void parse(std::istream& infile) = 0;
 
-	virtual size_t save(std::ofstream& outfile) {
+	virtual size_t save(std::ostream& outfile) {
 		std::vector<char> to_write = encode();
 		std::copy(to_write.begin(), to_write.end(), std::ostream_iterator<char>(outfile));
 	
@@ -62,7 +62,7 @@ public:
 
 	// Returns true if the output BMLtype was filled, else returns false
 	// Only consumes bytes if the tag from the input stream is what was expected
-	bool ParseElement(std::ifstream& infile, int expected_id, BMLtype& output); 
+	bool ParseElement(std::istream& infile, int expected_id, BMLtype& output); 
 
 class BMLint : public BMLtype {
 	// TODO: Replace with BMLBitVector
@@ -80,7 +80,7 @@ public:
 	}
 
 	std::vector<char> encodeValue();
-	void parse(std::ifstream& infile);
+	void parse(std::istream& infile);
 };
 
 class BMLlong : public BMLtype {
@@ -99,7 +99,7 @@ public:
 	}
 
 	std::vector<char> encodeValue();
-	void parse(std::ifstream& infile);
+	void parse(std::istream& infile);
 };
 
 class BMLsingle : public BMLtype {
@@ -111,7 +111,7 @@ public:
 	float getValue() const { return value; }
 
 	std::vector<char> encodeValue();
-	void parse(std::ifstream& infile);
+	void parse(std::istream& infile);
 };
 
 class BMLdouble : public BMLtype {
@@ -123,7 +123,7 @@ public:
 	double getValue() const { return value; }
 
 	std::vector<char> encodeValue();
-	void parse(std::ifstream& infile);
+	void parse(std::istream& infile);
 };
 
 class BMLstring : public BMLtype {
@@ -142,11 +142,11 @@ public:
 	std::string getValue() const { return value; }
 
 	// Overloads
-	//void load(std::ifstream& infile);
+	//void load(std::istream& infile);
 	std::vector<char> encode();
 	std::vector<char> encodeLength();
 	std::vector<char> encodeValue();
-	void parse(std::ifstream& infile);
+	void parse(std::istream& infile);
 };
 
 class BMLblob : public BMLtype {
@@ -161,12 +161,12 @@ public:
 	uint64_t length;
 
 	// Overloads
-	//void load(std::ifstream& infile);
+	//void load(std::istream& infile);
 	std::vector<char> encode();
 	std::vector<char> encodeLength();
 	std::vector<char> encodeValue() { return std::vector<char>({}); }
-	void parse(std::ifstream& infile);
-	size_t save(std::ofstream& outfile);
+	void parse(std::istream& infile);
+	size_t save(std::ostream& outfile);
 };
 
 class BMLobject {
@@ -176,19 +176,19 @@ public:
 	BMLobject(int i) : id(i) { }
 
 	std::vector<char> encodeOpenTag();
-	size_t writeOpenTag(std::ofstream& outfile);
+	size_t writeOpenTag(std::ostream& outfile);
 	//size_t writeOpenTagToBuffer(std::vector<char>* buffer);
 	std::vector<char> encodeCloseTag();
-	size_t writeCloseTag(std::ofstream& outfile);
+	size_t writeCloseTag(std::ostream& outfile);
 	//size_t writeCloseTagToBuffer(std::vector<char>* buffer);
 };
 
 // Visitor class for boost::variant usage
 class save_visitor : public boost::static_visitor<> {
-	std::ofstream& save_file;
+	std::ostream& save_file;
 	size_t& bytes_written;
 public:
-	save_visitor(std::ofstream& outfile, size_t& bytes) : save_file(outfile), bytes_written(bytes) { }
+	save_visitor(std::ostream& outfile, size_t& bytes) : save_file(outfile), bytes_written(bytes) { }
 
 	void operator()(BMLstring& s) const {
 		bytes_written += s.save(save_file);

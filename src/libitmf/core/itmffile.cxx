@@ -1,6 +1,6 @@
 #include <itmffile.h>
 
-namespace itmflib {
+namespace itmf {
     /**
     Creates a standard ITMF file with encoding order StreamsAtStart. Will include
     logical units that are non-optional: ITMF Header, Stream, StreamHeader, Chunk,
@@ -280,14 +280,14 @@ namespace itmflib {
         infile.close();
     }
 
-    void itmflib::ITMFFILE::addFiles(std::vector<std::string> filepaths)
+    void itmf::ITMFFILE::addFiles(std::vector<std::string> filepaths)
     {
         for (auto it = filepaths.begin(); it != filepaths.end(); it++) {
             addFile(*it);
         }
     }
 
-    void ITMFFILE::writeFiles(std::ofstream& outfile)
+    void ITMFFILE::writeFiles(std::ostream& outfile)
     {
         DIRECTORY file_stream_directory;
         INDEX file_stream_index; // added to indexes if indexes are included
@@ -436,7 +436,7 @@ namespace itmflib {
         }
     }
 
-    void ITMFFILE::writeStreamsAtStart(std::ofstream& outfile) {
+    void ITMFFILE::writeStreamsAtStart(std::ostream& outfile) {
         header.write(outfile);
 
         // Properties
@@ -527,7 +527,7 @@ namespace itmflib {
     //    }
     //}
 
-    void ITMFFILE::writeStreamsAtEnd(std::ofstream& outfile) {
+    void ITMFFILE::writeStreamsAtEnd(std::ostream& outfile) {
         header.write(outfile);
 
         // Properties

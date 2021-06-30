@@ -31,7 +31,7 @@ endif()
 
 include(GoogleTest)
 
-macro(itmflib_add_test FILENAME TEST_SRC)
+macro(itmf_add_test FILENAME TEST_SRC)
     # create an exectuable in which the tests will be stored
     add_executable(${FILENAME} ${TEST_SRC})
     # link the Google test infrastructure, mocking library, and a default main fuction to
@@ -40,4 +40,4 @@ macro(itmflib_add_test FILENAME TEST_SRC)
     target_link_libraries(${FILENAME} PUBLIC itmfcore gtest gmock gtest_main)
 endmacro()
 
-itmflib_add_test(bmlbitutilstests bmlbitutilstests.cc)
+itmf_add_test(bmlbitutilstests bmlbitutilstests.cc)

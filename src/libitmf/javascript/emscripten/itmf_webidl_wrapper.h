@@ -15,9 +15,9 @@ to the ITMFILE.
 This will also need to be expanded for the scene graph in future versions.
 */
 
-typedef itmflib::ITMF_ENCODING_ORDER ITMFEncodingOrder;
-typedef itmflib::ITMF_SIGNATURE ITMFSignature;
-typedef itmflib::ITMF_COMPRESSION ITMFCompression;
+typedef itmf::ITMF_ENCODING_ORDER ITMFEncodingOrder;
+typedef itmf::ITMF_SIGNATURE ITMFSignature;
+typedef itmf::ITMF_COMPRESSION ITMFCompression;
 
 class ITMFStringArray {
 public:
@@ -38,10 +38,10 @@ public:
 		ITMFSignature signature,
 		ITMFCompression compression);
 
-	itmflib::ITMFCONFIGURATION getConfiguration() { return config_; }
+	itmf::ITMFCONFIGURATION getConfiguration() { return config_; }
 
 private:
-	itmflib::ITMFCONFIGURATION config_;
+	itmf::ITMFCONFIGURATION config_;
 };
 
 class ITMFDecoder {
@@ -56,7 +56,7 @@ public:
 	void ExtractAllFiles(char* destination);
 
 private:
-	itmflib::ITMFFILE file_;
+	itmf::ITMFFILE file_;
 };
 
 class ITMFEncoder {
@@ -77,7 +77,7 @@ public:
 	void Write(char* filename);
 
 private:
-	itmflib::ITMFFILE file_;
+	itmf::ITMFFILE file_;
 };
 
 #endif // ITMF_WEBIDL_WRAPPER_H_

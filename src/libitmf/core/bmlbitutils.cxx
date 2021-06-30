@@ -2,7 +2,7 @@
 
 // TODO - function comments
 
-namespace itmflib {
+namespace itmf {
 	/**
 		Takes in an integer and creates the BMLBitVector with the byte length indicator
 		bits per the specification.
