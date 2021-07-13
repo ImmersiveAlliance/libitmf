@@ -23,7 +23,7 @@ At the highest level, libitmf is a library focused on interacting with ITMF file
 
 In libitmf, ITMF files are represented by the ITMFFILE class. Under the C++ API, files can be read in from the filesystem by specifying a path:  
 
-```
+```c++
 #include "itmffile.h"
 
 int main() {
@@ -41,20 +41,21 @@ Dashed lines indicate an optional unit. StreamHeaders, Indexes, Directories, and
 Note that, for compatibility with legacy versions of OTOY’s ORBX format that ITMF was based on, the Properties unit may appear immediately after the Header in Streams at Start.  
 
 When creating a new ITMF file from scratch, the file may be initialized with the desired ordering using one of the following functions:  
-
-`itmf::ITMFFILE file = itmf::ITMFFILE::CreateStreamsAtStartFile();`  
-`itmf::ITMFFILE file = itmf::ITMFFILE::CreateStreamsAtEndFile();`  
-
+```c++
+itmf::ITMFFILE file = itmf::ITMFFILE::CreateStreamsAtStartFile(); 
+itmf::ITMFFILE file = itmf::ITMFFILE::CreateStreamsAtEndFile();
+```
 A file may also be initialized from an ITMFCONFIGURATION object, which stores information that corresponds to metadata from the ITMF Header. For example:  
 
-```
+```c++
 itmf::ITMFCONFIGURATION config(
 itmf::ITMF_ENCODING_ORDER::STREAMS_AT_START, 
 true, // Will the Properties logical unit be included?
 true, // Will the Indexes logical unit be included? 
 itmf::ITMF_SIGNATURE::NONE, 
 itmf::ITMF_COMPRESSION::NONE);
-   itmf::ITMFFILE file = itmf::ITMFFILE::CreateFileFromConfig(config);
+
+itmf::ITMFFILE file = itmf::ITMFFILE::CreateFileFromConfig(config);
 ```  
 
 ## Logical Units  
