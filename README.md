@@ -1,6 +1,6 @@
 # libitmf
 
-![Build Status](https://github.com/ImmersiveAlliance/libitmf/tree/main/.github/workflows/ci.yml/badge.svg)
+[![Build Status](https://github.com/ImmersiveAlliance/libitmf/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ImmersiveAlliance/libitmf/actions/workflows/ci.yml)
 
 ## Description
 
