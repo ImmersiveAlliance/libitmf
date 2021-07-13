@@ -8,6 +8,7 @@ namespace itmf {
 	// global functions
 
 	std::vector<char> encodeTag(int id, int type_id) {
+		// TODO: Ensure that the id is not larger than 6 or negative
 		BMLBitVector tag(id);
 		tag = tag << 3;
 		BMLBitVector typeBitVector(type_id);
@@ -154,10 +155,10 @@ namespace itmf {
 		std::vector<char> encoded_value;
 		uint32_t bits = 0;
 		memcpy(&bits, &value, sizeof value);
-		encoded_value.push_back((bits) * 0xFF);
-		encoded_value.push_back((bits >> 8) * 0xFF);
-		encoded_value.push_back((bits >> 16) * 0xFF);
-		encoded_value.push_back((bits >> 24) * 0xFF);
+		encoded_value.push_back((bits) & 0xFF);
+		encoded_value.push_back((bits >> 8) & 0xFF);
+		encoded_value.push_back((bits >> 16) & 0xFF);
+		encoded_value.push_back((bits >> 24) & 0xFF);
 
 		return encoded_value;
 	}
@@ -173,14 +174,14 @@ namespace itmf {
 		std::vector<char> encoded_value;
 		uint64_t bits = 0;
 		memcpy(&bits, &value, sizeof value);
-		encoded_value.push_back((bits) * 0xFF);
-		encoded_value.push_back((bits >> 8) * 0xFF);
-		encoded_value.push_back((bits >> 16) * 0xFF);
-		encoded_value.push_back((bits >> 24) * 0xFF);
-		encoded_value.push_back((bits >> 32) * 0xFF);
-		encoded_value.push_back((bits >> 40) * 0xFF);
-		encoded_value.push_back((bits >> 48) * 0xFF);
-		encoded_value.push_back((bits >> 56) * 0xFF);
+		encoded_value.push_back((bits) & 0xFF);
+		encoded_value.push_back((bits >> 8) & 0xFF);
+		encoded_value.push_back((bits >> 16) & 0xFF);
+		encoded_value.push_back((bits >> 24) & 0xFF);
+		encoded_value.push_back((bits >> 32) & 0xFF);
+		encoded_value.push_back((bits >> 40) & 0xFF);
+		encoded_value.push_back((bits >> 48) & 0xFF);
+		encoded_value.push_back((bits >> 56) & 0xFF);
 
 		return encoded_value;
 	}
