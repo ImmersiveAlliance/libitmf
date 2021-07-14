@@ -403,7 +403,7 @@ namespace itmf {
 		}
 
 		if (is_negative)
-			r * -1;
+			r *= -1;
 
 		return r;
 	}
