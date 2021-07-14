@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "gtest/gtest.h"
 #include "bmltypes.h"
 #include "itmfenums.h"
@@ -8,10 +10,10 @@ namespace itmf {
 	// Reading tests
 	TEST(ReadTest, ReadVUIETest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x3f };
+		unsigned char input_data[] = { 0x3f };
 		uint64_t expected_value = 63;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos begin_streampos = test_istream.tellg();
 		BMLBitVector result = readVUIE(test_istream);
@@ -24,10 +26,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVUIETest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x40 };
+		unsigned char input_data[] = { 0x40 };
 		uint64_t expected_value = 64;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVUIE(test_istream);
 
@@ -36,10 +38,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVUIETest3) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x82, 0x19 };
+		unsigned char input_data[] = { 0x82, 0x19 };
 		uint64_t expected_value = 537;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVUIE(test_istream);
 
@@ -48,10 +50,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVUIETest4) {
 		std::stringstream test_istream;
-		char input_data[] = { 0xc1, 0x86, 0xa0 };
+		unsigned char input_data[] = { 0xc1, 0x86, 0xa0 };
 		uint64_t expected_value = 100000;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVUIE(test_istream);
 
@@ -60,10 +62,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVSIETest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x3f };
+		unsigned char input_data[] = { 0x3f };
 		int64_t expected_value = 63;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVSIE(test_istream);
 
@@ -72,10 +74,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVSIETest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0xa0, 0x40 };
+		unsigned char input_data[] = { 0xa0, 0x40 };
 		int64_t expected_value = -64;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVSIE(test_istream);
 
@@ -84,10 +86,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVSIETest3) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x82, 0x19 };
+		unsigned char input_data[] = { 0x82, 0x19 };
 		int64_t expected_value = 537;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVSIE(test_istream);
 
@@ -96,10 +98,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadVSIETest4) {
 		std::stringstream test_istream;
-		char input_data[] = { 0xd1, 0x86, 0xa0 };
+		unsigned char input_data[] = { 0xd1, 0x86, 0xa0 };
 		int64_t expected_value = -100000;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLBitVector result = readVSIE(test_istream);
 
@@ -108,12 +110,12 @@ namespace itmf {
 
 	TEST(ReadTest, DecodeTagTest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b00010010 };
+		unsigned char input_data[] = { 0b00010010 };
 		int expected_id = 2;
 		int expected_type = 2;
 		int actual_id, actual_type;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos begin_streampos = test_istream.tellg();
 		decodeTag(test_istream, actual_id, actual_type);
@@ -127,12 +129,12 @@ namespace itmf {
 
 	TEST(ReadTest, DecodeTagTest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b10100000, 0b00000010};
+		unsigned char input_data[] = { 0b10100000, 0b00000010};
 		int expected_id = 1024;
 		int expected_type = 2;
 		int actual_id, actual_type;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos begin_streampos = test_istream.tellg();
 		decodeTag(test_istream, actual_id, actual_type);
@@ -146,12 +148,12 @@ namespace itmf {
 
 	TEST(ReadTest, DecodeTagTest3) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b10100000, 0b00000111};
+		unsigned char input_data[] = { 0b10100000, 0b00000111};
 		int expected_id = 1024;
 		int expected_type = 7;
 		int actual_id, actual_type;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos begin_streampos = test_istream.tellg();
 		decodeTag(test_istream, actual_id, actual_type);
@@ -165,12 +167,12 @@ namespace itmf {
 
 	TEST(ReadTest, DecodeTagTest4) {
 		std::stringstream test_istream;
-		char input_data[] = { 0 };
+		unsigned char input_data[] = { 0 };
 		int expected_id = 0;
 		int expected_type = 0;
 		int actual_id, actual_type;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos begin_streampos = test_istream.tellg();
 		decodeTag(test_istream, actual_id, actual_type);
@@ -184,12 +186,12 @@ namespace itmf {
 
 	TEST(ReadTest, PeekTagTest) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b10100000, 0b00000111};
+		unsigned char input_data[] = { 0b10100000, 0b00000111};
 		int expected_id = 1024;
 		int expected_type = 7;
 		int actual_id, actual_type;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		std::streampos expected_streampos = test_istream.tellg();
 		peekTag(test_istream, actual_id, actual_type);
@@ -202,10 +204,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLintTest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b00010000 };
+		unsigned char input_data[] = { 0b00010000 };
 		int expected_value = 16;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLint test_int;
 		test_int.parse(test_istream);
@@ -215,10 +217,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLintTest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b01010000 };
+		unsigned char input_data[] = { 0b01010000 };
 		int expected_value = -16;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLint test_int;
 		test_int.parse(test_istream);
@@ -228,10 +230,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLlongTest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b00010000 };
+		unsigned char input_data[] = { 0b00010000 };
 		long expected_value = 16;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLlong test_long;
 		test_long.parse(test_istream);
@@ -241,10 +243,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLlongTest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0b01010000 };
+		unsigned char input_data[] = { 0b01010000 };
 		long expected_value = -16;
 
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLlong test_long;
 		test_long.parse(test_istream);
@@ -254,10 +256,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x40 };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x40 };
 		float expected_value = 2.0f;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -267,10 +269,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0xC0 };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0xC0 };
 		float expected_value = -2.0f;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -280,10 +282,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest3) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0xc0, 0x40 };
+		unsigned char input_data[] = { 0x00, 0x00, 0xc0, 0x40 };
 		float expected_value = 6.0f;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -293,10 +295,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest4) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x80, 0x3e };
+		unsigned char input_data[] = { 0x00, 0x00, 0x80, 0x3e };
 		float expected_value = 0.25;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -306,9 +308,9 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest5) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0xc0, 0x7f };
+		unsigned char input_data[] = { 0x00, 0x00, 0xc0, 0x7f };
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -318,9 +320,9 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLsingleTest6) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x80, 0x7f };
+		unsigned char input_data[] = { 0x00, 0x00, 0x80, 0x7f };
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLsingle test_single;
 		test_single.parse(test_istream);
@@ -330,10 +332,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest1) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40 };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40 };
 		float expected_value = 2.0;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -343,10 +345,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest2) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0 };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0 };
 		float expected_value = -2.0;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -356,10 +358,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest3) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x40 };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x40 };
 		float expected_value = 6.0;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -369,10 +371,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest4) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd0, 0x3f };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd0, 0x3f };
 		float expected_value = 0.25;
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -382,9 +384,9 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest5) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0x7f };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0x7f };
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -394,9 +396,9 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLdoubleTest6) {
 		std::stringstream test_istream;
-		char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f };
+		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f };
 		
-		test_istream.write(input_data, sizeof(input_data));
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
 
 		BMLdouble test_double;
 		test_double.parse(test_istream);
@@ -406,10 +408,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLstringTest1) {
 		std::stringstream test_istream;
-		char length_vuie[] = { 0b00001111 };
+		unsigned char length_vuie[] = { 0b00001111 };
 		std::string text("Test BML String");
 
-		test_istream.write(length_vuie, sizeof(length_vuie));
+		test_istream.write(reinterpret_cast<char*>(length_vuie), sizeof(length_vuie));
 		test_istream.write(&text[0], text.size());
 
 		BMLstring test_string;
@@ -420,10 +422,10 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLstringTest2) {
 		std::stringstream test_istream;
-		char length_vuie[] = { 0b00010001 };
+		unsigned char length_vuie[] = { 0b00010001 };
 		std::string text("Test BML \0 String", 17);
 
-		test_istream.write(length_vuie, sizeof(length_vuie));
+		test_istream.write(reinterpret_cast<char*>(length_vuie), sizeof(length_vuie));
 		test_istream.write(&text[0], text.size());
 
 		BMLstring test_string;
@@ -434,11 +436,11 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLblobTest1) {
 		std::stringstream test_istream;
-		char length_vuie[] = { 0b00000001 };
-		char data[] = { 0b00010001 };
+		unsigned char length_vuie[] = { 0b00000001 };
+		unsigned char data[] = { 0b00010001 };
 
-		test_istream.write(length_vuie, sizeof(length_vuie));
-		test_istream.write(data, sizeof(data));
+		test_istream.write(reinterpret_cast<char*>(length_vuie), sizeof(length_vuie));
+		test_istream.write(reinterpret_cast<char*>(data), sizeof(data));
 
 		BMLblob test_blob;
 		test_blob.parse(test_istream);
@@ -453,33 +455,34 @@ namespace itmf {
 
 	TEST(ReadTest, ReadBMLblobTest2) {
 		std::stringstream test_istream;
-		char length_vuie[] = { 0b00000100 };
-		char data[] = { 0b11111111, 0b00000000, 0b11111111, 0b00000000 };
+		unsigned char length_vuie[] = { 0b00000100 };
+		unsigned char data[] = { 0b11111111, 0b00000000, 0b11111111, 0b00000000 };
 
-		test_istream.write(length_vuie, sizeof(length_vuie));
-		test_istream.write(data, sizeof(data));
+		test_istream.write(reinterpret_cast<char*>(length_vuie), sizeof(length_vuie));
+		test_istream.write(reinterpret_cast<char*>(data), sizeof(data));
 
 		BMLblob test_blob;
 		test_blob.parse(test_istream);
 
 		std::shared_ptr<char> result = test_blob.getValue();
 
+		char* expected_result = reinterpret_cast<char*>(data);
 		EXPECT_EQ(test_blob.length, sizeof(data));
 		for (size_t i = 0; i < sizeof(data); ++i) {
-			EXPECT_EQ(result.get()[i], data[i]) << "The parsed blob differs from the test data at index " << i;
+			EXPECT_EQ(result.get()[i], expected_result[i]) << "The parsed blob differs from the test data at index " << i;
 		}
 	}
 
 	TEST(ReadTest, ParseElementTest1) {
 		std::stringstream test_istream;
-		char tag[] = { 0b00001010 };
-		char int_data[] = { 0b00001111 };
+		unsigned char tag[] = { 0b00001010 };
+		unsigned char int_data[] = { 0b00001111 };
 		int expected_id = 1;
 		int expected_value = 15;
 		BMLint expected_int;
 
-		test_istream.write(tag, sizeof(tag));
-		test_istream.write(int_data, sizeof(int_data));
+		test_istream.write(reinterpret_cast<char*>(tag), sizeof(tag));
+		test_istream.write(reinterpret_cast<char*>(int_data), sizeof(int_data));
 
 		// The element should be successfully parsed, so ParseElement should return true
 		std::streampos start_position = test_istream.tellg();
@@ -495,14 +498,14 @@ namespace itmf {
 
 	TEST(ReadTest, ParseElementTest2) {
 		std::stringstream test_istream;
-		char tag[] = { 0b00001010 };
-		char int_data[] = { 0b00001111 };
+		unsigned char tag[] = { 0b00001010 };
+		unsigned char int_data[] = { 0b00001111 };
 		int expected_id = 2;
 		int expected_value = 15;
 		BMLint expected_int;
 
-		test_istream.write(tag, sizeof(tag));
-		test_istream.write(int_data, sizeof(int_data));
+		test_istream.write(reinterpret_cast<char*>(tag), sizeof(tag));
+		test_istream.write(reinterpret_cast<char*>(int_data), sizeof(int_data));
 
 		// Expected ID does not match, so ParseElement should evaluate to false
 		std::streampos start_position = test_istream.tellg();
@@ -516,14 +519,14 @@ namespace itmf {
 
 	TEST(ReadTest, ParseElementTest3) {
 		std::stringstream test_istream;
-		char tag[] = { 0b00001010 };
-		char long_data[] = { 0b00001111 };
+		unsigned char tag[] = { 0b00001010 };
+		unsigned char long_data[] = { 0b00001111 };
 		int expected_id = 1;
 		int expected_value = 15;
 		BMLlong expected_long;
 
-		test_istream.write(tag, sizeof(tag));
-		test_istream.write(long_data, sizeof(long_data));
+		test_istream.write(reinterpret_cast<char*>(tag), sizeof(tag));
+		test_istream.write(reinterpret_cast<char*>(long_data), sizeof(long_data));
 
 		// Expected a long but the tag is for an int, so ParseElement should evaluate to false
 		std::streampos start_position = test_istream.tellg();
