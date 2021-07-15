@@ -6,7 +6,9 @@
 #include "itmfenums.h"
 
 namespace itmf {
-// Encode tag tests
+
+	/* ENCODE TAG TESTS */
+	
 	TEST(EncodeTagTest, AllZeroTagTest) {
 		std::vector<char> actual_tag = encodeTag(0, 0);
 		std::vector<char> expected_tag = std::vector<char>({ 0x00 });
@@ -65,28 +67,28 @@ namespace itmf {
 		EXPECT_EQ(actual_tag[1], '\xA3');
 	}
 	
-// Encoding tests
+	/* ENCODING TESTS*/
 
 	// Int
-	TEST(EncodeTest, BMLIntEncodeTest1) {
+	TEST(EncodeTest, BMLintEncodeTest1) {
 		BMLint i(0, 1);
 		std::vector<char> i_encoded = i.encode();
 		EXPECT_EQ(i_encoded, std::vector<char>({ 0x02, 0x01 }));
 	}
 
-	TEST(EncodeTest, BMLIntEncodeTest2) {
+	TEST(EncodeTest, BMLintEncodeTest2) {
 		BMLint i(0, -1);
 		std::vector<char> i_encoded = i.encode();
 		EXPECT_EQ(i_encoded, std::vector<char>({ 0x02, 0x41 }));
 	}
 
-	TEST(EncodeTest, BMLIntEncodeTest3) {
+	TEST(EncodeTest, BMLintEncodeTest3) {
 		BMLint i(12, 63);
 		std::vector<char> i_encoded = i.encode();
 		EXPECT_EQ(i_encoded, std::vector<char>({ 0x62, 0x3F }));
 	}
 
-	TEST(EncodeTest, BMLIntEncodeTest4) {
+	TEST(EncodeTest, BMLintEncodeTest4) {
 		BMLint i(32, -64);
 		std::vector<char> i_encoded = i.encode();
 		size_t expected_length = 4;
@@ -98,7 +100,7 @@ namespace itmf {
 	}
 
 	// Long
-	TEST(EncodeTest, BMLLongEncodeTest1) {
+	TEST(EncodeTest, BMLlongEncodeTest1) {
 		BMLlong l(1, 100000000000);
 		std::vector<char> l_encoded = l.encode();
 		size_t expected_length = 7;
@@ -113,7 +115,7 @@ namespace itmf {
 	}
 
 	// Single
-	TEST(EncodeTest, BMLSingleEncodeTest1) {
+	TEST(EncodeTest, BMLsingleEncodeTest1) {
 		BMLsingle s(1, 0.1f);
 		std::vector<char> s_encoded = s.encode();
 		size_t expected_length = 5;
@@ -125,7 +127,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded[4], '\x3D');
 	}
 
-	TEST(EncodeTest, BMLSingleEncodeTest2) {
+	TEST(EncodeTest, BMLsingleEncodeTest2) {
 		BMLsingle s(10, -0.1f);
 		std::vector<char> s_encoded = s.encode();
 		size_t expected_length = 5;
@@ -137,7 +139,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded[4], '\xBD');
 	}
 
-	TEST(EncodeTest, BMLSingleEncodeTest3) {
+	TEST(EncodeTest, BMLsingleEncodeTest3) {
 		BMLsingle s(3, 123.456f);
 		std::vector<char> s_encoded = s.encode();
 		size_t expected_length = 5;
@@ -149,7 +151,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded[4], '\x42');
 	}
 
-	TEST(EncodeTest, BMLSingleEncodeMaxTest) {
+	TEST(EncodeTest, BMLsingleEncodeMaxTest) {
 		BMLsingle s(3, FLT_MAX);
 		std::vector<char> s_encoded = s.encode();
 		size_t expected_length = 5;
@@ -161,7 +163,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded[4], '\x7F');
 	}
 
-	TEST(EncodeTest, BMLSingleEncodeMinTest) {
+	TEST(EncodeTest, BMLsingleEncodeMinTest) {
 		BMLsingle s(3, -FLT_MIN);
 		std::vector<char> s_encoded = s.encode();
 		size_t expected_length = 5;
@@ -174,9 +176,9 @@ namespace itmf {
 	}
 
 	// Double
-	TEST(EncodeTest, BMLDoubleEncodeTest1) {
+	TEST(EncodeTest, BMLdoubleEncodeTest1) {
 		BMLdouble d(6, 5.0e50);
-		std::vector<char> d_encoded = d.encode(); // 4A7561D276DDFDC0
+		std::vector<char> d_encoded = d.encode();
 		size_t expected_length = 9;
 		EXPECT_EQ(d_encoded.size(), expected_length);
 		EXPECT_EQ(d_encoded[0], '\x35');
@@ -190,7 +192,7 @@ namespace itmf {
 		EXPECT_EQ(d_encoded[8], '\x4A');
 	}
 
-	TEST(EncodeTest, BMLDoubleEncodeMaxTest) {
+	TEST(EncodeTest, BMLdoubleEncodeMaxTest) {
 		BMLdouble d(4, DBL_MAX);
 		std::vector<char> d_encoded = d.encode();
 		size_t expected_length = 9;
@@ -206,7 +208,7 @@ namespace itmf {
 		EXPECT_EQ(d_encoded[8], '\x7F');
 	}
 
-	TEST(EncodeTest, BMLDoubleEncodeMinTest) {
+	TEST(EncodeTest, BMLdoubleEncodeMinTest) {
 		BMLdouble d(1, -DBL_MIN);
 		std::vector<char> d_encoded = d.encode();
 		size_t expected_length = 9;
@@ -223,7 +225,7 @@ namespace itmf {
 	}
 
 	// String
-	TEST(EncodeTest, BMLStringEmptyTest) {
+	TEST(EncodeTest, BMLstringEmptyTest) {
 		std::string text("");
 		BMLstring s(3, text);
 		std::vector<char> s_encoded = s.encode();
@@ -233,7 +235,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded, expected_encode);
 	}
 
-	TEST(EncodeTest, BMLStringTest1) {
+	TEST(EncodeTest, BMLstringTest1) {
 		std::string text("Test BML String");
 		BMLstring s(3, text);
 		std::vector<char> s_encoded = s.encode();
@@ -243,7 +245,7 @@ namespace itmf {
 		EXPECT_EQ(s_encoded, expected_encode);
 	}
 
-	TEST(EncodeTest, BMLStringTest2) {
+	TEST(EncodeTest, BMLstringTest2) {
 		std::string text("Test BML \0 String", 17);
 		BMLstring s(3, text);
 		std::vector<char> s_encoded = s.encode();
@@ -254,7 +256,7 @@ namespace itmf {
 	}
 
 	// Blob
-	TEST(EncodeTest, BMLBlobEmptyTest) {
+	TEST(EncodeTest, BMLblobEmptyTest) {
 		BMLblob b;
 		std::vector<char> b_encoded = b.encode();
 		size_t expected_length = 2;
@@ -263,7 +265,7 @@ namespace itmf {
 		EXPECT_EQ(b_encoded[1], 0x00);
 	}
 	
-	TEST(EncodeTest, BMLBlobEncodeTest1) {
+	TEST(EncodeTest, BMLblobEncodeTest1) {
 		char* blob = new char[6];
 		strcpy(blob, "hello");
 		std::shared_ptr<char> actual_blob(blob, std::default_delete<char[]>());
@@ -276,7 +278,7 @@ namespace itmf {
 	}
 	
 	// Object (open and close tags)
-	TEST(EncodeTest, BMLObjectOpenCloseTagTest1) {
+	TEST(EncodeTest, BMLobjectOpenCloseTagTest1) {
 		BMLobject o(1);
 		std::vector<char> opentag = o.encodeOpenTag();
 		std::vector<char> closetag = o.encodeCloseTag();
@@ -286,8 +288,10 @@ namespace itmf {
 		EXPECT_EQ(closetag, expected_closetag);
 	}
 
-// Writing tests
-	TEST(WriteTest, BMLIntWriteTest1) {
+	/* WRITING TESTS */
+
+	// Int
+	TEST(WriteTest, BMLintWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x02, 0x01 };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -298,7 +302,8 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLLongWriteTest1) {
+	// Long
+	TEST(WriteTest, BMLlongWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x0B, 0xF8, 0x17, 0x48, 0x76, 0xE8, 0x00 };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -310,7 +315,8 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLSingleWriteTest1) {
+	// Single
+	TEST(WriteTest, BMLsingleWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x0C, 0xCD, 0xCC, 0xCC, 0x3D };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -322,7 +328,8 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLDoubleWriteTest1) {
+	// Double
+	TEST(WriteTest, BMLdoubleWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x35, 0xC0, 0xFD, 0xDD, 0x76, 0xD2, 0x61, 0x75, 0x4A };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -334,7 +341,8 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLStringWriteTest1) {
+	// String
+	TEST(WriteTest, BMLstringWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x1E, 0x0F, 'T', 'e', 's', 't', ' ', 'B', 'M', 'L', ' ', 'S', 't', 'r', 'i', 'n', 'g' };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -347,7 +355,7 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLStringWriteTest2) {
+	TEST(WriteTest, BMLstringWriteTest2) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x1E, 0x11, 'T', 'e', 's', 't', ' ', 'B', 'M', 'L', ' ', '\0', ' ', 'S', 't', 'r', 'i', 'n', 'g' };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -360,7 +368,8 @@ namespace itmf {
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
 
-	TEST(WriteTest, BMLBlobWriteTest1) {
+	// Blob
+	TEST(WriteTest, BMLblobWriteTest1) {
 		std::stringstream expected_ostream;
 		unsigned char output_data[] = { 0x1F, 0x06, 'h', 'e', 'l', 'l', 'o', '\0' };
 		expected_ostream.write(reinterpret_cast<char*>(output_data), sizeof(output_data));
@@ -374,8 +383,10 @@ namespace itmf {
 		b.save(test_ostream);
 		EXPECT_EQ(test_ostream.str(), expected_ostream.str());
 	}
+	
+	/* READING TESTS */
 
-// Reading tests
+	// VUIE
 	TEST(ReadTest, ReadVUIETest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0x3f };
@@ -428,6 +439,7 @@ namespace itmf {
 		EXPECT_EQ(result.to_uint64(), expected_value);
 	}
 
+	// VSIE
 	TEST(ReadTest, ReadVSIETest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0x3f };
@@ -476,7 +488,7 @@ namespace itmf {
 		EXPECT_EQ(result.to_int64(), expected_value);
 	}
 
-// Decoding tests
+	/* DECODING TAG TESTS */
 
 	TEST(ReadTest, DecodeTagTest1) {
 		std::stringstream test_istream;
@@ -554,6 +566,8 @@ namespace itmf {
 		EXPECT_EQ(stream_offset, sizeof(input_data));
 	}
 
+	/* PEEKING TAG TESTS */
+	
 	TEST(ReadTest, PeekTagTest) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0b10100000, 0b00000111 };
@@ -572,6 +586,9 @@ namespace itmf {
 		EXPECT_EQ(actual_streampos, expected_streampos);
 	}
 
+	/* READING TESTS */
+
+	// Int
 	TEST(ReadTest, ReadBMLintTest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0b00010000 };
@@ -598,6 +615,7 @@ namespace itmf {
 		EXPECT_EQ(test_int.getValue(), expected_value);
 	}
 
+	// Long
 	TEST(ReadTest, ReadBMLlongTest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0b00010000 };
@@ -624,6 +642,7 @@ namespace itmf {
 		EXPECT_EQ(test_long.getValue(), expected_value);
 	}
 
+	// Single
 	TEST(ReadTest, ReadBMLsingleTest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x40 };
@@ -700,6 +719,7 @@ namespace itmf {
 		EXPECT_TRUE(std::isinf(test_single.getValue()));
 	}
 
+	// Double
 	TEST(ReadTest, ReadBMLdoubleTest1) {
 		std::stringstream test_istream;
 		unsigned char input_data[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40 };
@@ -776,6 +796,7 @@ namespace itmf {
 		EXPECT_TRUE(std::isinf(test_double.getValue()));
 	}
 
+	// String
 	TEST(ReadTest, ReadBMLstringTest1) {
 		std::stringstream test_istream;
 		unsigned char length_vuie[] = { 0b00001111 };
@@ -804,6 +825,7 @@ namespace itmf {
 		EXPECT_EQ(test_string.getValue(), text);
 	}
 
+	// Blob
 	TEST(ReadTest, ReadBMLblobTest1) {
 		std::stringstream test_istream;
 		unsigned char length_vuie[] = { 0b00000001 };
@@ -842,6 +864,8 @@ namespace itmf {
 			EXPECT_EQ(result.get()[i], expected_result[i]) << "The parsed blob differs from the test data at index " << i;
 		}
 	}
+
+	/* PARSE ELEMENT TESTS */
 
 	TEST(ReadTest, ParseElementTest1) {
 		std::stringstream test_istream;
@@ -908,7 +932,8 @@ namespace itmf {
 		EXPECT_EQ(stream_offset, 0);
 	}
 
-// Constructor tests
+	/* CONSTRUCTOR TESTS */
+
 	TEST(ConstructorTest, ConstructBMLint1) {
 		int expected_id = 1;
 		int32_t expected_value = 10000;
@@ -967,7 +992,8 @@ namespace itmf {
 		EXPECT_EQ(test_blob.getValue(), expected_data);
 	}
 
-// Operator tests
+	/* OPERATOR TESTS */
+
 	TEST(OperatorTest, BMLIntAdditionTest1) {
 		BMLint i(1, 0);
 		i += 5;
@@ -1011,7 +1037,8 @@ namespace itmf {
 		EXPECT_EQ(l.getValue(), expected_value);
 	}
 
-// Other tests
+	/* OTHER TESTS */
+
 	TEST(OtherTest, CountLeadingOnesTest1) {
 		unsigned char byte = 0b01010101;
 		EXPECT_EQ(countLeadingOnes(byte), 0);
