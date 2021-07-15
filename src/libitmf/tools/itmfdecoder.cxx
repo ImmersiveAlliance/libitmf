@@ -8,6 +8,12 @@ void PrintUsage() {
 int main(int argc, char** argv) {
 	std::string filelocation;
 	std::string destination;
+
+	if (argc <= 1) {
+		PrintUsage();
+
+		return 0;
+	}
 	
 	for (int i = 0; i < argc; i++) {
 		if (!strcmp("-h", argv[i])) {
