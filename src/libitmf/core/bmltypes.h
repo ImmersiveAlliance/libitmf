@@ -76,6 +76,7 @@ public:
 	BMLint& operator+=(const int32_t& rhs) {
 		this->value += rhs;
 
+		// TODO: Fix overflow if it goes above INT32_MAX
 		return *this;
 	}
 
