@@ -41,3 +41,4 @@ macro(itmf_add_test FILENAME TEST_SRC)
 endmacro()
 
 itmf_add_test(bmlbitutilstests bmlbitutilstests.cc)
+itmf_add_test(bmltypestests bmltypestests.cc)

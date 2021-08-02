@@ -3,6 +3,21 @@
 // TODO - function comments
 
 namespace itmf {
+	// Uses Sean Eron Anderson's "obvious" way to compute lg(in)
+	// TODO: Replace this expensive solution with calls to __builtin_clz and equivalents
+	unsigned char countLeadingOnes(unsigned char byte) {
+		unsigned char nb = ~byte;
+		unsigned char log_nb = 0; 
+
+		if (nb == 0) return 8;
+ 
+		while (nb >>= 1)
+		  log_nb++;
+ 
+		unsigned char num_bits = (sizeof nb) * 8;
+		return (num_bits) - (log_nb + 1);
+	}
+
 	/**
 		Takes in an integer and creates the BMLBitVector with the byte length indicator
 		bits per the specification.
@@ -144,6 +159,67 @@ namespace itmf {
 			A new BMLBitVector containing the resulting bit vector of the same length of the bit vectors
 			under going |.
 	*/
+	BMLBitVector BMLBitVector::readVUIE(std::istream& infile)
+	{
+		char length_byte;
+		infile.read(&length_byte, 1);
+		unsigned char leading_ones = countLeadingOnes(length_byte);
+
+		std::vector<bool> bitvector;
+
+		// Read in remaining bits from the length byte
+		if (leading_ones < 7)
+			for (signed char i = (7 - leading_ones); i >= 0; --i)
+				bitvector.push_back((length_byte >> i) & 1);
+
+		// Read in bits from all remaining bytes
+		for (size_t i = 0; i < leading_ones; ++i) {
+			char byte;
+			infile.read(&byte, 1);
+			for (signed char j = 7; j >= 0; --j)
+				bitvector.push_back((byte >> j) & 1);
+		}
+
+		bool is_negative = false;
+		return BMLBitVector(bitvector, Encoding::VUIE, is_negative);
+	}
+
+	BMLBitVector BMLBitVector::readVSIE(std::istream& infile)
+	{
+		char length_byte;
+		infile.read(&length_byte, 1);
+		unsigned char leading_ones = countLeadingOnes(length_byte);
+
+		bool is_negative = false;
+
+		std::vector<bool> bitvector;
+		// Determine sign and add the remaining bits in this byte to the bitvector
+		if (leading_ones < 7) {
+			unsigned char sign_position = (8 - (leading_ones + 2));
+			is_negative = (length_byte >> sign_position) & 1;
+			for (signed char i = sign_position-1; i >= 0; --i)
+				bitvector.push_back((length_byte >> i) & 1);
+		}
+		else if (leading_ones == 8) {
+			is_negative = true;
+		}
+		else if (leading_ones == 7) {
+			is_negative = false;
+			leading_ones = 8;
+		}
+
+
+		// Read in bits from all remaining bytes
+		for (size_t i = 0; i < leading_ones; ++i) {
+			char byte;
+			infile.read(&byte, 1);
+			for (signed char j = 7; j >= 0; --j)
+				bitvector.push_back((byte >> j) & 1);
+		}
+
+		return BMLBitVector(bitvector, Encoding::VSIE, is_negative);
+	}
+
 	BMLBitVector BMLBitVector::operator|(BMLBitVector& rhs) {
 		std::vector<bool> result;
 
@@ -403,7 +479,7 @@ namespace itmf {
 		}
 
 		if (is_negative)
-			r * -1;
+			r *= -1;
 
 		return r;
 	}

@@ -83,6 +83,109 @@ namespace itmf {
 		EXPECT_EQ(b.getBitVector(), std::vector<bool>({ 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1 }));
 	}
 
+	// VUIE Read Tests
+	TEST(ReadTest, ReadVUIETest1) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0x3f };
+		uint64_t expected_value = 63;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		std::streampos begin_streampos = test_istream.tellg();
+		BMLBitVector result = BMLBitVector::readVUIE(test_istream);
+		std::streampos end_streampos = test_istream.tellg();
+
+		EXPECT_EQ(result.to_uint64(), expected_value);
+		std::streamoff stream_offset = end_streampos - begin_streampos;
+		EXPECT_EQ(stream_offset, sizeof(input_data));
+	}
+
+	TEST(ReadTest, ReadVUIETest2) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0x40 };
+		uint64_t expected_value = 64;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVUIE(test_istream);
+
+		EXPECT_EQ(result.to_uint64(), expected_value);
+	}
+
+	TEST(ReadTest, ReadVUIETest3) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0x82, 0x19 };
+		uint64_t expected_value = 537;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVUIE(test_istream);
+
+		EXPECT_EQ(result.to_uint64(), expected_value);
+	}
+
+	TEST(ReadTest, ReadVUIETest4) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0xc1, 0x86, 0xa0 };
+		uint64_t expected_value = 100000;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVUIE(test_istream);
+
+		EXPECT_EQ(result.to_uint64(), expected_value);
+	}
+
+	// VSIE Read Tests
+	TEST(ReadTest, ReadVSIETest1) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0x3f };
+		int64_t expected_value = 63;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVSIE(test_istream);
+
+		EXPECT_EQ(result.to_int64(), expected_value);
+	}
+
+	TEST(ReadTest, ReadVSIETest2) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0xa0, 0x40 };
+		int64_t expected_value = -64;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVSIE(test_istream);
+
+		EXPECT_EQ(result.to_int64(), expected_value);
+	}
+
+	TEST(ReadTest, ReadVSIETest3) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0x82, 0x19 };
+		int64_t expected_value = 537;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVSIE(test_istream);
+
+		EXPECT_EQ(result.to_int64(), expected_value);
+	}
+
+	TEST(ReadTest, ReadVSIETest4) {
+		std::stringstream test_istream;
+		unsigned char input_data[] = { 0xd1, 0x86, 0xa0 };
+		int64_t expected_value = -100000;
+
+		test_istream.write(reinterpret_cast<char*>(input_data), sizeof(input_data));
+
+		BMLBitVector result = BMLBitVector::readVSIE(test_istream);
+
+		EXPECT_EQ(result.to_int64(), expected_value);
+	}
+
+
 	/* BIT OPERATION TESTS */
 
 	// Left shift tests

@@ -8,6 +8,7 @@ namespace itmf {
 	// global functions
 
 	std::vector<char> encodeTag(int id, int type_id) {
+		// TODO: Ensure that the id is not larger than 6 or negative
 		BMLBitVector tag(id);
 		tag = tag << 3;
 		BMLBitVector typeBitVector(type_id);
@@ -19,7 +20,7 @@ namespace itmf {
 	// This function will need to be rewritten
 	void decodeTag(std::istream& infile, int& id, int& type_id) {
 		BMLBitVector type_as_vector;
-		BMLBitVector tag = readVUIE(infile);
+		BMLBitVector tag = BMLBitVector::readVUIE(infile);
 		id = tag.to_int32() >> 3;
 		BMLBitVector type_mask(0b111, Encoding::VUIE);
 		type_as_vector = tag & type_mask;
@@ -30,81 +31,6 @@ namespace itmf {
 		std::streampos startpos = infile.tellg();
 		decodeTag(infile, id, type_id); 
 		infile.seekg(startpos);
-	}
-
-	// aka count_leading_zeros
-	// Uses Sean Eron Anderson's "obvious" way to compute lg(in)
-	// TODO: Replace this expensive solution with calls to __builtin_clz and equivalents
-	unsigned char countLeadingOnes(unsigned char byte) {
-		unsigned char nb = ~byte;
-		unsigned char log_nb = 0; 
-
-		if (nb == 0) return 8;
- 
-		while (nb >>= 1)
-		  log_nb++;
- 
-		unsigned char num_bits = (sizeof nb) * 8;
-		return (num_bits) - (log_nb + 1);
-	}
-
-	BMLBitVector readVUIE(std::istream& infile) {
-		char length_byte;
-		infile.read(&length_byte, 1);
-		unsigned char leading_ones = countLeadingOnes(length_byte);
-
-		std::vector<bool> bitvector;
-
-		// Read in remaining bits from the length byte
-		if (leading_ones < 7)
-			for (signed char i = (7 - leading_ones); i >= 0; --i)
-				bitvector.push_back((length_byte >> i) & 1);
-
-		// Read in bits from all remaining bytes
-		for (size_t i = 0; i < leading_ones; ++i) {
-			char byte;
-			infile.read(&byte, 1);
-			for (signed char j = 7; j >= 0; --j)
-				bitvector.push_back((byte >> j) & 1);
-		}
-
-		bool is_negative = false;
-		return BMLBitVector(bitvector, Encoding::VUIE, is_negative);
-	}
-
-	BMLBitVector readVSIE(std::istream& infile) {
-		char length_byte;
-		infile.read(&length_byte, 1);
-		unsigned char leading_ones = countLeadingOnes(length_byte);
-
-		bool is_negative = false;
-
-		std::vector<bool> bitvector;
-		// Determine sign and add the remaining bits in this byte to the bitvector
-		if (leading_ones < 7) {
-			unsigned char sign_position = (8 - (leading_ones + 2));
-			is_negative = (length_byte >> sign_position) & 1;
-			for (signed char i = sign_position-1; i >= 0; --i)
-				bitvector.push_back((length_byte >> i) & 1);
-		}
-		else if (leading_ones == 8) {
-			is_negative = true;
-		}
-		else if (leading_ones == 7) {
-			is_negative = false;
-			leading_ones = 8;
-		}
-
-
-		// Read in bits from all remaining bytes
-		for (size_t i = 0; i < leading_ones; ++i) {
-			char byte;
-			infile.read(&byte, 1);
-			for (signed char j = 7; j >= 0; --j)
-				bitvector.push_back((byte >> j) & 1);
-		}
-
-		return BMLBitVector(bitvector, Encoding::VSIE, is_negative);
 	}
 
 	bool ParseElement(std::istream& infile, int expected_id, BMLtype& output) {
@@ -133,7 +59,7 @@ namespace itmf {
 	}
 
 	void BMLint::parse(std::istream& infile) {
-		BMLBitVector parsed_value = readVSIE(infile);
+		BMLBitVector parsed_value = BMLBitVector::readVSIE(infile);
 		this->value = parsed_value.to_int32();
 	}
 
@@ -145,7 +71,7 @@ namespace itmf {
 	}
 
 	void BMLlong::parse(std::istream& infile) {
-		BMLBitVector parsed_value = readVSIE(infile);
+		BMLBitVector parsed_value = BMLBitVector::readVSIE(infile);
 		this->value = parsed_value.to_int64();
 	}
 
@@ -154,10 +80,10 @@ namespace itmf {
 		std::vector<char> encoded_value;
 		uint32_t bits = 0;
 		memcpy(&bits, &value, sizeof value);
-		encoded_value.push_back((bits) * 0xFF);
-		encoded_value.push_back((bits >> 8) * 0xFF);
-		encoded_value.push_back((bits >> 16) * 0xFF);
-		encoded_value.push_back((bits >> 24) * 0xFF);
+		encoded_value.push_back((bits) & 0xFF);
+		encoded_value.push_back((bits >> 8) & 0xFF);
+		encoded_value.push_back((bits >> 16) & 0xFF);
+		encoded_value.push_back((bits >> 24) & 0xFF);
 
 		return encoded_value;
 	}
@@ -173,14 +99,14 @@ namespace itmf {
 		std::vector<char> encoded_value;
 		uint64_t bits = 0;
 		memcpy(&bits, &value, sizeof value);
-		encoded_value.push_back((bits) * 0xFF);
-		encoded_value.push_back((bits >> 8) * 0xFF);
-		encoded_value.push_back((bits >> 16) * 0xFF);
-		encoded_value.push_back((bits >> 24) * 0xFF);
-		encoded_value.push_back((bits >> 32) * 0xFF);
-		encoded_value.push_back((bits >> 40) * 0xFF);
-		encoded_value.push_back((bits >> 48) * 0xFF);
-		encoded_value.push_back((bits >> 56) * 0xFF);
+		encoded_value.push_back((bits) & 0xFF);
+		encoded_value.push_back((bits >> 8) & 0xFF);
+		encoded_value.push_back((bits >> 16) & 0xFF);
+		encoded_value.push_back((bits >> 24) & 0xFF);
+		encoded_value.push_back((bits >> 32) & 0xFF);
+		encoded_value.push_back((bits >> 40) & 0xFF);
+		encoded_value.push_back((bits >> 48) & 0xFF);
+		encoded_value.push_back((bits >> 56) & 0xFF);
 
 		return encoded_value;
 	}
@@ -223,7 +149,7 @@ namespace itmf {
 	}
 
 	void BMLstring::parse(std::istream& infile) {
-		uint64_t str_length = readVUIE(infile).to_uint64();
+		uint64_t str_length = BMLBitVector::readVUIE(infile).to_uint64();
 		std::string parsed_string(str_length, ' ');
 		infile.read(&parsed_string[0], str_length);
 		this->value = parsed_string;
@@ -251,7 +177,7 @@ namespace itmf {
 	}
 
 	void BMLblob::parse(std::istream& infile) {
-		this->length = readVUIE(infile).to_uint64();
+		this->length = BMLBitVector::readVUIE(infile).to_uint64();
 		this->value.reset(new char[this->length], std::default_delete<char[]>());
 		infile.read(value.get(), this->length);
 	}

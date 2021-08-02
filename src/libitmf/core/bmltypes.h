@@ -13,12 +13,6 @@ namespace itmf {
 	void decodeTag(std::istream& infile, int& id, int& type_id);
 	void peekTag(std::istream& infile, int& id, int& type_id);
 
-	unsigned char countLeadingOnes(unsigned char byte);
-
-	BMLBitVector readVUIE(std::istream& infile);
-	BMLBitVector readVSIE(std::istream& infile);
-
-
 class BMLtype {
 public:
 	BMLtype() : id(), type_id() { }
@@ -76,6 +70,7 @@ public:
 	BMLint& operator+=(const int32_t& rhs) {
 		this->value += rhs;
 
+		// TODO: Fix overflow if it goes above INT32_MAX
 		return *this;
 	}
 

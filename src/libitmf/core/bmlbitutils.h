@@ -20,6 +20,8 @@ namespace itmf {
 		VSIE
 	};
 
+	unsigned char countLeadingOnes(unsigned char byte);
+
 	// Cases where the BMLBitVector will be used per spec:
 	/*
 	> Decoding/encoding tags - id + type
@@ -47,6 +49,9 @@ namespace itmf {
 			bv.is_negative = is_neg;
 			return bv;
 		}
+	    static BMLBitVector readVUIE(std::istream& infile);
+	    static BMLBitVector readVSIE(std::istream& infile);
+
 
 		// Operators
 		BMLBitVector operator|(BMLBitVector& rhs);
