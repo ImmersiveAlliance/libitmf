@@ -1,4 +1,4 @@
-# libitmf
+<p align="center"><img src="docs/figures/libitmf-github-logo.png" width="200"/></p>
 
 [![Build Status](https://github.com/ImmersiveAlliance/libitmf/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ImmersiveAlliance/libitmf/actions/workflows/ci.yml)
 
