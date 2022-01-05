@@ -40,7 +40,8 @@ endif(ITMF_TESTS)
 # Subdirectories
 
 
-add_subdirectory("${itmf_src_root}/core")
+add_subdirectory("${itmf_src_root}/container")
+add_subdirectory("${itmf_src_root}/scene_graph")
 add_subdirectory("${itmf_src_root}/tools")
 if(EMSCRIPTEN)
 	add_subdirectory("${itmf_src_root}/javascript/emscripten")

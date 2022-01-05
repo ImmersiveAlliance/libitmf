@@ -31,14 +31,22 @@ endif()
 
 include(GoogleTest)
 
-macro(itmf_add_test FILENAME TEST_SRC)
+macro(itmf_add_container_test FILENAME TEST_SRC)
     # create an exectuable in which the tests will be stored
     add_executable(${FILENAME} ${TEST_SRC})
     # link the Google test infrastructure, mocking library, and a default main fuction to
     # the test executable.  Remove g_test_main if writing your own main function.
     gtest_discover_tests(${FILENAME})
-    target_link_libraries(${FILENAME} PUBLIC itmfcore gtest gmock gtest_main)
+    target_link_libraries(${FILENAME} PUBLIC itmfcontainer gtest gmock gtest_main)
 endmacro()
 
-itmf_add_test(bmlbitutilstests bmlbitutilstests.cc)
-itmf_add_test(bmltypestests bmltypestests.cc)
+macro(itmf_add_scenegraph_test FILENAME TEST_SRC)
+    # create an exectuable in which the tests will be stored
+    add_executable(${FILENAME} ${TEST_SRC})
+    # link the Google test infrastructure, mocking library, and a default main fuction to
+    # the test executable.  Remove g_test_main if writing your own main function.
+    gtest_discover_tests(${FILENAME})
+    target_link_libraries(${FILENAME} PUBLIC itmfscenegraph gtest gmock gtest_main)
+endmacro()
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/container")

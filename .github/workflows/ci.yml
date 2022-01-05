@@ -4,6 +4,8 @@ on:
     push:
         paths-ignore:
             - '**.md'
+        branches-ignore:
+            - 'scene-graph'
     pull_request:
         paths-ignore:
             - '**.md'

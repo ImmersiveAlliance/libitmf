@@ -13,11 +13,11 @@ set(itmflib_SRCS
 	itmffile.cxx
 	)
 
-include_directories("${itmflib_src_root}/core")
+include_directories("${itmflib_src_root}/container")
 
-add_library(itmfcore STATIC ${itmflib_SRCS} ${bmllib_SRCS} defines.h)
+add_library(itmfcontainer STATIC ${itmflib_SRCS} ${bmllib_SRCS} defines.h)
 
-target_include_directories(itmfcore PUBLIC
+target_include_directories(itmfcontainer PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}	
 )
 

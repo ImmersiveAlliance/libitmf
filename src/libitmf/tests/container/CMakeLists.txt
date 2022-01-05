@@ -1,0 +1,2 @@
+itmf_add_container_test(bmlbitutilstests bmlbitutilstests.cc)
+itmf_add_container_test(bmltypestests bmltypestests.cc)
