@@ -105,7 +105,7 @@ namespace scene {
 						 typename std::conditional<ATYPE == AT_LONG2, Long2,
 						 Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
 
-			Type data;
+			const Type data;
 
 		public:
 			TypedAttribute(Type in_data) : data(in_data), Attribute(ATYPE) { }
