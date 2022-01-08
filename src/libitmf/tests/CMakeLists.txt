@@ -50,3 +50,4 @@ macro(itmf_add_scenegraph_test FILENAME TEST_SRC)
 endmacro()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/container")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/scene_graph")

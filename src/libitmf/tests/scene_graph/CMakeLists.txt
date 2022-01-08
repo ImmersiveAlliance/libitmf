@@ -1,0 +1,1 @@
+itmf_add_scenegraph_test(elementstests elementstests.cc)
