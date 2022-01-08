@@ -21,6 +21,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/pugixml-src
 set(scenegraph_SRCS
 	elements.h
 	elements.cxx
+	enums.h
 	)
 
 include_directories("${itmflib_src_root}/scene_graph")
