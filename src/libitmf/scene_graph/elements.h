@@ -45,7 +45,7 @@ namespace scene {
 	class Item {
 		private:
 			std::string name;
-			std::unordered_map<AttributeId, std::vector<AttributePtr> > attributes;
+			std::unordered_map<AttributeId, AttributePtr> attributes;
 		public:
 	};
 
@@ -57,21 +57,24 @@ namespace scene {
 		public:
 	};
 
-	class Node : public Item {
-		private:
-			std::vector<Pin> pins;
-			NodeType type;
-		public:
-	};
-
 	class Pin {
 		private:
 			// TODO: Verify
-			PinId id;
+			//PinId id;
 			NodePinType type;
 			NodePtr node;
 	};
 
+	class Node : public Item {
+		private:
+			//std::vector<Pin> pins;
+			std::unordered_map<PinId, Pin> pins;
+			NodeType type;
+		public:
+	};
+
+
+	// TODO: it's an interface, preface it with I
 	class Attribute {
 		protected:
 			Attribute(AttributeType t) : type(t) { }
@@ -107,13 +110,12 @@ namespace scene {
 			}
 
 			inline virtual boost::any getData() const = 0;
-			inline virtual boost::any getDataArray() const = 0;
+			//inline virtual boost::any getDataArray() const = 0;
 
 			virtual boost::any getDataAtTime(float time) const = 0;
-			virtual boost::any getDataArrayAtTime(float time) const = 0;
+			//virtual boost::any getDataArrayAtTime(float time) const = 0;
 	};
 
-	//template <AttributeType ATYPE>
 	template <class T>
 	class Animator {
 		private:
@@ -131,10 +133,11 @@ namespace scene {
 			boost::optional<T> getValueAtTime(const float time) const { return boost::none; }
 	};
 
-	template <AttributeType ATYPE>
+	// TODO array enum
+	template <AttributeType ATYPE, bool IS_ARRAY = false>
 	class TypedAttribute : public Attribute {
 		private:
-			using Type = typename std::conditional<ATYPE == AT_UNKNOWN, Attribute::Unknown,
+			using DataType = typename std::conditional<ATYPE == AT_UNKNOWN, Attribute::Unknown,
 						 typename std::conditional<ATYPE == AT_BOOL, Attribute::Bool,
 						 typename std::conditional<ATYPE == AT_INT, Attribute::Int,
 						 typename std::conditional<ATYPE == AT_INT2, Attribute::Int2,
@@ -151,32 +154,60 @@ namespace scene {
 						 typename std::conditional<ATYPE == AT_LONG, Attribute::Long,
 						 typename std::conditional<ATYPE == AT_LONG2, Attribute::Long2,
 						 Attribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
-			const std::vector<Type> data;
+			using Type = typename std::conditional<IS_ARRAY, std::vector<DataType>, DataType>::type;
+			//const std::vector<Type> data;
+			const Type data;
 
-			boost::optional<Animator<std::vector<Type>>> animator;
+			//boost::optional<Animator<std::vector<Type>>> animator;
+			boost::optional<Animator<Type>> animator;
 
 		public:
-			TypedAttribute(const Type in_data) : data(1, in_data), Attribute(ATYPE) { }
-			TypedAttribute(const std::vector<Type> in_data) : data(in_data), Attribute(ATYPE) { }
+			TypedAttribute(const Type in_data) : data(in_data), Attribute(ATYPE) { }
+			//TypedAttribute(const std::vector<Type> in_data) : data(in_data), Attribute(ATYPE) { }
 
-			inline Type getTypedData() const { return data[0]; }
-			inline std::vector<Type> getTypedDataArray() const { return data; }
+			//inline Type getTypedData() const { return data[0]; }
+			//inline std::vector<Type> getTypedDataArray() const { return data; }
+
+			//inline boost::any getData() const { return getTypedData(); }
+			//inline boost::any getDataArray() const { return getTypedDataArray(); }
+
+			//inline boost::any getDataAtTime(const float time) const { return getTypedDataAtTime(time); }
+			//inline boost::any getDataArrayAtTime(const float time) const { return getTypedDataArrayAtTime(time); }
+
+			//inline Type getTypedDataAtTime(const float time) const { return getTypedDataArrayAtTime(time)[0]; };
+			//// REVIEW: To separate the implementation, we might consider doing something like this:
+			////         https://stackoverflow.com/a/8662580
+			//std::vector<Type> getTypedDataArrayAtTime(float time) const {
+			//	boost::optional<std::vector<Type>> result = boost::none;
+			//	if (animator.is_initialized())
+			//		result = animator->getValueAtTime(time);
+			//	return result.get_value_or(this->getTypedDataArray());
+			//}
+
+			inline Type getTypedData() const { return data; }
+			//inline std::vector<Type> getTypedDataArray() const { return data; }
 
 			inline boost::any getData() const { return getTypedData(); }
-			inline boost::any getDataArray() const { return getTypedDataArray(); }
+			//inline boost::any getDataArray() const { return getTypedDataArray(); }
 
 			inline boost::any getDataAtTime(const float time) const { return getTypedDataAtTime(time); }
-			inline boost::any getDataArrayAtTime(const float time) const { return getTypedDataArrayAtTime(time); }
+			//inline boost::any getDataArrayAtTime(const float time) const { return getTypedDataArrayAtTime(time); }
 
-			inline Type getTypedDataAtTime(const float time) const { return getTypedDataArrayAtTime(time)[0]; };
-			// REVIEW: To separate the implementation, we might consider doing something like this:
-			//         https://stackoverflow.com/a/8662580
-			std::vector<Type> getTypedDataArrayAtTime(float time) const {
-				boost::optional<std::vector<Type>> result = boost::none;
+			//inline Type getTypedDataAtTime(const float time) const { return getTypedDataArrayAtTime(time)[0]; };
+			inline Type getTypedDataAtTime(const float time) const {
+				boost::optional<Type> result = boost::none;
 				if (animator.is_initialized())
 					result = animator->getValueAtTime(time);
-				return result.get_value_or(this->getTypedDataArray());
-			}
+				return result.get_value_or(this->getTypedData());
+	        };
+			// REVIEW: To separate the implementation, we might consider doing something like this:
+			//         https://stackoverflow.com/a/8662580
+			//std::vector<Type> getTypedDataArrayAtTime(float time) const {
+			//	boost::optional<std::vector<Type>> result = boost::none;
+			//	if (animator.is_initialized())
+			//		result = animator->getValueAtTime(time);
+			//	return result.get_value_or(this->getTypedDataArray());
+			//}
 	};
 
 }
