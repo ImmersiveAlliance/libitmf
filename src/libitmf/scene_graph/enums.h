@@ -1030,9 +1030,9 @@ enum AnimatorType {
 };
 
 enum AnimationType {
-	ANIM_LOOP,
-	ANIM_PINGPONG,
-	ANIM_ONCE
+	ANIM_LOOP = 1,
+	ANIM_PINGPONG = 2,
+	ANIM_ONCE = 3
 };
 
 }
