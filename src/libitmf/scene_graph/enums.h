@@ -1024,6 +1024,17 @@ enum NodeGraphType {
 	// Later versions will have built-in script graphs
 };
 
+// TODO: Decide naming convention
+enum AnimatorType {
+	REGULAR
+};
+
+enum AnimationType {
+	ANIM_LOOP,
+	ANIM_PINGPONG,
+	ANIM_ONCE
+};
+
 }
 }
 
