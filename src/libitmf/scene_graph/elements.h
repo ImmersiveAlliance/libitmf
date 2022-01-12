@@ -160,12 +160,16 @@ namespace scene {
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
 			inline boost::any getDataAtTime(const float time) const { return getTypedDataAtTime(time); }
-			inline Type getTypedDataAtTime(const float time) const {
+			Type getTypedDataAtTime(const float time) const {
 				boost::optional<Type> result = boost::none;
 				if (animator.is_initialized())
 					result = animator->getValueAtTime(time);
 				return result.get_value_or(this->getTypedData());
 	        };
+
+			// TODO: Add validation
+			bool addAnimator(const Animator<Type> in_anim) { this->animator = in_anim; return true; }
+			void removeAnimator() { this->animator = boost::none; }
 	};
 
 }
