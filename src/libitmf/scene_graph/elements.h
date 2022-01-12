@@ -21,14 +21,14 @@ namespace scene {
 	class Item;
 	class Graph;
 	class Node;
-	class Attribute;
+	class IAttribute;
 	class Pin;
 	template <class T>
 	class Animator;
 
 	typedef std::shared_ptr<Graph> GraphPtr;
 	typedef std::shared_ptr<Node> NodePtr;
-	typedef std::unique_ptr<Attribute> AttributePtr;
+	typedef std::unique_ptr<IAttribute> AttributePtr;
 
 	class AnimatorPtr;
 
@@ -69,11 +69,10 @@ namespace scene {
 		public:
 	};
 
-
 	// TODO: it's an interface, preface it with I
-	class Attribute {
+	class IAttribute {
 		protected:
-			Attribute(AttributeType t) : type(t) { }
+			IAttribute(AttributeType t) : type(t) { }
 
 		public:
 			typedef std::string Unknown;
@@ -129,25 +128,25 @@ namespace scene {
 
 	// TODO array enum
 	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
-	class TypedAttribute : public Attribute {
+	class TypedAttribute : public IAttribute {
 		private:
-			using DataType = typename std::conditional<ATYPE == AT_UNKNOWN, Attribute::Unknown,
-							 typename std::conditional<ATYPE == AT_BOOL, Attribute::Bool,
-							 typename std::conditional<ATYPE == AT_INT, Attribute::Int,
-							 typename std::conditional<ATYPE == AT_INT2, Attribute::Int2,
-							 typename std::conditional<ATYPE == AT_INT3, Attribute::Int3,
-							 typename std::conditional<ATYPE == AT_INT4, Attribute::Int4,
-							 typename std::conditional<ATYPE == AT_FLOAT, Attribute::Float,
-							 typename std::conditional<ATYPE == AT_FLOAT2, Attribute::Float2,
-							 typename std::conditional<ATYPE == AT_FLOAT3, Attribute::Float3,
-							 typename std::conditional<ATYPE == AT_FLOAT4, Attribute::Float4,
-							 typename std::conditional<ATYPE == AT_STRING, Attribute::String,
-							 typename std::conditional<ATYPE == AT_FILENAME, Attribute::Filename,
-							 typename std::conditional<ATYPE == AT_BYTE, Attribute::Byte,
-							 typename std::conditional<ATYPE == AT_MATRIX, Attribute::Matrix,
-							 typename std::conditional<ATYPE == AT_LONG, Attribute::Long,
-							 typename std::conditional<ATYPE == AT_LONG2, Attribute::Long2,
-							 Attribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
+			using DataType = typename std::conditional<ATYPE == AT_UNKNOWN, IAttribute::Unknown,
+							 typename std::conditional<ATYPE == AT_BOOL, IAttribute::Bool,
+							 typename std::conditional<ATYPE == AT_INT, IAttribute::Int,
+							 typename std::conditional<ATYPE == AT_INT2, IAttribute::Int2,
+							 typename std::conditional<ATYPE == AT_INT3, IAttribute::Int3,
+							 typename std::conditional<ATYPE == AT_INT4, IAttribute::Int4,
+							 typename std::conditional<ATYPE == AT_FLOAT, IAttribute::Float,
+							 typename std::conditional<ATYPE == AT_FLOAT2, IAttribute::Float2,
+							 typename std::conditional<ATYPE == AT_FLOAT3, IAttribute::Float3,
+							 typename std::conditional<ATYPE == AT_FLOAT4, IAttribute::Float4,
+							 typename std::conditional<ATYPE == AT_STRING, IAttribute::String,
+							 typename std::conditional<ATYPE == AT_FILENAME, IAttribute::Filename,
+							 typename std::conditional<ATYPE == AT_BYTE, IAttribute::Byte,
+							 typename std::conditional<ATYPE == AT_MATRIX, IAttribute::Matrix,
+							 typename std::conditional<ATYPE == AT_LONG, IAttribute::Long,
+							 typename std::conditional<ATYPE == AT_LONG2, IAttribute::Long2,
+							 IAttribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
 			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<DataType>, DataType>::type;
 
 			const Type data;
@@ -155,7 +154,7 @@ namespace scene {
 			boost::optional<Animator<Type>> animator;
 
 		public:
-			TypedAttribute(const Type in_data) : data(in_data), Attribute(ATYPE) { }
+			TypedAttribute(const Type in_data) : data(in_data), IAttribute(ATYPE) { }
 
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
