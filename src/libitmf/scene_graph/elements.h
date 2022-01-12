@@ -128,27 +128,28 @@ namespace scene {
 	};
 
 	// TODO array enum
-	template <AttributeType ATYPE, bool IS_ARRAY = false>
+	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
 	class TypedAttribute : public Attribute {
 		private:
 			using DataType = typename std::conditional<ATYPE == AT_UNKNOWN, Attribute::Unknown,
-						 typename std::conditional<ATYPE == AT_BOOL, Attribute::Bool,
-						 typename std::conditional<ATYPE == AT_INT, Attribute::Int,
-						 typename std::conditional<ATYPE == AT_INT2, Attribute::Int2,
-						 typename std::conditional<ATYPE == AT_INT3, Attribute::Int3,
-						 typename std::conditional<ATYPE == AT_INT4, Attribute::Int4,
-						 typename std::conditional<ATYPE == AT_FLOAT, Attribute::Float,
-						 typename std::conditional<ATYPE == AT_FLOAT2, Attribute::Float2,
-						 typename std::conditional<ATYPE == AT_FLOAT3, Attribute::Float3,
-						 typename std::conditional<ATYPE == AT_FLOAT4, Attribute::Float4,
-						 typename std::conditional<ATYPE == AT_STRING, Attribute::String,
-						 typename std::conditional<ATYPE == AT_FILENAME, Attribute::Filename,
-						 typename std::conditional<ATYPE == AT_BYTE, Attribute::Byte,
-						 typename std::conditional<ATYPE == AT_MATRIX, Attribute::Matrix,
-						 typename std::conditional<ATYPE == AT_LONG, Attribute::Long,
-						 typename std::conditional<ATYPE == AT_LONG2, Attribute::Long2,
-						 Attribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
-			using Type = typename std::conditional<IS_ARRAY, std::vector<DataType>, DataType>::type;
+							 typename std::conditional<ATYPE == AT_BOOL, Attribute::Bool,
+							 typename std::conditional<ATYPE == AT_INT, Attribute::Int,
+							 typename std::conditional<ATYPE == AT_INT2, Attribute::Int2,
+							 typename std::conditional<ATYPE == AT_INT3, Attribute::Int3,
+							 typename std::conditional<ATYPE == AT_INT4, Attribute::Int4,
+							 typename std::conditional<ATYPE == AT_FLOAT, Attribute::Float,
+							 typename std::conditional<ATYPE == AT_FLOAT2, Attribute::Float2,
+							 typename std::conditional<ATYPE == AT_FLOAT3, Attribute::Float3,
+							 typename std::conditional<ATYPE == AT_FLOAT4, Attribute::Float4,
+							 typename std::conditional<ATYPE == AT_STRING, Attribute::String,
+							 typename std::conditional<ATYPE == AT_FILENAME, Attribute::Filename,
+							 typename std::conditional<ATYPE == AT_BYTE, Attribute::Byte,
+							 typename std::conditional<ATYPE == AT_MATRIX, Attribute::Matrix,
+							 typename std::conditional<ATYPE == AT_LONG, Attribute::Long,
+							 typename std::conditional<ATYPE == AT_LONG2, Attribute::Long2,
+							 Attribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
+			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<DataType>, DataType>::type;
+
 			const Type data;
 
 			boost::optional<Animator<Type>> animator;

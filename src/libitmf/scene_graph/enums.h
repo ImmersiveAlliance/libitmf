@@ -23,6 +23,11 @@ enum AttributeType {
 	AT_LONG2		= 15
 };
 
+enum AttrContainerType {
+	ATTR_SCALAR,
+	ATTR_ARRAY
+};
+
 enum AttributeId {
 	// WARNING: NEVER USE THE FOLLOWING ATTRIBUTE ID(s): 484, 1205, 2450
 
