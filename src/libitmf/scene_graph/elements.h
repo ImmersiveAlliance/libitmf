@@ -96,7 +96,7 @@ namespace scene {
 
 			// TODO: Replace boost::optional<T> with some form of expected<T>
 			template <class T>
-			boost::optional<T> Cast(boost::any value) {
+			static boost::optional<T> Cast(boost::any value) {
 				try {
 					return boost::any_cast<T>(value);
 				} catch (boost::bad_any_cast &e) {
