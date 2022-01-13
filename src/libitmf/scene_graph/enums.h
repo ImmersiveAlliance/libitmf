@@ -1035,9 +1035,9 @@ enum AnimatorType {
 };
 
 enum AnimationType {
-	ANIM_LOOP = 1,
-	ANIM_PINGPONG = 2,
-	ANIM_ONCE = 3
+	ANIM_LOOP = 1,     // Iterates indefinitely, first to last
+	ANIM_PINGPONG = 2, // Iterates indefinitely, first to last to first to last
+	ANIM_ONCE = 3      // Goes through the sequence of files exactly once
 };
 
 }
