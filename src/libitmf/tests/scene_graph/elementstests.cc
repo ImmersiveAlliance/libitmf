@@ -10,8 +10,9 @@ namespace itmf {
 			TypedAttribute<AT_UNKNOWN> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Unknown data = boost::any_cast<IAttribute::Unknown>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Unknown> data = IAttribute::Cast<IAttribute::Unknown>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetBoolAttribute) {
@@ -19,8 +20,9 @@ namespace itmf {
 			TypedAttribute<AT_BOOL> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Bool data = boost::any_cast<IAttribute::Bool>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Bool> data = IAttribute::Cast<IAttribute::Bool>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetIntAttribute) {
@@ -28,8 +30,9 @@ namespace itmf {
 			TypedAttribute<AT_INT> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Int data = boost::any_cast<IAttribute::Int>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Int> data = IAttribute::Cast<IAttribute::Int>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetInt2Attribute) {
@@ -37,8 +40,9 @@ namespace itmf {
 			TypedAttribute<AT_INT2> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Int2 data = boost::any_cast<IAttribute::Int2>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Int2> data = IAttribute::Cast<IAttribute::Int2>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetInt3Attribute) {
@@ -46,8 +50,9 @@ namespace itmf {
 			TypedAttribute<AT_INT3> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Int3 data = boost::any_cast<IAttribute::Int3>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Int3> data = IAttribute::Cast<IAttribute::Int3>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetInt4Attribute) {
@@ -55,8 +60,9 @@ namespace itmf {
 			TypedAttribute<AT_INT4> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Int4 data = boost::any_cast<IAttribute::Int4>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Int4> data = IAttribute::Cast<IAttribute::Int4>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetFloatAttribute) {
@@ -64,8 +70,9 @@ namespace itmf {
 			TypedAttribute<AT_FLOAT> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Float data = boost::any_cast<IAttribute::Float>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Float> data = IAttribute::Cast<IAttribute::Float>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetFloat2Attribute) {
@@ -73,8 +80,9 @@ namespace itmf {
 			TypedAttribute<AT_FLOAT2> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Float2 data = boost::any_cast<IAttribute::Float2>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Float2> data = IAttribute::Cast<IAttribute::Float2>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetFloat3Attribute) {
@@ -82,8 +90,9 @@ namespace itmf {
 			TypedAttribute<AT_FLOAT3> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Float3 data = boost::any_cast<IAttribute::Float3>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Float3> data = IAttribute::Cast<IAttribute::Float3>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetFloat4Attribute) {
@@ -91,8 +100,9 @@ namespace itmf {
 			TypedAttribute<AT_FLOAT4> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Float4 data = boost::any_cast<IAttribute::Float4>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Float4> data = IAttribute::Cast<IAttribute::Float4>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetStringAttribute) {
@@ -100,8 +110,9 @@ namespace itmf {
 			TypedAttribute<AT_STRING> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::String data = boost::any_cast<IAttribute::String>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::String> data = IAttribute::Cast<IAttribute::String>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetFilenameAttribute) {
@@ -109,8 +120,9 @@ namespace itmf {
 			TypedAttribute<AT_FILENAME> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Filename data = boost::any_cast<IAttribute::Filename>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Filename> data = IAttribute::Cast<IAttribute::Filename>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetByteAttribute) {
@@ -118,8 +130,9 @@ namespace itmf {
 			TypedAttribute<AT_BYTE> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Byte data = boost::any_cast<IAttribute::Byte>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Byte> data = IAttribute::Cast<IAttribute::Byte>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetMatrixAttribute) {
@@ -129,8 +142,9 @@ namespace itmf {
 			TypedAttribute<AT_MATRIX> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Matrix data = boost::any_cast<IAttribute::Matrix>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Matrix> data = IAttribute::Cast<IAttribute::Matrix>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetLongAttribute) {
@@ -138,8 +152,9 @@ namespace itmf {
 			TypedAttribute<AT_LONG> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Long data = boost::any_cast<IAttribute::Long>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Long> data = IAttribute::Cast<IAttribute::Long>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
 		}
 
 		TEST(AttributeTest, GetLong2Attribute) {
@@ -147,8 +162,17 @@ namespace itmf {
 			TypedAttribute<AT_LONG2> attr(val);
 			EXPECT_EQ(attr.getTypedData(), val);
 
-			IAttribute::Long2 data = boost::any_cast<IAttribute::Long2>(attr.getData());
-			EXPECT_EQ(data, val);
+			boost::optional<IAttribute::Long2> data = IAttribute::Cast<IAttribute::Long2>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), true);
+			EXPECT_EQ(*data, val);
+		}
+
+		TEST(AttributeTest, FailCast) {
+			IAttribute::Long2 val = {5, 10};
+			TypedAttribute<AT_LONG2> attr(val);
+
+			boost::optional<IAttribute::Long> data = IAttribute::Cast<IAttribute::Long>(attr.getData());
+			EXPECT_EQ(data.is_initialized(), false);
 		}
 	}
 }
