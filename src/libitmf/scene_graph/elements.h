@@ -29,8 +29,8 @@ namespace scene {
 	typedef std::shared_ptr<Graph> GraphPtr;
 	typedef std::shared_ptr<Node> NodePtr;
 	typedef std::unique_ptr<IAttribute> AttributePtr;
-
-	class AnimatorPtr;
+	template <class T>
+	using AnimatorPtr = std::shared_ptr<Animator<T>>;
 
 	class Root {
 		private:
@@ -71,6 +71,8 @@ namespace scene {
 
 	// TODO: it's an interface, preface it with I
 	class IAttribute {
+		private:
+			const AttributeType type;
 		protected:
 			IAttribute(AttributeType t) : type(t) { }
 
@@ -92,8 +94,6 @@ namespace scene {
 			typedef int64_t Long;
 			typedef std::array<Long, 2> Long2;
 
-			const AttributeType type;
-
 			// TODO: Replace boost::optional<T> with some form of expected<T>
 			template <class T>
 			boost::optional<T> Cast(boost::any value) {
@@ -105,8 +105,7 @@ namespace scene {
 			}
 
 			inline virtual boost::any getData() const = 0;
-
-			virtual boost::any getDataAtTime(float time) const = 0;
+			inline AttributeType getType() { return this->type; }
 	};
 
 	template <class T>
@@ -118,15 +117,25 @@ namespace scene {
 			boost::optional<float> period;
 			std::vector<float> pattern;
 			boost::optional<float> endTime;
-			boost::optional<uint32_t> numTimes; // Only required for animated array attributes
 			std::vector<T> valueSequence;
 
 		public:
-			// TODO: Implement
-			boost::optional<T> getValueAtTime(const float time) const { return boost::none; }
+			Animator(const std::vector<T> in_sequence,
+					 const AnimationType in_animation,
+					 const boost::optional<float> in_period = boost::none,
+					 const std::vector<float> in_pattern = {},
+					 const boost::optional<float> in_end = boost::none,
+					 const AnimatorType in_animator = REGULAR)
+				: valueSequence(in_sequence), period(in_period), pattern(in_pattern), endTime(in_end) { }
+
+			inline AnimatorType getAnimatorType() { return this->animator; }
+			inline AnimationType getAnimationType() { return this->animation; }
+			inline boost::optional<float> getPeriod() { return this->period; }
+			inline std::vector<float> getPattern() { return this->pattern; }
+			inline boost::optional<float> getEndTime() { return this->endTime; }
+
 	};
 
-	// TODO array enum
 	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
 	class TypedAttribute : public IAttribute {
 		private:
@@ -150,25 +159,18 @@ namespace scene {
 			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<DataType>, DataType>::type;
 
 			const Type data;
-
-			boost::optional<Animator<Type>> animator;
+			boost::optional<AnimatorPtr<Type>> animator;
 
 		public:
 			TypedAttribute(const Type in_data) : data(in_data), IAttribute(ATYPE) { }
 
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
-			inline boost::any getDataAtTime(const float time) const { return getTypedDataAtTime(time); }
-			Type getTypedDataAtTime(const float time) const {
-				boost::optional<Type> result = boost::none;
-				if (animator.is_initialized())
-					result = animator->getValueAtTime(time);
-				return result.get_value_or(this->getTypedData());
-	        };
 
 			// TODO: Add validation
-			bool addAnimator(const Animator<Type> in_anim) { this->animator = in_anim; return true; }
-			void removeAnimator() { this->animator = boost::none; }
+			inline void setAnimator(const AnimatorPtr<Type> in_anim) { this->animator = in_anim; }
+			inline void removeAnimator() { this->animator = boost::none; }
+			boost::optional<Animator<Type>> getAnimator() { return this->animator; }
 	};
 
 }
