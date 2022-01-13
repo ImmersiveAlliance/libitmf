@@ -126,8 +126,9 @@ namespace scene {
 					 const std::vector<float> in_pattern = {},
 					 const boost::optional<float> in_end = boost::none,
 					 const AnimatorType in_animator = REGULAR)
-				: valueSequence(in_sequence), period(in_period), pattern(in_pattern), endTime(in_end) { }
+				: valueSequence(in_sequence), animation(in_animation), period(in_period), pattern(in_pattern), endTime(in_end), animator(in_animator) { }
 
+			inline std::vector<T> getValueSequence() { return this->valueSequence; }
 			inline AnimatorType getAnimatorType() { return this->animator; }
 			inline AnimationType getAnimationType() { return this->animation; }
 			inline boost::optional<float> getPeriod() { return this->period; }
@@ -167,10 +168,9 @@ namespace scene {
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
 
-			// TODO: Add validation
 			inline void setAnimator(const AnimatorPtr<Type> in_anim) { this->animator = in_anim; }
 			inline void removeAnimator() { this->animator = boost::none; }
-			boost::optional<Animator<Type>> getAnimator() { return this->animator; }
+			boost::optional<AnimatorPtr<Type>> getAnimator() { return this->animator; }
 	};
 
 }

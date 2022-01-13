@@ -1,5 +1,7 @@
 #include "elements.h"
 
+#include <boost/optional/optional_io.hpp>
+
 #include "gtest/gtest.h"
 
 namespace itmf {
@@ -173,6 +175,53 @@ namespace itmf {
 
 			boost::optional<IAttribute::Long> data = IAttribute::Cast<IAttribute::Long>(attr.getData());
 			EXPECT_EQ(data.is_initialized(), false);
+		}
+
+		TEST(AttributeTest, SetAndRetrieveAnimator) {
+			std::vector<IAttribute::String> dataSequence = {"val1", "val2", "val3"};
+			AnimationType animationType = ANIM_LOOP;
+			float period = 6.0;
+			std::vector<float> pattern = {1.0, 3.0, 4.0, 5.0};
+			float endTime = 30.0;
+			AnimatorType animatorType = REGULAR;
+			auto animPtr = std::make_shared<Animator<IAttribute::String>>(
+				dataSequence,
+				animationType,
+				period,
+				pattern,
+				endTime,
+				animatorType
+			);
+
+			TypedAttribute<AT_STRING> attr("test");
+			EXPECT_EQ(attr.getAnimator().is_initialized(), false);
+			attr.setAnimator(animPtr);
+			EXPECT_EQ(attr.getAnimator().is_initialized(), true);
+			EXPECT_EQ(*attr.getAnimator(), animPtr);
+		}
+
+		TEST(AnimatorTest, SetAndGet) {
+			std::vector<IAttribute::String> dataSequence = {"val1", "val2", "val3"};
+			AnimationType animationType = ANIM_LOOP;
+			float period = 6.0;
+			std::vector<float> pattern = {1.0, 3.0, 4.0, 5.0};
+			float endTime = 30.0;
+			AnimatorType animatorType = REGULAR;
+			auto animPtr = std::make_shared<Animator<IAttribute::String>>(
+				dataSequence,
+				animationType,
+				period,
+				pattern,
+				endTime,
+				animatorType
+			);
+
+			EXPECT_EQ(dataSequence, animPtr->getValueSequence());
+			EXPECT_EQ(animationType, animPtr->getAnimationType());
+			EXPECT_EQ(period, animPtr->getPeriod());
+			EXPECT_EQ(pattern, animPtr->getPattern());
+			EXPECT_EQ(endTime, animPtr->getEndTime());
+			EXPECT_EQ(animatorType, animPtr->getAnimatorType());
 		}
 	}
 }
