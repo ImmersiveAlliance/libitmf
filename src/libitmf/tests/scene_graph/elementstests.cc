@@ -183,6 +183,7 @@ namespace itmf {
 			float period = 6.0;
 			std::vector<float> pattern = {1.0, 3.0, 4.0, 5.0};
 			float endTime = 30.0;
+			std::string name = "name";
 			AnimatorType animatorType = REGULAR;
 			auto animPtr = std::make_shared<Animator<IAttribute::String>>(
 				dataSequence,
@@ -190,6 +191,7 @@ namespace itmf {
 				period,
 				pattern,
 				endTime,
+				name,
 				animatorType
 			);
 
@@ -200,12 +202,13 @@ namespace itmf {
 			EXPECT_EQ(*attr.getAnimator(), animPtr);
 		}
 
-		TEST(AnimatorTest, SetAndGet) {
+		TEST(AnimatorTest, SetThenGet) {
 			std::vector<IAttribute::String> dataSequence = {"val1", "val2", "val3"};
 			AnimationType animationType = ANIM_LOOP;
 			float period = 6.0;
 			std::vector<float> pattern = {1.0, 3.0, 4.0, 5.0};
 			float endTime = 30.0;
+			std::string name = "name";
 			AnimatorType animatorType = REGULAR;
 			auto animPtr = std::make_shared<Animator<IAttribute::String>>(
 				dataSequence,
@@ -213,6 +216,7 @@ namespace itmf {
 				period,
 				pattern,
 				endTime,
+				name,
 				animatorType
 			);
 
@@ -221,6 +225,7 @@ namespace itmf {
 			EXPECT_EQ(period, animPtr->getPeriod());
 			EXPECT_EQ(pattern, animPtr->getPattern());
 			EXPECT_EQ(endTime, animPtr->getEndTime());
+			EXPECT_EQ(name, animPtr->getName());
 			EXPECT_EQ(animatorType, animPtr->getAnimatorType());
 		}
 	}

@@ -69,7 +69,6 @@ namespace scene {
 		public:
 	};
 
-	// TODO: it's an interface, preface it with I
 	class IAttribute {
 		private:
 			const AttributeType type;
@@ -111,7 +110,7 @@ namespace scene {
 	template <class T>
 	class Animator {
 		private:
-			//boost::optional<std::string> name; // TODO: Determine if this is allowed
+			boost::optional<std::string> name;
 			AnimatorType animator;
 			AnimationType animation;
 			boost::optional<float> period;
@@ -120,19 +119,21 @@ namespace scene {
 			std::vector<T> valueSequence;
 
 		public:
-			Animator(const std::vector<T> in_sequence,
-					 const AnimationType in_animation,
-					 const boost::optional<float> in_period = boost::none,
-					 const std::vector<float> in_pattern = {},
-					 const boost::optional<float> in_end = boost::none,
-					 const AnimatorType in_animator = REGULAR)
-				: valueSequence(in_sequence), animation(in_animation), period(in_period), pattern(in_pattern), endTime(in_end), animator(in_animator) { }
+			Animator(const std::vector<T> sequenceIn,
+					 const AnimationType animationIn,
+					 const boost::optional<float> periodIn = boost::none,
+					 const std::vector<float> patternIn = {},
+					 const boost::optional<float> endIn = boost::none,
+					 const boost::optional<std::string> nameIn = boost::none,
+					 const AnimatorType animatorIn = REGULAR)
+				: valueSequence(sequenceIn), animation(animationIn), period(periodIn), pattern(patternIn), endTime(endIn), name(nameIn), animator(animatorIn) { }
 
 			inline std::vector<T> getValueSequence() { return this->valueSequence; }
 			inline AnimatorType getAnimatorType() { return this->animator; }
 			inline AnimationType getAnimationType() { return this->animation; }
 			inline boost::optional<float> getPeriod() { return this->period; }
 			inline std::vector<float> getPattern() { return this->pattern; }
+			inline boost::optional<std::string> getName() { return this->name; }
 			inline boost::optional<float> getEndTime() { return this->endTime; }
 
 	};
@@ -163,12 +164,12 @@ namespace scene {
 			boost::optional<AnimatorPtr<Type>> animator;
 
 		public:
-			TypedAttribute(const Type in_data) : data(in_data), IAttribute(ATYPE) { }
+			TypedAttribute(const Type dataIn) : data(dataIn), IAttribute(ATYPE) { }
 
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
 
-			inline void setAnimator(const AnimatorPtr<Type> in_anim) { this->animator = in_anim; }
+			inline void setAnimator(const AnimatorPtr<Type> animIn) { this->animator = animIn; }
 			inline void removeAnimator() { this->animator = boost::none; }
 			boost::optional<AnimatorPtr<Type>> getAnimator() { return this->animator; }
 	};
