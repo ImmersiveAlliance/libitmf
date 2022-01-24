@@ -19,6 +19,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/pugixml-src
 
 # Add source (.cxx and .h) here
 set(scenegraph_SRCS
+	attributes.h
 	elements.h
 	elements.cxx
 	enums.h
