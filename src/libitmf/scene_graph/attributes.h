@@ -15,52 +15,6 @@
 namespace itmf {
 namespace scene {
 
-	class IAttribute;
-	template <class T>
-	class Animator;
-
-	typedef std::unique_ptr<IAttribute> AttributePtr;
-	template <class T>
-	using AnimatorPtr = std::shared_ptr<Animator<T>>;
-
-	class IAttribute {
-		private:
-			const AttributeType type;
-		protected:
-			IAttribute(AttributeType t) : type(t) { }
-
-		public:
-			typedef std::string Unknown;
-			typedef bool Bool;
-			typedef int32_t Int;
-			typedef std::array<Int, 2> Int2;
-			typedef std::array<Int, 3> Int3;
-			typedef std::array<Int, 4> Int4;
-			typedef float Float;
-			typedef std::array<Float, 2> Float2;
-			typedef std::array<Float, 3> Float3;
-			typedef std::array<Float, 4> Float4;
-			typedef std::string String;
-			typedef String Filename;
-			typedef uint8_t Byte;
-			typedef std::array<Float4, 3> Matrix;
-			typedef int64_t Long;
-			typedef std::array<Long, 2> Long2;
-
-			// TODO: Replace boost::optional<T> with some form of expected<T>
-			template <class T>
-			static boost::optional<T> Cast(boost::any value) {
-				try {
-					return boost::any_cast<T>(value);
-				} catch (boost::bad_any_cast &e) {
-					return boost::none;
-				}
-			}
-
-			inline virtual boost::any getData() const = 0;
-			inline AttributeType getType() { return this->type; }
-	};
-
 	template <class T>
 	class Animator {
 		private:
@@ -92,6 +46,68 @@ namespace scene {
 
 	};
 
+	template <class T>
+	using AnimatorPtr = std::shared_ptr<Animator<T>>;
+
+
+	class IAttribute {
+		private:
+			const AttributeType attrType;
+			const AttrContainerType conType;
+		protected:
+			IAttribute(AttributeType at, AttrContainerType ct) : attrType(at), conType(ct) { }
+
+		public:
+			typedef std::string Unknown;
+			typedef bool Bool;
+			typedef int32_t Int;
+			typedef std::array<Int, 2> Int2;
+			typedef std::array<Int, 3> Int3;
+			typedef std::array<Int, 4> Int4;
+			typedef float Float;
+			typedef std::array<Float, 2> Float2;
+			typedef std::array<Float, 3> Float3;
+			typedef std::array<Float, 4> Float4;
+			typedef std::string String;
+			typedef String Filename;
+			typedef uint8_t Byte;
+			typedef std::array<Float4, 3> Matrix;
+			typedef int64_t Long;
+			typedef std::array<Long, 2> Long2;
+
+			class Ptr {
+				private:
+					std::unique_ptr<IAttribute> p;
+				public:
+					Ptr(std::unique_ptr<IAttribute>&& pIn) : p(std::move(pIn)) { }
+					Ptr(const Ptr& other) : p(other.p->clone()) {}
+
+					Ptr& operator =(Ptr const& other) {
+						this->p = other.p->clone();
+						return *this;
+					}
+
+					IAttribute* get() { return p.get(); }
+					Ptr clone() const { return Ptr(p->clone()); }
+			};
+
+			// TODO: Replace boost::optional<T> with some form of expected<T>
+			template <class T>
+			static boost::optional<T> Cast(boost::any value) {
+				try {
+					return boost::any_cast<T>(value);
+				} catch (boost::bad_any_cast &e) {
+					return boost::none;
+				}
+			}
+
+			inline virtual boost::any getData() const = 0;
+			virtual std::unique_ptr<IAttribute> clone() const = 0;
+
+			inline AttributeType getAttrType() { return this->attrType; }
+			inline AttrContainerType getContainerType() { return this->conType; }
+	};
+
 	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
 	class TypedAttribute : public IAttribute {
 		private:
@@ -118,7 +134,7 @@ namespace scene {
 			boost::optional<AnimatorPtr<Type>> animator;
 
 		public:
-			TypedAttribute(const Type dataIn) : data(dataIn), IAttribute(ATYPE) { }
+			TypedAttribute(const Type dataIn) : data(dataIn), IAttribute(ATYPE, ACONT) { }
 
 			inline Type getTypedData() const { return data; }
 			inline boost::any getData() const { return getTypedData(); }
@@ -126,7 +142,12 @@ namespace scene {
 			inline void setAnimator(const AnimatorPtr<Type> animIn) { this->animator = animIn; }
 			inline void removeAnimator() { this->animator = boost::none; }
 			boost::optional<AnimatorPtr<Type>> getAnimator() { return this->animator; }
+
+			std::unique_ptr<IAttribute> clone() const {
+				return std::unique_ptr<TypedAttribute<ATYPE,ACONT>>(new TypedAttribute<ATYPE,ACONT>(*this));
+			};
 	};
+
 
 }
 }

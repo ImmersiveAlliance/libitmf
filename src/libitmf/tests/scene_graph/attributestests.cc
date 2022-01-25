@@ -202,6 +202,26 @@ namespace itmf {
 			EXPECT_EQ(*attr.getAnimator(), animPtr);
 		}
 
+		TEST(AttributeTest, PtrClone) {
+			IAttribute::Long2 val = {5, 10};
+			IAttribute::Ptr attr1(std::unique_ptr<IAttribute>(new TypedAttribute<AT_LONG2>(val)));
+			IAttribute::Ptr attr2 = attr1.clone();
+
+			// Retrieve pointers to each typed attribute after the clone
+			auto typedAttr1 = dynamic_cast<TypedAttribute<AT_LONG2>*>(attr1.get());
+			auto typedAttr2 = dynamic_cast<TypedAttribute<AT_LONG2>*>(attr2.get());
+
+			// Add an animator to the second typed attribute
+			std::vector<IAttribute::Long2> seq = {{1, 2}, {3, 4}};
+			auto animPtr = std::make_shared<Animator<IAttribute::Long2>>(seq, ANIM_LOOP);
+			typedAttr2->setAnimator(animPtr);
+
+			EXPECT_NE(typedAttr1, typedAttr2);
+
+			EXPECT_EQ(typedAttr1->getAnimator(), boost::none);
+			EXPECT_EQ(typedAttr2->getAnimator(), animPtr);
+		}
+
 		TEST(AnimatorTest, SetThenGet) {
 			std::vector<IAttribute::String> dataSequence = {"val1", "val2", "val3"};
 			AnimationType animationType = ANIM_LOOP;
