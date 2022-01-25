@@ -29,7 +29,11 @@ namespace scene {
 			std::string version;
 			std::vector<GraphPtr> graphs;
 		public:
-			// TODO: Constructor
+			static const std::string LATEST_VERSION;
+
+			Root(std::vector<GraphPtr> graphsIn = {}, std::string verIn = LATEST_VERSION)
+				: graphs(graphsIn), version(verIn) { }
+
 			inline std::string getVersion() { return this->version; }
 			inline std::vector<GraphPtr> getGraphs() { return this->graphs; }
 
@@ -44,18 +48,16 @@ namespace scene {
 			std::string name;
 			std::unordered_map<AttributeId, IAttribute::Ptr> attributes;
 		public:
-			// TODO: Constructor
-			// NOTE: attrsIn is no longer owned by the caller after this operation.
-			Item(std::string nameIn = "", std::unordered_map<AttributeId, IAttribute::Ptr>&& attrsIn = {})
-				: name(nameIn), attributes(std::move(attrsIn)) { }
+			Item(std::string nameIn = "", std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+				: name(nameIn), attributes(attrsIn) { }
 			inline std::string getName() { return this->name; }
 			inline boost::optional<IAttribute::Ptr> getAttribute(AttributeId id);
-			//inline std::unordered_map<AttributeId, AttributePtr> getAttributes() { return this->attributes; }
+			inline std::unordered_map<AttributeId, IAttribute::Ptr> getAttributes() { return this->attributes; }
 
 			inline void setName(std::string nameIn) { this->name = nameIn; }
-			//inline void setAttribute(AttributeId id, AttributePtr attribute) { this->attributes[id] = std::move(attribute); }
-			//inline void setAttribute(AttributeId id) { this->attributes[id] = nullptr; }
-			//inline void setAttributes(std::unordered_map<AttributeId, AttributePtr> attrsIn) { this->attributes = attrsIn; }
+			inline void setAttribute(AttributeId id, IAttribute::Ptr attribute) { this->attributes[id] = std::move(attribute); }
+			inline void setAttribute(AttributeId id) { this->attributes[id] = IAttribute::Ptr(nullptr); }
+			inline void setAttributes(std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn) { this->attributes = attrsIn; }
 	};
 
 	class Graph : public Item {
@@ -64,7 +66,13 @@ namespace scene {
 			std::vector<GraphPtr> graphs;
 			std::vector<NodePtr> nodes;
 		public:
-			// TODO: Constructor
+			Graph(std::string nameIn = "",
+				  NodeGraphType typeIn = GT_UNKNOWN,
+				  std::vector<GraphPtr> graphsIn = {},
+				  std::vector<NodePtr> nodesIn = {},
+				  std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+				: graphs(graphsIn), nodes(nodesIn), type(typeIn), Item(nameIn, attrsIn) { }
+
 			inline NodeGraphType getType() { return this->type; }
 			inline std::vector<GraphPtr> getGraphs() { return this->graphs; }
 			inline std::vector<NodePtr> getNodes() { return this->nodes; }
@@ -82,7 +90,7 @@ namespace scene {
 			NodePinType type;
 			NodePtr node;
 		public:
-			// TODO: Constructor
+			Pin(NodePinType typeIn = PT_UNKNOWN, NodePtr nodeIn = nullptr) : type(typeIn), node(nodeIn) { }
 			inline NodePinType getType() { return this->type; }
 			inline NodePtr getNode() { return this-> node; }
 
@@ -95,7 +103,7 @@ namespace scene {
 			std::unordered_map<PinId, Pin> pins;
 			NodeType type;
 		public:
-			Node(NodeType typeIn,
+			Node(NodeType typeIn = NT_UNKNOWN,
 				 std::string name = "",
 				 std::unordered_map<PinId, Pin> pinsIn = {},
 				 std::unordered_map<AttributeId, IAttribute::Ptr>&& attrsIn = {})
