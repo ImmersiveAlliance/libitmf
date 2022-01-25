@@ -79,7 +79,7 @@ namespace scene {
 				private:
 					std::unique_ptr<IAttribute> p;
 				public:
-					Ptr(std::unique_ptr<IAttribute>&& pIn) : p(std::move(pIn)) { }
+					Ptr(std::unique_ptr<IAttribute>&& pIn = nullptr) : p(std::move(pIn)) { }
 					Ptr(const Ptr& other) : p(other.p->clone()) {}
 
 					Ptr& operator =(Ptr const& other) {
