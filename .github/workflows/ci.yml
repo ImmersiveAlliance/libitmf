@@ -4,8 +4,6 @@ on:
     push:
         paths-ignore:
             - '**.md'
-        branches-ignore:
-            - 'scene-graph'
     pull_request:
         paths-ignore:
             - '**.md'
@@ -62,4 +60,4 @@ jobs:
         - name: "Run tests"
           run: |
             cd build
-            ctest
+            make CTEST_OUTPUT_ON_FAILURE=1 test
