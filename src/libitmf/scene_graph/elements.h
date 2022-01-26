@@ -47,9 +47,10 @@ namespace scene {
 		private:
 			std::string name;
 			std::unordered_map<AttributeId, IAttribute::Ptr> attributes;
-		public:
+		protected:
 			Item(std::string nameIn = "", std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
 				: name(nameIn), attributes(attrsIn) { }
+		public:
 			inline std::string getName() { return this->name; }
 			inline boost::optional<IAttribute::Ptr> getAttribute(AttributeId id);
 			inline std::unordered_map<AttributeId, IAttribute::Ptr> getAttributes() { return this->attributes; }
