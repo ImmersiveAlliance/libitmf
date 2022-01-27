@@ -162,11 +162,11 @@ namespace scene {
 			void removeAnimator() { this->animator = boost::none; }
 			boost::optional<AnimatorPtr<T>> getAnimator() { return this->animator; }
 
-			std::unique_ptr<IAttribute> clone() const {
+			std::unique_ptr<IAttribute> clone() const override {
 				return std::unique_ptr<Attribute<ATYPE,ACONT>>(new Attribute<ATYPE,ACONT>(*this));
 			};
 		protected:
-			boost::any getAnyData() const { return getTypedData(); }
+			boost::any getAnyData() const override { return getTypedData(); }
 
 
 		private:
