@@ -38,7 +38,7 @@ namespace scene {
 			inline std::vector<GraphPtr> getGraphs() { return this->graphs; }
 
 			inline void setVersion(std::string versionIn) { this->version = versionIn; }
-			inline void setGraphs(std::vector<GraphPtr> graphsIn) { this->graphs = graphs; }
+			inline void setGraphs(std::vector<GraphPtr> graphsIn) { this->graphs = graphsIn; }
 			inline void addGraph(GraphPtr graphIn) { this->graphs.push_back(graphIn); }
 	};
 
