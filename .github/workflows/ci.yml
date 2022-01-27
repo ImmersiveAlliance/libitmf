@@ -60,4 +60,4 @@ jobs:
         - name: "Run tests"
           run: |
             cd build
-            make CTEST_OUTPUT_ON_FAILURE=1 test
+            ctest --output-on-failure
