@@ -4,7 +4,7 @@ namespace itmf {
 namespace scene {
     const std::string Root::LATEST_VERSION = "1";
 
-    boost::optional<IAttribute::Ptr> Item::getAttribute(AttributeId id) {
+    boost::optional<AttributePtr> Item::getAttribute(AttributeId id) {
         if (this->attributes.count(id) > 0)
             return this->attributes[id];
         else

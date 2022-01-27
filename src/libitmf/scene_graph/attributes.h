@@ -17,15 +17,6 @@ namespace scene {
 
 	template <class T>
 	class Animator {
-		private:
-			boost::optional<std::string> name;
-			AnimatorType animator;
-			AnimationType animation;
-			boost::optional<float> period;
-			std::vector<float> pattern;
-			boost::optional<float> endTime;
-			std::vector<T> valueSequence;
-
 		public:
 			Animator(const std::vector<T> sequenceIn,
 					 const AnimationType animationIn,
@@ -36,14 +27,22 @@ namespace scene {
 					 const AnimatorType animatorIn = REGULAR)
 				: valueSequence(sequenceIn), animation(animationIn), period(periodIn), pattern(patternIn), endTime(endIn), name(nameIn), animator(animatorIn) { }
 
-			inline std::vector<T> getValueSequence() { return this->valueSequence; }
-			inline AnimatorType getAnimatorType() { return this->animator; }
-			inline AnimationType getAnimationType() { return this->animation; }
-			inline boost::optional<float> getPeriod() { return this->period; }
-			inline std::vector<float> getPattern() { return this->pattern; }
-			inline boost::optional<std::string> getName() { return this->name; }
-			inline boost::optional<float> getEndTime() { return this->endTime; }
+			std::vector<T> getValueSequence() { return this->valueSequence; }
+			AnimatorType getAnimatorType() { return this->animator; }
+			AnimationType getAnimationType() { return this->animation; }
+			boost::optional<float> getPeriod() { return this->period; }
+			std::vector<float> getPattern() { return this->pattern; }
+			boost::optional<std::string> getName() { return this->name; }
+			boost::optional<float> getEndTime() { return this->endTime; }
 
+		private:
+			boost::optional<std::string> name;
+			AnimatorType animator;
+			AnimationType animation;
+			boost::optional<float> period;
+			std::vector<float> pattern;
+			boost::optional<float> endTime;
+			std::vector<T> valueSequence;
 	};
 
 	template <class T>
@@ -51,12 +50,6 @@ namespace scene {
 
 
 	class IAttribute {
-		private:
-			const AttributeType attrType;
-			const AttrContainerType conType;
-		protected:
-			IAttribute(AttributeType at, AttrContainerType ct) : attrType(at), conType(ct) { }
-
 		public:
 			typedef std::string Unknown;
 			typedef bool Bool;
@@ -75,6 +68,11 @@ namespace scene {
 			typedef int64_t Long;
 			typedef std::array<Long, 2> Long2;
 
+			// Minimal class representing a pointer to an IAttribute.
+			// Implemented using a unique_ptr for memory management
+			// plus support for implicit deep copies to help Attributes
+			// behave as a sort of polymorphic value.
+			// Loosely based on https://stackoverflow.com/q/23726228
 			class Ptr {
 				private:
 					std::unique_ptr<IAttribute> p;
@@ -87,31 +85,19 @@ namespace scene {
 						return *this;
 					}
 
-					IAttribute* get() { return p.get(); }
+					IAttribute& operator *() const { return *p; }
 					Ptr clone() const { return Ptr(p->clone()); }
+					bool isNull() const { return p == nullptr; }
 			};
 
-			// TODO: Replace boost::optional<T> with some form of expected<T>
-			template <class T>
-			static boost::optional<T> Cast(boost::any value) {
-				try {
-					return boost::any_cast<T>(value);
-				} catch (boost::bad_any_cast &e) {
-					return boost::none;
-				}
-			}
-
-			inline virtual boost::any getData() const = 0;
 			virtual std::unique_ptr<IAttribute> clone() const = 0;
 
-			inline AttributeType getAttrType() { return this->attrType; }
-			inline AttrContainerType getContainerType() { return this->conType; }
-	};
+			AttributeType getAttrType() { return this->attrType; }
+			AttrContainerType getContainerType() { return this->conType; }
 
-	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
-	class TypedAttribute : public IAttribute {
 		private:
-			using DataType = typename std::conditional<ATYPE == AT_UNKNOWN, IAttribute::Unknown,
+			template <AttributeType ATYPE>
+			using BaseType = typename std::conditional<ATYPE == AT_UNKNOWN, IAttribute::Unknown,
 							 typename std::conditional<ATYPE == AT_BOOL, IAttribute::Bool,
 							 typename std::conditional<ATYPE == AT_INT, IAttribute::Int,
 							 typename std::conditional<ATYPE == AT_INT2, IAttribute::Int2,
@@ -128,26 +114,69 @@ namespace scene {
 							 typename std::conditional<ATYPE == AT_LONG, IAttribute::Long,
 							 typename std::conditional<ATYPE == AT_LONG2, IAttribute::Long2,
 							 IAttribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
-			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<DataType>, DataType>::type;
 
-			const Type data;
-			boost::optional<AnimatorPtr<Type>> animator;
+		protected:
+			IAttribute(AttributeType at, AttrContainerType ct) : attrType(at), conType(ct) { }
+
+			virtual boost::any getAnyData() const = 0;
+
+			template <AttributeType ATYPE, AttrContainerType ACONT>
+			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<BaseType<ATYPE>>, BaseType<ATYPE>>::type;
 
 		public:
-			TypedAttribute(const Type dataIn) : data(dataIn), IAttribute(ATYPE, ACONT) { }
+			// TODO: Replace boost::optional<T> with some form of expected<T>
+			template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
+			boost::optional<Type<ATYPE,ACONT>> get() const {
+				try {
+					return boost::any_cast<Type<ATYPE,ACONT>>(this->getAnyData());
+				} catch (boost::bad_any_cast &e) {
+					return boost::none;
+				}
+			}
 
-			inline Type getTypedData() const { return data; }
-			inline boost::any getData() const { return getTypedData(); }
-
-			inline void setAnimator(const AnimatorPtr<Type> animIn) { this->animator = animIn; }
-			inline void removeAnimator() { this->animator = boost::none; }
-			boost::optional<AnimatorPtr<Type>> getAnimator() { return this->animator; }
-
-			std::unique_ptr<IAttribute> clone() const {
-				return std::unique_ptr<TypedAttribute<ATYPE,ACONT>>(new TypedAttribute<ATYPE,ACONT>(*this));
-			};
+		private:
+			const AttributeType attrType;
+			const AttrContainerType conType;
 	};
 
+
+	template <AttributeType ATYPE, AttrContainerType ACONT = ATTR_SCALAR>
+	class Attribute : public IAttribute {
+		private:
+			using T = Type<ATYPE,ACONT>;
+
+		public:
+			Attribute(const T dataIn) : data(dataIn), IAttribute(ATYPE, ACONT) { }
+
+			static boost::optional<Attribute<ATYPE,ACONT>> From(IAttribute&& attrIn) {
+				if (attrIn.getAttrType() == ATYPE && attrIn.getContainerType() == ACONT) {
+					return dynamic_cast<Attribute<ATYPE,ACONT>&&>(attrIn);
+				} else {
+					return boost::none;
+				}
+			}
+
+			T getTypedData() const { return data; }
+
+			void setAnimator(const AnimatorPtr<T> animIn) { this->animator = animIn; }
+			void removeAnimator() { this->animator = boost::none; }
+			boost::optional<AnimatorPtr<T>> getAnimator() { return this->animator; }
+
+			std::unique_ptr<IAttribute> clone() const {
+				return std::unique_ptr<Attribute<ATYPE,ACONT>>(new Attribute<ATYPE,ACONT>(*this));
+			};
+		protected:
+			boost::any getAnyData() const { return getTypedData(); }
+
+
+		private:
+			const T data;
+			boost::optional<AnimatorPtr<T>> animator;
+
+	};
+
+
+	typedef IAttribute::Ptr AttributePtr;
 
 }
 }

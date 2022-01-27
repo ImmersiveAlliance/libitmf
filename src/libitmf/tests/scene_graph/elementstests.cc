@@ -9,17 +9,17 @@ namespace itmf {
 
 		TEST(ItemTest, GetAttribute) {
 			float expected_val = 0.5;
-			std::unique_ptr<IAttribute> p(new TypedAttribute<AT_FLOAT>(expected_val));
+			std::unique_ptr<IAttribute> p(new Attribute<AT_FLOAT>(expected_val));
 
-			Graph g("", GT_UNKNOWN, {}, {}, {{A_ASPECT_RATIO, IAttribute::Ptr(std::move(p))}});
+			Graph g("", GT_UNKNOWN, {}, {}, {{A_ASPECT_RATIO, AttributePtr(std::move(p))}});
 
-			IAttribute::Ptr found_attr = *g.getAttribute(A_ASPECT_RATIO);
-			ASSERT_NE(found_attr.get(), nullptr);
+			AttributePtr found_attr = *g.getAttribute(A_ASPECT_RATIO);
+			ASSERT_FALSE(found_attr.isNull());
 
-			boost::optional<IAttribute::Ptr> missing_attr = g.getAttribute(A_ACTION);
+			boost::optional<AttributePtr> missing_attr = g.getAttribute(A_ACTION);
 			EXPECT_TRUE(missing_attr == boost::none);
 
-			EXPECT_EQ(IAttribute::Cast<IAttribute::Float>(found_attr.get()->getData()), expected_val);
+			EXPECT_EQ((*found_attr).get<AT_FLOAT>(), expected_val);
 		}
 
 		TEST(NodeTest, GetPin) {
