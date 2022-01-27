@@ -52,13 +52,13 @@ namespace scene {
 				: name(nameIn), attributes(attrsIn) { }
 		public:
 			inline std::string getName() { return this->name; }
-			inline boost::optional<IAttribute::Ptr> getAttribute(AttributeId id);
+			boost::optional<IAttribute::Ptr> getAttribute(AttributeId id);
 			inline std::unordered_map<AttributeId, IAttribute::Ptr> getAttributes() { return this->attributes; }
 
 			inline void setName(std::string nameIn) { this->name = nameIn; }
 			inline void setAttribute(AttributeId id, IAttribute::Ptr attribute) { this->attributes[id] = std::move(attribute); }
-			inline void setAttribute(AttributeId id) { this->attributes[id] = IAttribute::Ptr(nullptr); }
 			inline void setAttributes(std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn) { this->attributes = attrsIn; }
+			inline void removeAttribute(AttributeId id) { this->attributes.erase(id); }
 	};
 
 	class Graph : public Item {
@@ -104,11 +104,11 @@ namespace scene {
 			std::unordered_map<PinId, Pin> pins;
 			NodeType type;
 		public:
-			Node(NodeType typeIn = NT_UNKNOWN,
-				 std::string name = "",
+			Node(std::string name = "",
+				 NodeType typeIn = NT_UNKNOWN,
 				 std::unordered_map<PinId, Pin> pinsIn = {},
-				 std::unordered_map<AttributeId, IAttribute::Ptr>&& attrsIn = {})
-				: type(typeIn), pins(pinsIn), Item(name, std::move(attrsIn)) { }
+				 std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+				: type(typeIn), pins(pinsIn), Item(name, attrsIn) { }
 
 			inline NodeType getType() { return this->type; }
 			boost::optional<Pin> getPin(PinId id);
