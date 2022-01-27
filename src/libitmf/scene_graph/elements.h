@@ -44,20 +44,22 @@ namespace scene {
 
 
 	class Item {
+		public:
+			typedef std::unordered_map<AttributeId, IAttribute::Ptr, std::hash<int>> AttrMap;
 		private:
 			std::string name;
-			std::unordered_map<AttributeId, IAttribute::Ptr> attributes;
+			AttrMap attributes;
 		protected:
-			Item(std::string nameIn = "", std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+			Item(std::string nameIn = "", AttrMap attrsIn = {})
 				: name(nameIn), attributes(attrsIn) { }
 		public:
 			inline std::string getName() { return this->name; }
 			boost::optional<IAttribute::Ptr> getAttribute(AttributeId id);
-			inline std::unordered_map<AttributeId, IAttribute::Ptr> getAttributes() { return this->attributes; }
+			inline AttrMap getAttributes() { return this->attributes; }
 
 			inline void setName(std::string nameIn) { this->name = nameIn; }
 			inline void setAttribute(AttributeId id, IAttribute::Ptr attribute) { this->attributes[id] = std::move(attribute); }
-			inline void setAttributes(std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn) { this->attributes = attrsIn; }
+			inline void setAttributes(AttrMap attrsIn) { this->attributes = attrsIn; }
 			inline void removeAttribute(AttributeId id) { this->attributes.erase(id); }
 	};
 
@@ -71,7 +73,7 @@ namespace scene {
 				  NodeGraphType typeIn = GT_UNKNOWN,
 				  std::vector<GraphPtr> graphsIn = {},
 				  std::vector<NodePtr> nodesIn = {},
-				  std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+				  AttrMap attrsIn = {})
 				: graphs(graphsIn), nodes(nodesIn), type(typeIn), Item(nameIn, attrsIn) { }
 
 			inline NodeGraphType getType() { return this->type; }
@@ -100,23 +102,25 @@ namespace scene {
 	};
 
 	class Node : public Item {
+		public:
+			typedef std::unordered_map<PinId, Pin, std::hash<int>> PinMap;
 		private:
-			std::unordered_map<PinId, Pin> pins;
+			PinMap pins;
 			NodeType type;
 		public:
 			Node(std::string name = "",
 				 NodeType typeIn = NT_UNKNOWN,
-				 std::unordered_map<PinId, Pin> pinsIn = {},
-				 std::unordered_map<AttributeId, IAttribute::Ptr> attrsIn = {})
+				 PinMap pinsIn = {},
+				 AttrMap attrsIn = {})
 				: type(typeIn), pins(pinsIn), Item(name, attrsIn) { }
 
 			inline NodeType getType() { return this->type; }
 			boost::optional<Pin> getPin(PinId id);
-			inline std::unordered_map<PinId, Pin> getPins() { return this->pins; }
+			inline PinMap getPins() { return this->pins; }
 
 			inline void setType(NodeType typeIn) { this->type = typeIn; }
 			inline void setPin(PinId id, Pin pin) { this->pins[id] = pin; }
-			inline void setPins(std::unordered_map<PinId, Pin> pinsIn) { this->pins = pinsIn; }
+			inline void setPins(PinMap pinsIn) { this->pins = pinsIn; }
 	};
 
 }
