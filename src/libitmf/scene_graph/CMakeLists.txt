@@ -4,13 +4,13 @@ execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pugixml-download )
 if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+  message(FATAL_ERROR "CMake step for pugixml failed: ${result}")
 endif()
 execute_process(COMMAND ${CMAKE_COMMAND} --build .
   RESULT_VARIABLE result
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pugixml-download )
 if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+  message(FATAL_ERROR "Build step for pugixml failed: ${result}")
 endif()
 
 # Add pugixml directly to our build.

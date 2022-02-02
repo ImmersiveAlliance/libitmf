@@ -21,4 +21,6 @@ target_include_directories(itmfcontainer PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}	
 )
 
+target_link_libraries(itmfcontainer expected)
+
 message(${CMAKE_CURRENT_SOURCE_DIR})

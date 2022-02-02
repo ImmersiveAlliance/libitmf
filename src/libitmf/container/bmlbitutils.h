@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iterator>
+#include "tl/expected.hpp"
 //#include <boost/dynamic_bitset/dynamic_bitset.hpp>
 
 #define BML_BYTE_SIZE 8
@@ -21,7 +22,6 @@ namespace itmf {
 	};
 
 	unsigned char countLeadingOnes(unsigned char byte);
-
 	// Cases where the BMLBitVector will be used per spec:
 	/*
 	> Decoding/encoding tags - id + type
