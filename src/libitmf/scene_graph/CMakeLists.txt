@@ -23,6 +23,8 @@ set(scenegraph_SRCS
 	elements.h
 	elements.cxx
 	enums.h
+	xml.h
+	xml.cxx
 	)
 
 include_directories("${itmflib_src_root}/scene_graph")
