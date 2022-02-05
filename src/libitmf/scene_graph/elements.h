@@ -31,8 +31,8 @@ namespace scene {
 			Root(std::vector<GraphPtr> graphsIn = {}, std::string verIn = LATEST_VERSION)
 				: graphs(graphsIn), version(verIn) { }
 
-			std::string getVersion() { return this->version; }
-			std::vector<GraphPtr> getGraphs() { return this->graphs; }
+			std::string getVersion() const { return this->version; }
+			std::vector<GraphPtr> getGraphs() const { return this->graphs; }
 
 			void setVersion(std::string versionIn) { this->version = versionIn; }
 			void setGraphs(std::vector<GraphPtr> graphsIn) { this->graphs = graphsIn; }
@@ -47,8 +47,8 @@ namespace scene {
 	class Pin {
 		public:
 			Pin(NodePinType typeIn = PT_UNKNOWN, NodePtr nodeIn = nullptr) : type(typeIn), node(nodeIn) { }
-			NodePinType getType() { return this->type; }
-			NodePtr getNode() { return this-> node; }
+			NodePinType getType() const { return this->type; }
+			NodePtr getNode() const { return this-> node; }
 
 			void setType(NodePinType typeIn) { this->type = typeIn; }
 			void setNode(NodePtr nodeIn) { this->node = nodeIn; }
@@ -62,9 +62,9 @@ namespace scene {
 	class Item {
 		public:
 			typedef std::unordered_map<AttributeId, AttributePtr, std::hash<int>> AttrMap;
-			std::string getName() { return this->name; }
-			boost::optional<AttributePtr> getAttribute(AttributeId id);
-			AttrMap getAttributes() { return this->attributes; }
+			std::string getName() const { return this->name; }
+			boost::optional<AttributePtr> getAttribute(AttributeId id) const;
+			AttrMap getAttributes() const { return this->attributes; }
 
 			void setName(std::string nameIn) { this->name = nameIn; }
 			void setAttribute(AttributeId id, AttributePtr attribute) { this->attributes[id] = std::move(attribute); }
@@ -89,9 +89,9 @@ namespace scene {
 				  AttrMap attrsIn = {})
 				: graphs(graphsIn), nodes(nodesIn), type(typeIn), Item(nameIn, attrsIn) { }
 
-			NodeGraphType getType() { return this->type; }
-			std::vector<GraphPtr> getGraphs() { return this->graphs; }
-			std::vector<NodePtr> getNodes() { return this->nodes; }
+			NodeGraphType getType() const { return this->type; }
+			std::vector<GraphPtr> getGraphs() const { return this->graphs; }
+			std::vector<NodePtr> getNodes() const { return this->nodes; }
 
 			void setType(NodeGraphType typeIn) { this->type = typeIn; }
 			void setGraphs(std::vector<GraphPtr> graphsIn) { this->graphs = graphsIn; }
@@ -116,9 +116,9 @@ namespace scene {
 				 AttrMap attrsIn = {})
 				: type(typeIn), pins(pinsIn), Item(name, attrsIn) { }
 
-			NodeType getType() { return this->type; }
-			boost::optional<Pin> getPin(PinId id);
-			PinMap getPins() { return this->pins; }
+			NodeType getType() const { return this->type; }
+			boost::optional<Pin> getPin(PinId id) const;
+			PinMap getPins() const { return this->pins; }
 
 			void setType(NodeType typeIn) { this->type = typeIn; }
 			void setPin(PinId id, Pin pin) { this->pins[id] = pin; }
