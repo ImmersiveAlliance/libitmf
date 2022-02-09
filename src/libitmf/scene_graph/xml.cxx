@@ -4,6 +4,7 @@ namespace itmf {
 namespace scene {
 
 	// TODO: Implement
+	// Convert Root and all children to XML::Elements
 	XML XML::FromRoot(const Root root) {
 		XML result;
 		return result;
@@ -15,6 +16,7 @@ namespace scene {
 		// End Pugi Implementation
 	}
 
+
 	// TODO: Implement
 	Root XML::toRoot() {
 		return Root();
@@ -25,6 +27,265 @@ namespace scene {
 		toOstream_PugiImpl(out);
 		// End Pugi Implementation
 	}
+
+	// Scene Graph <-> XML conversion
+
+	std::unique_ptr<XML::Element> XML::RootToXML(const Root& root) {
+		std::string label = "OCS2";
+		std::string contents;
+
+		std::unordered_map<std::string, std::string> attributes = {
+			{"version", root.getVersion()}
+		};
+
+		std::vector<std::unique_ptr<Element>> children;
+		for(GraphPtr& graph : root.getGraphs())
+			children.push_back(GraphToXML(*graph));
+
+		return std::unique_ptr<Element>(new Element{std::move(children), attributes, label, contents});
+	}
+
+	std::unique_ptr<XML::Element> XML::GraphToXML(const Graph& graph) {
+		std::unique_ptr<XML::Element> elem(new XML::Element{{}, {}, "graph", ""});
+		// Add data related to any scene graph Item
+		AppendItemData(graph, *elem);
+
+		// Populate element children
+		for (GraphPtr& subgraph : graph.getGraphs())
+			elem->children.push_back(GraphToXML(*subgraph));
+		for (NodePtr& node : graph.getNodes())
+			elem->children.push_back(NodeToXML(*node));
+
+		// Assign attributes
+		elem->attributes["type"] = std::to_string(graph.getType());
+
+		return elem;
+	}
+
+	std::unique_ptr<XML::Element> XML::NodeToXML(const Node& node) {
+		std::unique_ptr<XML::Element> elem(new XML::Element{{}, {}, "node", ""});
+		// Add data related to any scene graph Item
+		AppendItemData(node, *elem);
+
+		// Populate element children
+		for (std::pair<PinId, Pin>&& idAndPin : node.getPins())
+			elem->children.push_back(PinToXML(idAndPin.first, idAndPin.second));
+
+		// Assign attributes
+		elem->attributes["type"] = std::to_string(node.getType());
+
+		return elem;
+	}
+
+	std::unique_ptr<XML::Element> XML::PinToXML(const PinId id, const Pin& pin) {
+		std::string label = "pin";
+		std::string content = "";
+
+		std::unordered_map<std::string, std::string> attributes = {
+			{"name", std::to_string(id)}, // TODO: Convert PinId to a string
+			{"type", std::to_string(pin.getType())} // TODO: investigate dynamicType
+		};
+
+		std::vector<std::unique_ptr<Element>> children;
+		children.push_back(NodeToXML(*pin.getNode()));
+
+		return std::unique_ptr<XML::Element>(new XML::Element{std::move(children), attributes, label, content});
+	}
+
+	//// TODO: Implement
+	//std::unique_ptr<XML::Element> XML::AttrToXML(const AttributeId id, const IAttribute& attr) {
+	//	return {};
+	//}
+
+	//// TODO: Implement
+	//template <class T>
+	//std::unique_ptr<XML::Element> XML::AnimToXML(const Animator<T>& animator) {
+	//	return {};
+	//}
+
+	// TODO: Implement
+	void XML::AppendItemData(const Item& item, Element& elem) {
+		elem.attributes["name"] = item.getName();
+
+		// TODO: Handle animators and attributes
+		for (std::pair<AttributeId, AttributePtr> idAndAttr : item.getAttributes()) {
+			if (idAndAttr.second.isNull()) continue;
+
+			//AttributeId& id = idAndAttr.first;
+			//IAttribute& iattr = *idAndAttr.second;
+			AppendAttributeData(idAndAttr.first, std::move(*idAndAttr.second), elem);
+		}
+	}
+
+	void XML::AppendAttributeData(const AttributeId& id, const IAttribute&& attr, Element& elem) {
+		AttrContainerType contype = attr.getContainerType();
+
+		switch(attr.getAttrType()) {
+			case AT_BOOL:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_BOOL, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_BOOL, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_INT:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_INT, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_INT, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_INT2:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_INT2, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_INT2, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_INT3:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_INT3, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_INT3, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_INT4:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_INT4, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_INT4, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_FLOAT:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_FLOAT, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_FLOAT, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_FLOAT2:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_FLOAT2, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_FLOAT2, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_FLOAT3:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_FLOAT3, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_FLOAT3, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_FLOAT4:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_FLOAT4, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_FLOAT4, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_STRING:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_STRING, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_STRING, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_FILENAME:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_FILENAME, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_FILENAME, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_BYTE:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_BYTE, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_BYTE, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_MATRIX:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_MATRIX, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_MATRIX, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_LONG:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_LONG, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_LONG, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_LONG2:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_LONG2, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_LONG2, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+			case AT_UNKNOWN: default:
+				switch(contype) {
+					case ATTR_SCALAR:
+						AppendTypedAttributeData<AT_UNKNOWN, ATTR_SCALAR>(id, std::move(attr), elem);
+						break;
+					case ATTR_ARRAY:
+						AppendTypedAttributeData<AT_UNKNOWN, ATTR_ARRAY>(id, std::move(attr), elem);
+						break;
+				}
+				break;
+		}
+	}
+
+
+	// End Scene Graph <-> XML conversion
 
 
 	// Pugi Implementation
@@ -46,8 +307,8 @@ namespace scene {
 
 	void XML::toOstream_PugiImpl(std::ostream& out) const {
 		pugi::xml_document doc;
-		if (this->root != nullptr)
-			PugiRecurseCreatePugi(*this->root, doc.append_child());
+		if (this->head != nullptr)
+			PugiRecurseCreatePugi(*this->head, doc.append_child());
 		doc.save(out);
 	}
 

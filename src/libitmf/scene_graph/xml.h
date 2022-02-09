@@ -20,10 +20,14 @@ namespace scene {
 		public:
 			static XML FromRoot(const Root root);
 			static XML FromIStream(std::istream& is);
+			// TODO: Maybe split it out
+			//XMLReader::ReadFile(instream);
+			//XMLWriter::WriteFile(outstream);
 
 			void toOStream(std::ostream& out) const;
 			Root toRoot();
 		private:
+			// TODO: this is a serialization, maybe more general than XML. Consider for JSON.
 			struct Element {
 				std::vector<std::unique_ptr<Element>> children;
 				std::unordered_map<std::string, std::string> attributes;
@@ -31,9 +35,31 @@ namespace scene {
 				std::string contents;
 			};
 
-			XML(std::unique_ptr<Element> rootIn = nullptr) : root(std::move(rootIn)) { }
+			XML(std::unique_ptr<Element> headIn = nullptr) : head(std::move(headIn)) { }
 
-			std::unique_ptr<Element> root;
+			std::unique_ptr<Element> head;
+
+			// Scene Graph <-> XML conversion
+
+			static std::unique_ptr<Element> RootToXML(const Root& root);
+			static std::unique_ptr<Element> GraphToXML(const Graph& graph);
+			static std::unique_ptr<Element> NodeToXML(const Node& node);
+			static std::unique_ptr<Element> PinToXML(const PinId id, const Pin& pin);
+			//static std::unique_ptr<Element> AttrToXML(const AttributeId id, const IAttribute& attr); // Might want to eliminate this?
+			//template <class T>
+			//static std::unique_ptr<Element> AnimToXML(const Animator<T>& animator);
+			static void AppendItemData(const Item& item, Element& elem);
+			static void AppendAttributeData(const AttributeId& id, const IAttribute&& attr, Element& elem);
+			template <AttributeType ATYPE, AttrContainerType ACONT>
+			static void AppendTypedAttributeData(const AttributeId& id, const IAttribute&& iattr, Element& elem) {
+				auto attr = Attribute<ATYPE, ACONT>::From(std::move(iattr));
+				// TODO
+				//if attr.hasAnimator {
+				//		animid = ...;
+				//		elem.children.append(AnimToXML(anim, animId));
+				//	}
+				//elem.children.append(attr, animId)
+			}
 
 			// Pugi Implementation
 			static XML FromIStream_PugiImpl(std::istream& is);
