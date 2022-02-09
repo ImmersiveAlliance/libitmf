@@ -92,8 +92,8 @@ namespace scene {
 
 			virtual std::unique_ptr<IAttribute> clone() const = 0;
 
-			AttributeType getAttrType() { return this->attrType; }
-			AttrContainerType getContainerType() { return this->conType; }
+			AttributeType getAttrType() const { return this->attrType; }
+			AttrContainerType getContainerType() const { return this->conType; }
 
 		private:
 			template <AttributeType ATYPE>
@@ -133,6 +133,7 @@ namespace scene {
 					return boost::none;
 				}
 			}
+			// TODO: ToString?
 
 		private:
 			const AttributeType attrType;
@@ -148,9 +149,9 @@ namespace scene {
 		public:
 			Attribute(const T dataIn) : data(dataIn), IAttribute(ATYPE, ACONT) { }
 
-			static boost::optional<Attribute<ATYPE,ACONT>> From(IAttribute&& attrIn) {
+			static boost::optional<Attribute<ATYPE,ACONT>> From(const IAttribute&& attrIn) {
 				if (attrIn.getAttrType() == ATYPE && attrIn.getContainerType() == ACONT) {
-					return dynamic_cast<Attribute<ATYPE,ACONT>&&>(attrIn);
+					return dynamic_cast<const Attribute<ATYPE,ACONT>&&>(attrIn);
 				} else {
 					return boost::none;
 				}
