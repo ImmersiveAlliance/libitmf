@@ -15,8 +15,36 @@
 namespace itmf {
 namespace scene {
 
+	class IAnimator {
+		public:
+			AnimatorType getAnimatorType() const { return this->animator; }
+			AnimationType getAnimationType() const { return this->animation; }
+			boost::optional<float> getPeriod() const { return this->period; }
+			std::vector<float> getPattern() const { return this->pattern; }
+			boost::optional<std::string> getName() const { return this->name; }
+			boost::optional<float> getEndTime() const { return this->endTime; }
+
+		protected:
+			IAnimator(const AnimationType animationIn,
+					  const boost::optional<float> periodIn = boost::none,
+					  const std::vector<float> patternIn = {},
+					  const boost::optional<float> endIn = boost::none,
+					  const boost::optional<std::string> nameIn = boost::none,
+					  const AnimatorType animatorIn = REGULAR)
+				: animation(animationIn), period(periodIn), pattern(patternIn), endTime(endIn), name(nameIn), animator(animatorIn) { }
+
+		private:
+			IAnimator() { }
+			boost::optional<std::string> name;
+			AnimatorType animator;
+			AnimationType animation;
+			boost::optional<float> period;
+			std::vector<float> pattern;
+			boost::optional<float> endTime;
+	};
+
 	template <class T>
-	class Animator {
+	class Animator : public IAnimator {
 		public:
 			Animator(const std::vector<T> sequenceIn,
 					 const AnimationType animationIn,
@@ -25,23 +53,11 @@ namespace scene {
 					 const boost::optional<float> endIn = boost::none,
 					 const boost::optional<std::string> nameIn = boost::none,
 					 const AnimatorType animatorIn = REGULAR)
-				: valueSequence(sequenceIn), animation(animationIn), period(periodIn), pattern(patternIn), endTime(endIn), name(nameIn), animator(animatorIn) { }
+				: valueSequence(sequenceIn), IAnimator(animationIn, periodIn, patternIn, endIn, nameIn, animatorIn) { }
 
-			std::vector<T> getValueSequence() { return this->valueSequence; }
-			AnimatorType getAnimatorType() { return this->animator; }
-			AnimationType getAnimationType() { return this->animation; }
-			boost::optional<float> getPeriod() { return this->period; }
-			std::vector<float> getPattern() { return this->pattern; }
-			boost::optional<std::string> getName() { return this->name; }
-			boost::optional<float> getEndTime() { return this->endTime; }
+			std::vector<T> getValueSequence() const { return this->valueSequence; }
 
 		private:
-			boost::optional<std::string> name;
-			AnimatorType animator;
-			AnimationType animation;
-			boost::optional<float> period;
-			std::vector<float> pattern;
-			boost::optional<float> endTime;
 			std::vector<T> valueSequence;
 	};
 
@@ -67,6 +83,8 @@ namespace scene {
 			typedef std::array<Float4, 3> Matrix;
 			typedef int64_t Long;
 			typedef std::array<Long, 2> Long2;
+
+			virtual ~IAttribute() { };
 
 			// Minimal class representing a pointer to an IAttribute.
 			// Implemented using a unique_ptr for memory management
@@ -95,7 +113,6 @@ namespace scene {
 			AttributeType getAttrType() const { return this->attrType; }
 			AttrContainerType getContainerType() const { return this->conType; }
 
-		private:
 			template <AttributeType ATYPE>
 			using BaseType = typename std::conditional<ATYPE == AT_UNKNOWN, IAttribute::Unknown,
 							 typename std::conditional<ATYPE == AT_BOOL, IAttribute::Bool,
@@ -115,13 +132,13 @@ namespace scene {
 							 typename std::conditional<ATYPE == AT_LONG2, IAttribute::Long2,
 							 IAttribute::Unknown >::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type;
 
+			template <AttributeType ATYPE, AttrContainerType ACONT>
+			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<BaseType<ATYPE>>, BaseType<ATYPE>>::type;
+
 		protected:
 			IAttribute(AttributeType at, AttrContainerType ct) : attrType(at), conType(ct) { }
 
 			virtual boost::any getAnyData() const = 0;
-
-			template <AttributeType ATYPE, AttrContainerType ACONT>
-			using Type = typename std::conditional<ACONT == ATTR_ARRAY, std::vector<BaseType<ATYPE>>, BaseType<ATYPE>>::type;
 
 		public:
 			// TODO: Replace boost::optional<T> with some form of expected<T>
@@ -161,7 +178,7 @@ namespace scene {
 
 			void setAnimator(const AnimatorPtr<T> animIn) { this->animator = animIn; }
 			void removeAnimator() { this->animator = boost::none; }
-			boost::optional<AnimatorPtr<T>> getAnimator() { return this->animator; }
+			boost::optional<AnimatorPtr<T>> getAnimator() const { return this->animator; }
 
 			std::unique_ptr<IAttribute> clone() const override {
 				return std::unique_ptr<Attribute<ATYPE,ACONT>>(new Attribute<ATYPE,ACONT>(*this));
