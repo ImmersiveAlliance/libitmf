@@ -129,7 +129,7 @@ namespace scene {
 	template <AttributeType ATYPE, AttrContainerType ACONT>
 	typename std::enable_if<ACONT==ATTR_ARRAY, std::string>::type XMLWriter::AttrDataToXMLString(const IAttribute::Type<ATYPE, ACONT>& attr) {
      	std::ostringstream s;
-     	for (auto val : attr) {
+     	for (const auto& val : attr) {
 			if (&val != &attr[0])
 				s << " ";
 			s << AttrValueToXMLString<ATYPE>(val);
@@ -206,7 +206,7 @@ namespace scene {
 			attributes.push_back({"numTimes", std::to_string(seq.size())});
 
 	 	std::ostringstream contents;
-	 	for (auto val : seq) {
+	 	for (const auto& val : seq) {
 			if (&val != &seq[0])
 				contents << " ";
 			contents << AttrDataToXMLString<ATYPE, ACONT>(val);
