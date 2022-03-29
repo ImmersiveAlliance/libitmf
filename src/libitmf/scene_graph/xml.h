@@ -36,6 +36,7 @@ namespace scene {
 			static Root ReadStream(std::istream& in);
 		private:
 			XMLReader() { }
+
 			// Pugi Implementation
 			static std::unique_ptr<Element> FromIStream_PugiImpl(std::istream& is);
 			static std::unique_ptr<Element> PugiRecurseCreateElement(const pugi::xml_node& node);
@@ -113,10 +114,10 @@ namespace scene {
 	template <AttributeType ATYPE, AttributeType SUBTYPE>
 	std::string XMLWriter::AttrValueSequenceToXMLString(const IAttribute::Type<ATYPE, ATTR_SCALAR>& attr) {
      	std::stringstream s;
-     	for (auto& val : attr) {
-			if (&val != &attr[0])
+		for (auto it = attr.begin(); it != attr.end(); ++it) {
+			if (it != attr.begin())
 				s << " ";
-			s << AttrValueToXMLString<SUBTYPE>(val);
+			s << AttrValueToXMLString<SUBTYPE>(*it);
 		}
      	return s.str();
 	}
@@ -129,10 +130,10 @@ namespace scene {
 	template <AttributeType ATYPE, AttrContainerType ACONT>
 	typename std::enable_if<ACONT==ATTR_ARRAY, std::string>::type XMLWriter::AttrDataToXMLString(const IAttribute::Type<ATYPE, ACONT>& attr) {
      	std::ostringstream s;
-     	for (const auto& val : attr) {
-			if (&val != &attr[0])
+		for (auto it = attr.begin(); it != attr.end(); ++it) {
+			if (it != attr.begin())
 				s << " ";
-			s << AttrValueToXMLString<ATYPE>(val);
+			s << AttrValueToXMLString<ATYPE>(*it);
 		}
      	return s.str();
 	}
@@ -183,11 +184,11 @@ namespace scene {
 		std::vector<float> pattern = animator.getPattern();
 		if (!pattern.empty()) {
 			std::ostringstream pat_str;
-			for (auto& val : pattern) {
-				if (&val != &pattern[0])
+			for (auto it = pattern.begin(); it != pattern.end(); ++it) {
+				if (it != pattern.begin())
 					pat_str << " ";
 				// TODO: consider precision, rounding, etc.
-				pat_str << val;
+				pat_str << *it;
 			}
 			attributes.push_back({"pattern", pat_str.str()});
 		}
@@ -206,10 +207,10 @@ namespace scene {
 			attributes.push_back({"numTimes", std::to_string(seq.size())});
 
 	 	std::ostringstream contents;
-	 	for (const auto& val : seq) {
-			if (&val != &seq[0])
+		for (auto it = seq.begin(); it != seq.end(); ++it) {
+			if (it != seq.begin())
 				contents << " ";
-			contents << AttrDataToXMLString<ATYPE, ACONT>(val);
+			contents << AttrDataToXMLString<ATYPE, ACONT>(*it);
 		}
 
 		return std::unique_ptr<Element>(new Element{{}, attributes, label, contents.str()});
