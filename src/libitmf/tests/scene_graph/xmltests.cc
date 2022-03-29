@@ -10,18 +10,18 @@ namespace itmf {
 namespace scene {
 
 	TEST(XMLWriteTest, WriteStreamTest) {
-		pugi::xml_document doc;
-		//doc.load_string("<?xml version='1.0'?><OCS2 version='1'/>");
-		doc.load_file("minimal.ocs");
-		std::ostringstream expected;
-		doc.save(expected);
+		//pugi::xml_document doc;
+		////doc.load_string("<?xml version='1.0'?><OCS2 version='1'/>");
+		//doc.load_file("minimal.ocs");
+		//std::ostringstream expected;
+		//doc.save(expected);
 
-		Root root({}, "1");
-		std::ostringstream actual;
-		// TODO: Revisit
-		//XMLWriter::WriteStream(root, actual);
+		//Root root({}, "1");
+		//std::ostringstream actual;
+		//// TODO: Revisit
+		////XMLWriter::WriteStream(root, actual);
 
-		//EXPECT_EQ(actual.str(), expected.str());
+		////EXPECT_EQ(actual.str(), expected.str());
 	}
 
 	//TEST(XMLWriteTest, GraphTest) {
